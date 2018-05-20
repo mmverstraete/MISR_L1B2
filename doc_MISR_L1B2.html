@@ -1,0 +1,1241 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+    "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+   <head>
+      <meta http-equiv="content-type" content="text/html; charset=utf-8">
+      <title>Documentation for the IDL routines in project MISR_L1B2</title>
+   </head>
+<body>
+<h1>Documentation for the IDL routines in project MISR_L1B2</h1>
+<h2>avail_l1b2</h2>
+<ul>
+<li><p><strong>Purpose:</strong> This program saves information on the availability of <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance files in either Global or Local Mode on the current computer at the time of execution.</p></li>
+<li><p><strong>Algorithm:</strong> This program (1) relies on the function <code>avail_l1b2_data</code> to search for and report on the availability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance files in either Global (GM) or Local Mode (LM) on the computer executing this program, and (2) saves the information in a log file. Input and output files are assumed to be in the standard locations defined by the function <code>set_root_dirs.pro</code>.</p></li>
+<li><p><strong>Syntax:</strong> <code>avail_l1b2_gm, misr_mode, $</code><br />
+<code>DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
+<li><p><strong>Positional parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>misr_mode {STRING} [I]:</code> A 2-character parameter indicating whether to report on the availability of Global (<code>GM</code>) or Local (<code>LM</code>) Mode files.</p></li>
+</ul></li>
+<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
+<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
+</ul></li>
+<li><p><strong>Returned value type:</strong> N/A.</p></li>
+<li><p><strong>Outcome:</strong></p>
+<ul>
+<li><p>If no exception condition has been detected, the keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> was set and if the optional output keyword parameter <code>EXCPT_COND</code> was provided in the call. An output file named <code>avail_L1B2_[hostname]_[creation_date].txt</code> and located in the folder <code>root_dirs[3] + &#8217;/Available/L1B2_&#8217; + misr_mode</code> contains information on the availability of <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> files of the specified <span class="smallcaps">Mode</span> in the folders of <code>root_dirs[1]</code> on the current computer <code>hostname</code> at the time of execution <code>[creation_date]</code>.</p></li>
+<li><p>If an exception condition has been detected, the optional output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered and this program prints out the error message if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. The output file may be inexistent, incomplete or useless.</p></li>
+</ul></li>
+<li><p><strong>Exception conditions:</strong></p>
+<ul>
+<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
+<li><p>Error 110: The input positional parameter <code>misr_mode</code> is invalid.</p></li>
+<li><p>Error 199: Unrecognized computer: Update the function <code>set_root_dirs</code>.</p></li>
+<li><p>Error 400: No directories containing <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> files of the specified <span class="smallcaps">Mode</span> have been found at the expected locations on this computer.</p></li>
+<li><p>Error 410: An exception condition occurred in <code>avail_l1b2_data.pro</code>.</p></li>
+<li><p>Error 500: An exception condition occurred in <code>is_writable.pro</code>.</p></li>
+</ul></li>
+<li><p><strong>Dependencies:</strong></p>
+<ul>
+<li><p><code>avail_l1b2_data.pro</code></p></li>
+<li><p><code>chk_misr_mode.pro</code></p></li>
+<li><p><code>is_writable.pro</code></p></li>
+<li><p><code>set_root_dirs.pro</code></p></li>
+<li><p><code>strstr.pro</code></p></li>
+<li><p><code>today.pro</code></p></li>
+</ul></li>
+<li><p><strong>Remarks:</strong></p>
+<ul>
+<li><p><strong>Note 1:</strong> This function works equally well with <span class="smallcaps">GM</span> and <span class="smallcaps">LM</span> files.</p></li>
+<li><p><strong>Note 2:</strong> This program currently reports on the first and last <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> data files of the specified <span class="smallcaps">Mode</span> found in standard places on this computer. It does not verify the availability of all 9 <span class="smallcaps">L1B2</span> files per <span class="smallcaps">Orbit</span>, or of the associated Geometric Parameters and <span class="smallcaps">L2</span> Land Surface files, which are also required by the <span class="smallcaps">MISR-HR</span> processing system. Nor does it report on the version status of the data files.</p></li>
+<li><p><strong>Note 3:</strong> Assuming (1) that the <span class="smallcaps">L1B2</span> Geometric Parameters Product (GPP) and <span class="smallcaps">L2</span> Land Surface Product (LSP) files are systematically acquired together with the <span class="smallcaps">L1B2</span> GRP files, (2) that the standard Ancillary Geographic Product (AGP) files for those <span class="smallcaps">Paths</span> are available, and (3) that the acquisition of <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GRP files include complete <span class="smallcaps">Orbits</span> (as opposed to subsets of one or a few <span class="smallcaps">Blocks</span>), this program reports on the spatial domain and temporal range for which <span class="smallcaps">MISR-HR</span> products derived from the Global Mode data can be generated on this computer.</p></li>
+</ul></li>
+<li><p><strong>Examples:</strong></p>
+<pre><code>[On MicMac2:]
+
+IDL&gt; avail_l1b2, &#39;GM&#39;, /DEBUG, EXCPT_COND = excpt_cond
+The output file
+avail_L1B2GM_MicMac2_2018-05-04.txt
+has been created in the folder
+~/MISR_HR/Outcomes/Available/L1B2_GM
+IDL&gt; SPAWN, &#39;cat ~/MISR_HR/Outcomes/Available/L1B2_GM/
+   avail_L1B2GM_MicMac2_2018-05-04.txt&#39;
+     File name: &#39;avail_L1B2GM_MicMac2_2018-05-04.txt&#39;
+   Folder name: root_dirs[3] + &#39;Available/L1B2_GM/&#39;
+  Generated by: AVAIL_L1B2
+      Saved on: 2018-05-04
+
+Content: MISR L1B2 GM data availability on computer MicMac2.
+
+                Directory names Sizes # files       From         To
+                --------------- ----- -------       ----         --
+/Volumes/MISR_Data3/P168/L1_GM/  615G    3483 2000-03-24 2017-11-18
+/Volumes/MISR_Data3/P169/L1_GM/  560G    3159 2000-02-28 2015-11-20
+/Volumes/MISR_Data3/P170/L1_GM/  558G    3177 2000-03-06 2015-11-27
+/Volumes/MISR_Data3/P171/L1_GM/  546G    3137 2000-02-26 2015-11-18
+/Volumes/MISR_Data3/P176/L1_GM/  542G    3150 2000-02-29 2015-11-21</code></pre></li>
+<li><p><strong>References:</strong> None.</p></li>
+<li><p><strong>Versioning:</strong></p>
+<ul>
+<li><p>2017&#8211;07&#8211;24: Version 0.8 &#8212; Initial release, under the name <code>avail_l1b2_gm.pro</code>.</p></li>
+<li><p>2017&#8211;12&#8211;18: Version 0.9 &#8212; Update Output format.</p></li>
+<li><p>2018&#8211;01&#8211;30: Version 1.0 &#8212; Initial public release.</p></li>
+<li><p>2018&#8211;04&#8211;08: Version 1.1 &#8212; Update this function to use <code>set_root_dirs.pro</code> instead of <code>set_misr_roots.pro</code>.</p></li>
+<li><p>2018&#8211;05&#8211;03: Version 1.2 &#8212; Merge this function with its twin <code>avail_l1b2_lm.pro</code> and change the name to <code>avail_l1b2.pro</code>.</p></li>
+<li><p>2018&#8211;05&#8211;14: Version 1.3 &#8212; Update this function to use the revised version of <code>is_writable.pro</code> and update the documentation.</p></li>
+<li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
+</ul></li>
+</ul>
+<h2>avail_l1b2_data</h2>
+<ul>
+<li><p><strong>Purpose:</strong> This function reports on the availability of <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> data files in the subdirectories matching the <code>IDL</code> regular expression <code>path_pattern</code>.</p></li>
+<li><p><strong>Algorithm:</strong> This function searches the path(s) matching the pattern <code>path_pattern</code> for <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> files. It stores information on their names, sizes and range of temporal coverage in the output structure <code>misr_l1b2_data</code>.</p></li>
+<li><p><strong>Syntax:</strong> <code>rc = avail_l1b2_data(misr_mode, path_pattern, $</code><br />
+<code>misr_l1b2_data, DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
+<li><p><strong>Positional parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>misr_mode {STRING} [I]:</code> A 2-character parameter indicating whether to report on the availability of Global (<code>GM</code>) or Local (<code>LM</code>) Mode files.</p></li>
+<li><p><code>path_pattern {STRING} [I]:</code> A path pattern presumed to contain <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> data files.</p></li>
+<li><p><code>misr_l1b2_data {STRUCTURE} [O]:</code> A structure containing the names of the subdirectories of <code>path_pattern</code> containing <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> files, the total size of files in those directories, and the range of dates covered by these data.</p></li>
+</ul></li>
+<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
+<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
+</ul></li>
+<li><p><strong>Returned value type:</strong> <code>INTEGER</code>.</p></li>
+<li><p><strong>Outcome:</strong></p>
+<ul>
+<li><p>If no exception condition has been detected, this function returns <code>0</code>, and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> was set and if the optional output keyword parameter <code>EXCPT_COND</code> was provided in the call. The output positional parameter <code>misr_l1b2_data</code> is a structure containing information on the availability of <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> files in the appropriate folders of <code>root_dirs[1]</code> at the time of execution.</p></li>
+<li><p>If an exception condition has been detected, this function returns a non-zero error code, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> was set and if the optional output keyword parameter <code>EXCPT_COND</code> was provided in the call. The output positional parameter <code>misr_l1b2_data</code> may be empty, incomplete or useless.</p></li>
+</ul></li>
+<li><p><strong>Exception conditions:</strong></p>
+<ul>
+<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
+<li><p>Error 110: Input positional parameter <code>misr_mode</code> is invalid.</p></li>
+<li><p>Error 120: Positional parameter <code>path_pattern</code> is not of type <code>STRING</code>.</p></li>
+<li><p>Error 130: Positional parameter <code>path_pattern</code> is not a directory or is not accessible.</p></li>
+<li><p>Error 140: An exception condition occurred in function <code>is_dir</code>.</p></li>
+<li><p>Error 150: An exception condition occurred in function <code>get_dirs_sizes</code>.</p></li>
+<li><p>Error 200: An exception condition occurred in function <code>orbit2date</code> when processing the first available <span class="smallcaps">Orbit</span>.</p></li>
+<li><p>Error 210: An exception condition occurred in function <code>orbit2date</code> when processing the last available <span class="smallcaps">Orbit</span>.</p></li>
+</ul></li>
+<li><p><strong>Dependencies:</strong></p>
+<ul>
+<li><p><code>chk_misr_mode.pro</code></p></li>
+<li><p><code>get_dirs_sizes.pro</code></p></li>
+<li><p><code>is_string.pro</code></p></li>
+<li><p><code>orbit2date.pro</code></p></li>
+<li><p><code>strstr.pro</code></p></li>
+</ul></li>
+<li><p><strong>Remarks:</strong></p>
+<ul>
+<li><p><strong>Note 1:</strong> This function currently reports on the first and last <span class="smallcaps">MISR</span> files of the specified <span class="smallcaps">Mode</span> found in each of the subdirectories matching <code>path_pattern</code>. It does not verify the availability of all 9 <span class="smallcaps">L1B2</span> files per <span class="smallcaps">Orbit</span>, or of the associated <span class="smallcaps">L2</span> Land Surface and the Geometric Parameters files, which are also required by the <span class="smallcaps">MISR-HR</span> processing system.</p></li>
+<li><p><strong>Note 2:</strong> In general, there may not be continuous coverage between the first and last reported dates: <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> <span class="smallcaps">GM</span> files may be occasionally missing for technical reasons, and <span class="smallcaps">L1B2</span> <span class="smallcaps">LM</span> files may only be acquired occasionally on a given site, or on different sites on the same <span class="smallcaps">Orbit</span> at different dates.</p></li>
+<li><p><strong>Note 3:</strong> For generic purposes, and in particular to save this information in a local file, use the program <code>avail_l1b2.pro</code> instead of this function.</p></li>
+</ul></li>
+<li><p><strong>Examples:</strong></p>
+<pre><code>[On MicMac2:]
+
+IDL&gt; root_dirs = set_root_dirs()
+IDL&gt; misr_mode = &#39;GM&#39;
+IDL&gt; dir_patt = root_dirs[1] + &#39;P*/L1_&#39; + misr_mode + &#39;/&#39;
+IDL&gt; rc = avail_l1b2_data(misr_mode, dir_patt, $
+   misr_l1b2_data, /DEBUG, EXCPT_COND = excpt_cond)
+IDL&gt; PRINT, &#39;rc = &#39;, strstr(rc), &#39;, excpt_cond = &gt;&#39; + excpt_cond + &#39;&lt;&#39;
+rc = 0, excpt_cond = &gt;&lt;
+IDL&gt; help, /STRUCTURE, misr_l1b2_data
+** Structure &lt;3898cc08&gt;, 7 tags, length=368, data length=360, refs=1:
+   TITLE           STRING    &#39;MISR L1B2 GM data availability&#39;
+   NUMDIRS         LONG                 5
+   DIRNAMES        STRING    Array[5]
+   DIRSIZES        STRING    Array[5]
+   NUMFILES        LONG      Array[5]
+   INIDATE         STRING    Array[5]
+   FINDATE         STRING    Array[5]
+IDL&gt; PRINT, misr_l1b2_data.DIRNAMES
+/Volumes/MISR_Data3/P168/L1_GM/
+/Volumes/MISR_Data3/P169/L1_GM/
+/Volumes/MISR_Data3/P170/L1_GM/
+/Volumes/MISR_Data3/P171/L1_GM/
+/Volumes/MISR_Data3/P176/L1_GM/
+IDL&gt; PRINT, misr_l1b2_data.DIRSIZES
+615G 560G 558G 546G 542G</code></pre></li>
+<li><p><strong>References:</strong> None.</p></li>
+<li><p><strong>Versioning:</strong></p>
+<ul>
+<li><p>2017&#8211;07&#8211;24: Version 0.9 &#8212; Initial release, under the name <code>avail_l1b2_gm_data</code>.</p></li>
+<li><p>2018&#8211;01&#8211;30: Version 1.0 &#8212; Initial public release.</p></li>
+<li><p>2018&#8211;05&#8211;04: Version 1.1 &#8212; Merge this function with its twin<br />
+<code>avail_l1b2_lm_data.pro</code> and change the name to <code>avail_l1b2.pro</code>.</p></li>
+<li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
+</ul></li>
+</ul>
+<h2>best_fit_l1b2</h2>
+<ul>
+<li><p><strong>Purpose:</strong> This function determines the best linear fit formula to estimate values in the target <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> data channel specified by a <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span>, <span class="smallcaps">Block</span>, <span class="smallcaps">Camera</span> and <span class="smallcaps">Band</span>, and optionally saves a log file and a graphic scatterplot containing that information.</p></li>
+<li><p><strong>Algorithm:</strong> This function computes the linear fits between the specified target data channel and the other 35 <span class="smallcaps">MISR</span> data channels for the same <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span>, and returns the parameters of the optimal linear function required to estimate values in the target data channel as output positional parameters.</p></li>
+<li><p><strong>Syntax:</strong> <code>rc = best_fit_l1b2(misr_mode, misr_path, misr_orbit, $</code><br />
+<code>misr_block, misr_camera, misr_band, best_camera, best_band, $</code><br />
+<code>best_a, best_b, best_chisq, best_prob, AGP_VERSION = agp_version, $</code><br />
+<code>VERBOSE = verbose, SCATTERPLOT = scatterplot, $</code><br />
+<code>DEBUG = debug, EXCPT_COND = excpt_cond</code>)</p></li>
+<li><p><strong>Positional parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>misr_mode {STRING} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span>.</p></li>
+<li><p><code>misr_path {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> number.</p></li>
+<li><p><code>misr_orbit {LONG} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Orbit</span> number.</p></li>
+<li><p><code>misr_block {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Block</span> number.</p></li>
+<li><p><code>misr_camera {STRING} [I]:</code> The target <span class="smallcaps">MISR</span> <span class="smallcaps">Camera</span> name.</p></li>
+<li><p><code>misr_band {STRING} [I]:</code> The target <span class="smallcaps">MISR</span> <span class="smallcaps">Band</span> name.</p></li>
+<li><p><code>best_camera {STRING} [O]:</code> The name of the best <span class="smallcaps">MISR</span> <span class="smallcaps">Camera</span> to estimate the values in the target data channel.</p></li>
+<li><p><code>best_band {STRING} [O]:</code> The name of the best <span class="smallcaps">MISR</span> <span class="smallcaps">Band</span> to estimate the values in the target data channel.</p></li>
+<li><p><code>best_a {FLOAT} [O]:</code> The coefficient <code>a</code> of the best linear fit.</p></li>
+<li><p><code>best_b {FLOAT} [O]:</code> The coefficient <code>b</code> of the best linear fit.</p></li>
+<li><p><code>best_chisq {FLOAT} [O]:</code> The Chi square statistics of the best linear fit.</p></li>
+<li><p><code>best_prob {FLOAT} [O]:</code> The probability that the computed fit would have a value of <code>CHISQ</code> or greater.</p></li>
+</ul></li>
+<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><span class="math inline">&#8728;</span>] <code>AGP_VERSION = agp_version {STRING} [I] (Default value: &#8217;F01_24&#8217;):</code> The AGP version identifier to use.</p></li>
+<li><p><code>VERBOSE = verbose {INT} [I]:</code> Flag to output (<code>1</code>) or skip (<code>0</code>) the details of the computations in a log file.</p></li>
+<li><p><code>SCATTERPLOT = scatterplot {INT} [I] (Default value: 0):</code> Flag to generate (<code>1</code>) or skip (<code>0</code>) a scatterplot of the two best correlated data channels.</p></li>
+<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
+<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
+</ul></li>
+<li><p><strong>Returned value type:</strong> <code>INTEGER</code>.</p></li>
+<li><p><strong>Outcome:</strong></p>
+<ul>
+<li><p>If no exception condition has been detected, this function returns <code>0</code>, and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> was set and if the optional output keyword parameter <code>EXCPT_COND</code> was provided in the call. The output positional parameters and the optional output files contain the results generated by this function.</p></li>
+<li><p>If an exception condition has been detected, this function returns a non-zero error code, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. The output positional parameters and eventual output files may be undefined, inexistent, incomplete or useless.</p></li>
+</ul></li>
+<li><p><strong>Exception conditions:</strong></p>
+<ul>
+<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
+<li><p>Error 110: The input positional parameter <code>misr_mode</code> is invalid.</p></li>
+<li><p>Error 120: The input positional parameter <code>misr_path</code> is invalid.</p></li>
+<li><p>Error 130: The input positional parameter <code>misr_orbit</code> is invalid.</p></li>
+<li><p>Error 140: The input positional parameter <code>misr_block</code> is invalid.</p></li>
+<li><p>Error 150: The input positional parameter <code>misr_camera</code> is invalid.</p></li>
+<li><p>Error 160: The input positional parameter <code>misr_band</code> is invalid.</p></li>
+<li><p>Error 199: Unrecognized computer: Update the function <code>set_root_dirs</code>.</p></li>
+<li><p>Error 200: An exception condition occurred in <code>path2str.pro</code>.</p></li>
+<li><p>Error 210: An exception condition occurred in <code>orbit2str.pro</code>.</p></li>
+<li><p>Error 220: An exception condition occurred in <code>block2str.pro</code>.</p></li>
+<li><p>Error 240: An exception condition occurred in <code>orbit2date.pro</code>.</p></li>
+<li><p>Error 250: An exception condition occurred in <code>make_agp_masks.pro</code>.</p></li>
+<li><p>Error 300: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_SETREGION_BY_PATH_BLOCKRANGE</code>.</p></li>
+<li><p>Error 310: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_READDATA</code> while reading the target data channel.</p></li>
+<li><p>Error 320: An exception condition occurred in <code>fn2pocv_l1b2.pro</code>.</p></li>
+<li><p>Error 330: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_READDATA</code> while reading one of the other data channels.</p></li>
+<li><p>Error 400: An exception condition occurred in <code>get_l1b2_files.pro</code>.</p></li>
+<li><p>Error 500: An exception condition occurred in <code>plt_scatt_gen.pro</code> (ocean).</p></li>
+<li><p>Error 510: An exception condition occurred in <code>plt_scatt_gen.pro</code> (land).</p></li>
+<li><p>Error 520: An exception condition occurred in <code>is_writable.pro</code>.</p></li>
+</ul></li>
+<li><p><strong>Dependencies:</strong></p>
+<ul>
+<li><p><code>MISR Toolkit</code></p></li>
+<li><p><code>block2str.pro</code></p></li>
+<li><p><code>chk_misr_band.pro</code></p></li>
+<li><p><code>chk_misr_block.pro</code></p></li>
+<li><p><code>chk_misr_camera.pro</code></p></li>
+<li><p><code>chk_misr_mode.pro</code></p></li>
+<li><p><code>chk_misr_orbit.pro</code></p></li>
+<li><p><code>chk_misr_path.pro</code></p></li>
+<li><p><code>fn2pocv_l1b2_gm.pro</code></p></li>
+<li><p><code>get_l1b2_files.pro</code></p></li>
+<li><p><code>hr2lr.pro</code></p></li>
+<li><p><code>is_writable.pro</code></p></li>
+<li><p><code>lr2hr.pro</code></p></li>
+<li><p><code>make_agp_masks.pro</code></p></li>
+<li><p><code>orbit2date.pro</code></p></li>
+<li><p><code>orbit2str.pro</code></p></li>
+<li><p><code>path2str.pro</code></p></li>
+<li><p><code>plt_scatt_gen.pro</code></p></li>
+<li><p><code>set_misr_specs.pro</code></p></li>
+<li><p><code>set_root_dirs.pro</code></p></li>
+<li><p><code>strstr.pro</code></p></li>
+<li><p><code>today.pro</code></p></li>
+</ul></li>
+<li><p><strong>Remarks:</strong></p>
+<ul>
+<li><p><strong>Note 1:</strong> This function works equally well for <span class="smallcaps">GM</span> and <span class="smallcaps">LM</span> files.</p></li>
+<li><p><strong>Note 2:</strong> If the input positional parameter <code>misr_mode</code> is <code>GM</code> and if the target is a low-resolution data channel, the 12 high-resolution data channels are downscaled with the function <code>hr2lr.pro</code> before computing the best fit; conversely, if the target is a high-resolution data channel, the 24 low-resolution data channels are upscaled with the function <code>lr2hr.pro</code> before computing the best fit.</p></li>
+</ul></li>
+<li><p><strong>Examples:</strong></p>
+<pre><code>IDL&gt; misr_path = 168
+IDL&gt; misr_orbit = 68050
+IDL&gt; misr_block = 111
+IDL&gt; misr_camera = &#39;AN&#39;
+IDL&gt; misr_band = &#39;Blue&#39;
+IDL&gt; misr_mode = &#39;LM&#39;
+IDL&gt; rc = best_fit_l1b2(misr_path, misr_orbit, misr_block, $
+   misr_camera, misr_band, misr_mode, best_camera, best_band, $
+   best_a, best_b, best_chisq, best_prob, /VERBOSE, $
+   /SCATTERPLOT, /DEBUG, EXCPT_COND = excpt_cond)
+IDL&gt; Done with Camera AA and Band Blue
+     Done with Camera AA and Band Green
+     ...
+     Done with Camera DF and Band NIR
+The scatterplot has been saved in
+   ~/MISR_HR/Outcomes/P168_O068050_B111/L1B2_LM/
+   Bestfit_L1B2 BRF LM P168 O068050 B111 AN Blue.png
+The log file has been saved in
+   ~/MISR_HR/Outcomes/P168_O068050_B111/L1B2_LM/
+   Bestfit_L1B2 BRF LM P168 O068050 B111 AN Blue.txt
+IDL&gt; PRINT, &#39;rc = &#39; + strstr(rc) + , excpt_cond = &gt;&#39; + excpt_cond + &#39;&lt;&#39;
+rc = 0 and excpt_cond = &gt;&lt;</code></pre></li>
+<li><p><strong>References:</strong> None.</p></li>
+<li><p><strong>Versioning:</strong></p>
+<ul>
+<li><p>2018&#8211;05&#8211;11: Version 0.9 &#8212; Initial release.</p></li>
+<li><p>2017&#8211;05&#8211;12: Version 1.0 &#8212; Initial public release.</p></li>
+<li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
+</ul></li>
+</ul>
+<h2>cor_l1b2</h2>
+<ul>
+<li><p><strong>Purpose:</strong> This function saves the results of the computation of the cross-correlation statistics between the 36 data channels of the 9 <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) files, in the specified <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span>, for a single <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span> combination.</p></li>
+<li><p><strong>Algorithm:</strong> This function relies on the <code>IDL</code> function <code>cor_l1b2_block.pro</code> to carry out the computations, and saves the numerical results in an <code>IDL</code> <code>SAVE</code> file as well as in a plain text file. If the input data are from <span class="smallcaps">Global</span> <span class="smallcaps">Mode</span> files, this function also separately computes the correlations between the 12 high spatial resolution BRF fields.</p></li>
+<li><p><strong>Syntax:</strong> <code>rc = cor_l1b2(misr_mode, misr_path, misr_orbit, misr_block, $</code><br />
+<code>DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
+<li><p><strong>Positional parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>misr_path {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> number.</p></li>
+<li><p><code>misr_orbit {LONG} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Orbit</span> number.</p></li>
+<li><p><code>misr_block {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Block</span> number.</p></li>
+</ul></li>
+<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
+<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
+</ul></li>
+<li><p><strong>Returned value type:</strong> <code>INTEGER</code>.</p></li>
+<li><p><strong>Outcome:</strong></p>
+<ul>
+<li><p>If no exception condition has been detected, this function returns <code>0</code>, and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided in the call. By default, this function generates and saves 2 files in the folder<br />
+<code>root_dirs[3] + &#8217;/Pxxx_Oyyyyyy_Bzzz/L1B2_&#8217; + [misr_mode] + &#8217;/&#8217;</code>:</p>
+<ul>
+<li><p>1 plain text file containing the numerical results of the correlation computations, named<br />
+<code>corr_Pxxx_Oyyyyyy_Bzzz_L1B2_[misr_mode]_toabrf_[acquisition-date]_</code><br />
+<code>[MISR-Version]_[creation-date].txt</code>.</p></li>
+<li><p>1 <code>IDL</code> <code>SAVE</code> file containing the numerical results of the correlation computations, named<br />
+<code>corr_Pxxx_Oyyyyyy_Bzzz_L1B2_[misr_mode]_toabrf_[acquisition-date]_</code><br />
+<code>[MISR-Version]_[creation-date].sav</code>.<br />
+</p></li>
+</ul></li>
+<li><p>If an exception condition has been detected, this function returns a non-zero error code, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. The output files may be inexistent, incomplete or useless.</p></li>
+</ul></li>
+<li><p><strong>Exception conditions:</strong></p>
+<ul>
+<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
+<li><p>Error 110: Input argument <code>misr_mode</code> is invalid.</p></li>
+<li><p>Error 120: Input argument <code>misr_path</code> is invalid.</p></li>
+<li><p>Error 130: Input argument <code>misr_orbit</code> is invalid.</p></li>
+<li><p>Error 140: Input argument <code>misr_block</code> is invalid.</p></li>
+<li><p>Error 199: Unrecognized computer: Update the function <code>set_root_dirs</code>.</p></li>
+<li><p>Error 210: An exception condition occurred in function <code>path2str.pro</code>.</p></li>
+<li><p>Error 220: An exception condition occurred in function <code>orbit2str.pro</code>.</p></li>
+<li><p>Error 230: An exception condition occurred in function <code>block2str.pro</code>.</p></li>
+<li><p>Error 300: An exception condition occurred in function <code>cor_l1b2_block.pro</code>.</p></li>
+<li><p>Error 310: An exception condition occurred in function <code>orbit2date.pro</code>.</p></li>
+<li><p>Error 400: An exception condition occurred in function <code>get_l1b2_files.pro</code>.</p></li>
+<li><p>Error 500: An exception condition occurred in function <code>is_writable.pro</code>.</p></li>
+</ul></li>
+<li><p><strong>Dependencies:</strong></p>
+<ul>
+<li><p><code>MISR Toolkit</code></p></li>
+<li><p><code>block2str.pro</code></p></li>
+<li><p><code>get_l1b2_files.pro</code></p></li>
+<li><p><code>chk_misr_block.pro</code></p></li>
+<li><p><code>chk_misr_orbit.pro</code></p></li>
+<li><p><code>chk_misr_path.pro</code></p></li>
+<li><p><code>cor_l1b2_block.pro</code></p></li>
+<li><p><code>force_path_sep.pro</code></p></li>
+<li><p><code>is_writable.pro</code></p></li>
+<li><p><code>orbit2date.pro</code></p></li>
+<li><p><code>orbit2str.pro</code></p></li>
+<li><p><code>path2str.pro</code></p></li>
+<li><p><code>set_root_dirs.pro</code></p></li>
+<li><p><code>strstr.pro</code></p></li>
+<li><p><code>today.pro</code></p></li>
+</ul></li>
+<li><p><strong>Remarks:</strong></p>
+<ul>
+<li><p><strong>Note 1:</strong> *** WARNING ***: Execution of this function can take a significant amount of time (e.g., over an hour on MicMac).</p></li>
+</ul></li>
+<li><p><strong>Examples:</strong></p>
+<pre><code>rc = cor_l1b2(&#39;GM&#39;, 168, 68050, 110, $
+   /DEBUG, EXCPT_COND = excpt_cond)
+
+generates 2 files in the folder
+root_dirs[3] + &#39;/P168_O068050_B110/L1B2_GM/&#39;:
+
+corr_P168_O068050_B110_L1B2_GM_toabrf_2012-10-03_F03_0024_2018-01-26.txt
+corr_P168_O068050_B110_L1B2_GM_toabrf_2012-10-03_F03_0024_2018-01-26.sav</code></pre></li>
+<li><p><strong>References:</strong> None.</p></li>
+<li><p><strong>Versioning:</strong></p>
+<ul>
+<li><p>2017&#8211;03&#8211;15: Version 0.8 &#8212; Initial release under the name <code>cor_l1b2</code>.</p></li>
+<li><p>2017&#8211;07&#8211;21: Version 0.9 &#8212; Use current version of the correlation routines; update documentation; change the function name to <code>cor_l1b2_gm.pro</code>.</p></li>
+<li><p>2018&#8211;01&#8211;30: Version 1.0 &#8212; Initial public release.</p></li>
+<li><p>2018&#8211;03&#8211;04: Version 1.1 &#8212; Update the function to rely on <code>get_l1b2_gm_files.pro</code> instead of <code>chk_l1b2_gm_files.pro</code>.</p></li>
+<li><p>2018&#8211;05&#8211;02: Version 1.2 &#8212; Merge this function with its twin <code>cor_l1b2_lm.pro</code> and change the name to <code>cor_l1b2.pro</code>.</p></li>
+<li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
+</ul></li>
+</ul>
+<h2>cor_l1b2_block</h2>
+<ul>
+<li><p><strong>Purpose:</strong> This function computes the cross-correlation statistics between the 36 data channels contained in the 9 <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) files for the given <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span> combination. item <strong>Algorithm:</strong> This function computes the 630 <span class="math inline">(36&#8197;&#215;&#8197;35/2)</span> cross-correlations between the input data channels at the lowest available spatial resolution (1100 m for <span class="smallcaps">GM</span> and 275 m for <span class="smallcaps">LM</span>) and the results are saved in the output structure <code>stats_lr</code>. If the input arguments are for <span class="smallcaps">GM</span> data, this function (1) relies on the <code>IDL</code> function <code>hr2lr.pro</code> to downsize the 12 high spatial resolution data channels of the specified input files to match the lower spatial resolution of the remaining 24 data channels and (2) also computes the 66 <span class="math inline">(12&#8197;&#215;&#8197;11/2)</span> cross-correlations between the high spatial resolution data channels and those resuts are saved in the output structure <code>stats_hr</code>. If the input arguments are for <span class="smallcaps">LM</span> data, this latter structure is empty. All statistical results are carried out by the <code>IDL</code> function <code>cor_arrays.pro</code>.</p></li>
+<li><p><strong>Syntax:</strong> <code>rc = cor_l1b2_block(l1b2_files, misr_mode, misr_path, $</code><br />
+<code>misr_orbit, misr_block, stats_lr, stats_hr, $</code><br />
+<code>DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
+<li><p><strong>Positional parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>l1b2_files {STRING array} [I]:</code> The file specifications (path and filename) of the 9 <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GRP ToA GM radiance files.</p></li>
+<li><p><code>misr_mode {STRING} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span>.</p></li>
+<li><p><code>misr_path {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> number.</p></li>
+<li><p><code>misr_orbit {LONG} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Orbit</span> number.</p></li>
+<li><p><code>misr_block {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Block</span> number.</p></li>
+<li><p><code>stats_lr {STRUCTURE} [O]:</code> The cross-correlation statistics between all 36 <span class="smallcaps">MISR</span> BRF fields at low spatial resolution.</p></li>
+<li><p><code>stats_hr {STRUCTURE} [O]:</code> The cross-correlation statistics between all 12 <span class="smallcaps">MISR</span> BRF fields at high spatial resolution.</p></li>
+</ul></li>
+<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
+<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
+</ul></li>
+<li><p><strong>Returned value type:</strong> <code>INTEGER</code>.</p></li>
+<li><p><strong>Outcome:</strong></p>
+<ul>
+<li><p>If no exception condition has been detected, this function returns <code>0</code>, and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided in the call. The output positional parameter <code>stats_lr</code> contains the correlation statistics for the 36 data channels at the lowest spatial resolution (1100 m for <span class="smallcaps">GM</span>, 275 m for <span class="smallcaps">LM</span>). For <span class="smallcaps">GM</span> input data, the output positional parameter <code>stats_hr</code> contains the correlation statistics for the 12 data channels available at the higher spatial resolution (275 m). In the case of <span class="smallcaps">LM</span> data, this second output structure is void.</p></li>
+<li><p>If an exception condition has been detected, this function returns a non-zero error code, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. The output positional parameters <code>stats_lr</code> and <code>stats_hr</code> may be empty, incomplete or useless.</p></li>
+</ul></li>
+<li><p><strong>Exception conditions:</strong></p>
+<ul>
+<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
+<li><p>Error 110: Input argument <code>misr_path</code> is invalid.</p></li>
+<li><p>Error 120: Input argument <code>misr_orbit</code> is invalid.</p></li>
+<li><p>Error 130: Input argument <code>misr_block</code> is invalid.</p></li>
+<li><p>Error 210: An exception condition occurred in function <code>path2str.pro</code>.</p></li>
+<li><p>Error 220: An exception condition occurred in function <code>orbit2str.pro</code>.</p></li>
+<li><p>Error 230: An exception condition occurred in function <code>block2str.pro</code>.</p></li>
+<li><p>Error 240: An exception condition occurred in function <code>acquis_date.pro</code>.</p></li>
+<li><p>Error 300: No or more than 1 file(s) found for the first low resolution data channel.</p></li>
+<li><p>Error 310: An exception condition occurred in function <code>MTK_READDATA</code> while reading <code>l1b2_file_1</code> low resolution.</p></li>
+<li><p>Error 320: No or more than 1 file(s) found for the second low resolution data channel.</p></li>
+<li><p>Error 330: An exception condition occurred in function <code>MTK_READDATA</code> while reading <code>l1b2_file_2</code> low resolution.</p></li>
+<li><p>Error 340: An exception condition occurred in function <code>cor_arrays.pro</code> while computing correlations between the low resolution channels.</p></li>
+<li><p>Error 350: No or more than 1 file(s) found for the first high resolution data channel.</p></li>
+<li><p>Error 360: An exception condition occurred in function <code>MTK_READDATA</code> while reading <code>l1b2_file_1</code> high resolution.</p></li>
+<li><p>Error 370: No or more than 1 file(s) found for the second high resolution data channel.</p></li>
+<li><p>Error 380: An exception condition occurred in function <code>MTK_READDATA</code> while reading <code>l1b2_file_2</code> high resolution.</p></li>
+<li><p>Error 390: An exception condition occurred in function <code>cor_arrays.pro</code> while computing correlations between the high resolution channels.</p></li>
+</ul></li>
+<li><p><strong>Dependencies:</strong></p>
+<ul>
+<li><p><code>MISR Toolkit</code></p></li>
+<li><p><code>chk_misr_block.pro</code></p></li>
+<li><p><code>chk_misr_mode.pro</code></p></li>
+<li><p><code>chk_misr_orbit.pro</code></p></li>
+<li><p><code>chk_misr_path.pro</code></p></li>
+<li><p><code>cor_arrays.pro</code></p></li>
+<li><p><code>hr2lr.pro</code></p></li>
+<li><p><code>set_misr_specs.pro</code></p></li>
+<li><p><code>round_dec.pro</code></p></li>
+<li><p><code>strstr.pro</code></p></li>
+</ul></li>
+<li><p><strong>Remarks:</strong></p>
+<ul>
+<li><p><strong>Note 1:</strong> *** WARNING ***: Execution of this function can take a significant amount of time (e.g., over an hour on MicMac).</p></li>
+</ul></li>
+<li><p><strong>Examples:</strong></p>
+<pre><code>rc = cor_l1b2_block(l1b2_files, &#39;GM&#39;, 168, 68050, 110, stats_lr, $
+   stats_hr, /DEBUG, EXCPT_COND = excpt_cond)
+
+returns the statistical results in ouput arguments stats_lr and
+stats_hr, in the folder root_dirs[3] + &#39;P168_O068050_B110/L1B2_GM/&#39;.</code></pre></li>
+<li><p><strong>References:</strong> None.</p></li>
+<li><p><strong>Versioning:</strong></p>
+<ul>
+<li><p>2017&#8211;02&#8211;28: Version 0.8 &#8212; Initial release under the name <code>cor_l1b2_block</code>.</p></li>
+<li><p>2017&#8211;07&#8211;21: Version 0.9 &#8212; Removed code to write a log file (transferred to program <code>cor_l1b2.pro</code>, now called <code>cor_l1b2_gm.pro</code>); add <code>misr_path</code>, <code>misr_orbit</code>, <code>misr_block</code> and the <span class="smallcaps">MISR</span> data acquisition date to the output structures; update the documentation.</p></li>
+<li><p>2018&#8211;01&#8211;30: Version 1.0 &#8212; Initial public release.</p></li>
+<li><p>2018&#8211;04&#8211;08: Version 1.1 &#8212; Update this function to use <code>set_root_dirs.pro</code> instead of <code>set_misr_roots.pro</code>.</p></li>
+<li><p>2018&#8211;04&#8211;23: Version 1.2 &#8212; Improve the debugging tests.</p></li>
+<li><p>2018&#8211;05&#8211;02: Version 1.3 &#8212; Merge this function with its twin <code>cor_l1b2_lm_block.pro</code> and change the name to <code>cor_l1b2_block.pro</code>.</p></li>
+<li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
+</ul></li>
+</ul>
+<h2>fn2mpocv_l1b2</h2>
+<ul>
+<li><p><strong>Purpose:</strong> This function extracts informatio on the <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span>, <span class="smallcaps">Camera</span> and version number from the specified <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance filename.</p></li>
+<li><p><strong>Algorithm:</strong> This function relies on <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> functions to extract the desired information from the <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance filename.</p></li>
+<li><p><strong>Syntax:</strong> <code>rc = fn2mpocv_l1b2(l1b2_file, misr_mode, misr_path, misr_orbit, $</code><br />
+<code>misr_camera, misr_version, DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
+<li><p><strong>Positional parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>l1b2_file {STRING} [I]:</code> The name of a <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GRP ToA radiance file.</p></li>
+<li><p><code>misr_mode {STRING} [O]:</code> The <span class="smallcaps">Mode</span> of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> input file.</p></li>
+<li><p><code>misr_path {INTEGER} [O]:</code> The <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> number of the <span class="smallcaps">L1B2</span> input file.</p></li>
+<li><p><code>misr_orbit {LONG} [O]:</code> The <span class="smallcaps">MISR</span> <span class="smallcaps">Orbit</span> number of the <span class="smallcaps">L1B2</span> input file.</p></li>
+<li><p><code>misr_camera {STRING} [O]:</code> The <span class="smallcaps">MISR</span> <span class="smallcaps">Camera</span> name of the <span class="smallcaps">L1B2</span> input file.</p></li>
+<li><p><code>misr_version STRING [O]:</code> The version number of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> input file.</p></li>
+</ul></li>
+<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
+<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
+</ul></li>
+<li><p><strong>Returned value type:</strong> <code>INTEGER</code>.</p></li>
+<li><p><strong>Outcome:</strong></p>
+<ul>
+<li><p>If no exception condition has been detected, this function returns <code>0</code>, and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> was set and if the optional output keyword parameter <code>EXCPT_COND</code> was provided in the call. The output arguments <code>misr_mode</code>, <code>misr_path</code>, <code>misr_orbit</code>,<br />
+<code>misr_camera</code> and <code>misr_version</code> contain the desired information.</p></li>
+<li><p>If an exception condition has been detected, this function returns a non-zero error code, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. The output arguments <code>misr_mode</code>, <code>misr_path</code>, <code>misr_orbit</code>, <code>misr_camera</code> and <code>misr_version</code> may be undefined, incomplete or useless.</p></li>
+</ul></li>
+<li><p><strong>Exception conditions:</strong></p>
+<ul>
+<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
+<li><p>Error 110: Input positional parameter <code>l1b2_file</code> is not of type <code>STRING</code>.</p></li>
+<li><p>Error 120: Input positional parameter <code>l1b2_file</code> is unreadable or not found.</p></li>
+<li><p>Error 200: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_FILE_TYPE</code>.</p></li>
+<li><p>Error 210: The input positional parameter <code>l1b2_file</code> is neither of type <code>GRP_TERRAIN_GM</code> nor of type <code>GRP_TERRAIN_LM</code>.</p></li>
+<li><p>Error 220: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_FILE_TO_PATH</code>.</p></li>
+<li><p>Error 230: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_FILE_TO_ORBIT</code>.</p></li>
+<li><p>Error 240: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_FILEATTR_GET</code>.</p></li>
+<li><p>Error 250: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_FILE_VERSION</code>.</p></li>
+<li><p>Error 200: An exception condition occurred in <code>routine.pro</code>.</p></li>
+</ul></li>
+<li><p><strong>Dependencies:</strong></p>
+<ul>
+<li><p><code>MISR Toolkit</code></p></li>
+<li><p><code>is_readable.pro</code></p></li>
+<li><p><code>is_string.pro</code></p></li>
+<li><p><code>set_misr_specs.pro</code></p></li>
+<li><p><code>strstr.pro</code></p></li>
+</ul></li>
+<li><p><strong>Remarks:</strong></p>
+<ul>
+<li><p><strong>Note 1:</strong> This function works equally well with <span class="smallcaps">GM</span> and <span class="smallcaps">LM</span> files.</p></li>
+<li><p><strong>Note 2:</strong> This function performs the reverse operation of <code>mpovc2fn.pro</code>.</p></li>
+</ul></li>
+<li><p><strong>Examples:</strong></p>
+<pre><code>IDL&gt; l1b2_spec = &#39;/Volumes/MISR_Data3/P168/L1_GM/
+   MISR_AM1_GRP_TERRAIN_GM_P168_O068050_AA_F03_0024.hdf&#39;
+IDL&gt; rc = fn2mpocv_l1b2(l1b2_spec, misr_mode, misr_path, $
+   misr_orbit, misr_camera, misr_version, $
+   /DEBUG, EXCPT_COND = excpt_cond)
+IDL&gt; PRINT, &#39;rc = &#39; + strstr(rc) + &#39;, excpt_cond = &gt;&#39; + excpt_cond + &#39;&lt;&#39;
+rc = 0, excpt_cond = &gt;&lt;
+IDL&gt; PRINT, &#39;misr_mode = &#39;, misr_mode
+misr_mode = GM
+IDL&gt; PRINT, &#39;misr_path = &#39;, strstr(misr_path)
+misr_path = 168
+IDL&gt; PRINT, &#39;misr_orbit = &#39;, strstr(misr_orbit)
+misr_orbit = 68050
+IDL&gt; PRINT, &#39;misr_camera = &#39;, misr_camera
+misr_camera =  AA
+IDL&gt; PRINT, &#39;misr_version = &#39;, misr_version
+misr_version = F03_0024</code></pre></li>
+<li><p><strong>References:</strong> None.</p></li>
+<li><p><strong>Versioning:</strong></p>
+<ul>
+<li><p>2017&#8211;09&#8211;03: Version 0.9 &#8212; Initial release under the name <code>fn2pocv_l1b2_gm.pro</code>.</p></li>
+<li><p>2018&#8211;01&#8211;30: Version 1.0 &#8212; Initial public release.</p></li>
+<li><p>2018&#8211;05&#8211;07: Version 1.1 &#8212; Add the <code>misr_mode</code> output positional parameter, merge this function with its twin <code>fn2pocv_l1b2_lm.pro</code> and change the name to<br />
+<code>fn2mpocv_l1b2.pro</code>.</p></li>
+<li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
+</ul></li>
+</ul>
+<h2>get_bad_l1b2</h2>
+<ul>
+<li><p><strong>Purpose:</strong> This function identifies, counts and locates the pixels flagged as bad or unusable for any purpose in each of the 9 <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> files specified by the given <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span>, and for each of the 4 spectral bands.</p></li>
+<li><p><strong>Algorithm:</strong> This function reads the scaled radiance measurements from each of the 36 <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> data channels for a given <code>misr_mode</code>, <code>misr_path</code>, <code>misr_orbit</code> and <code>misr_block</code> and searches for data values <code>16380</code>. If any are found, the number and locations of those pixels in the <span class="smallcaps">Block</span> are reported in the output structure <code>bad_struct</code>.</p></li>
+<li><p><strong>Syntax:</strong> <code>rc = get_bad_l1b2(misr_mode, misr_path, misr_orbit, misr_block, $</code><br />
+<code>bad_struct, DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
+<li><p><strong>Positional parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>misr_mode {STRING} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span>.</p></li>
+<li><p><code>misr_path {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> number.</p></li>
+<li><p><code>misr_orbit {LONG} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Orbit</span> number.</p></li>
+<li><p><code>misr_block {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Block</span> number.</p></li>
+<li><p><code>bad_struct {STRUCTURE} [O]:</code> The structure containing the information on the bad pixels contained in the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> files.</p></li>
+</ul></li>
+<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>VERBOSE = verbose {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) printing progress information on the console.</p></li>
+<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
+<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
+</ul></li>
+<li><p><strong>Returned value type:</strong> <code>INTEGER</code>.</p></li>
+<li><p><strong>Outcome:</strong></p>
+<ul>
+<li><p>If no exception condition has been detected, this function returns [<code>0</code>, or default returned value], and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> was set and if the optional output keyword parameter <code>EXCPT_COND</code> was provided in the call. The output positional parameter contains the results generated by this function.</p></li>
+<li><p>If an exception condition has been detected, this function returns [a non-zero error code, or some non-sandard returned value], and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. The output positional parameter may be undefined, inexistent, incomplete or useless.</p></li>
+</ul></li>
+<li><p><strong>Exception conditions:</strong></p>
+<ul>
+<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
+<li><p>Error 110: The input positional parameter <code>misr_mode</code> is invalid.</p></li>
+<li><p>Error 120: The input positional parameter <code>misr_path</code> is invalid.</p></li>
+<li><p>Error 130: The input positional parameter <code>misr_orbit</code> is invalid.</p></li>
+<li><p>Error 140: The input positional parameter <code>misr_block</code> is invalid.</p></li>
+<li><p>Error 110: Input positional parameter xxx is not of type yyy.</p></li>
+<li><p>Error 200: An exception condition occurred in <code>mpocv2fn_l1b2.pro</code>.</p></li>
+<li><p>Error 210: An exception condition occurred in <code>is_readable.pro</code>.</p></li>
+<li><p>Error 220: An exception condition occurred in the IDL routine <code>EOS_GD_OPEN</code>.</p></li>
+<li><p>Error 230: An exception condition occurred in the IDL routine <code>EOS_GD_ATTACH</code>.</p></li>
+<li><p>Error 240: An exception condition occurred in the IDL routine <code>EOS_GD_READFIELD</code>.</p></li>
+<li><p>Error 250: An exception condition occurred in the IDL routine <code>EOS_GD_DETACH</code>.</p></li>
+<li><p>Error 260: An exception condition occurred in the IDL routine <code>EOS_GD_CLOSE</code>.</p></li>
+</ul></li>
+<li><p><strong>Dependencies:</strong></p>
+<ul>
+<li><p><code>chk_misr_block.pro</code></p></li>
+<li><p><code>chk_misr_mode.pro</code></p></li>
+<li><p><code>is_readable.pro</code></p></li>
+<li><p><code>mpocv2fn_l1b2.pro</code></p></li>
+<li><p><code>chk_misr_orbit.pro</code></p></li>
+<li><p><code>chk_misr_path.pro</code></p></li>
+<li><p><code>set_misr_specs.pro</code></p></li>
+<li><p><code>strstr.pro</code></p></li>
+</ul></li>
+<li><p><strong>Remarks:</strong></p>
+<ul>
+<li><p><strong>Note 1:</strong> This function works equally well for <span class="smallcaps">GM</span> and <span class="smallcaps">LM</span> files.</p></li>
+</ul></li>
+<li><p><strong>Examples:</strong></p>
+<pre><code>[Insert the command and its outcome]</code></pre></li>
+<li><p><strong>References:</strong> None.</p></li>
+<li><p><strong>Versioning:</strong></p>
+<ul>
+<li><p>2018&#8211;05&#8211;09: Version 0.9 &#8212; Initial release.</p></li>
+<li><p>2018&#8211;05&#8211;10: Version 1.0 &#8212; Initial public release.</p></li>
+<li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
+</ul></li>
+</ul>
+<h2>get_l1b2_files</h2>
+<ul>
+<li><p><strong>Purpose:</strong> This function provides the file specifications (path + names) of the 9 <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance files corresponding to the given <code>misr_mode</code>, <code>misr_path</code> and <code>misr_orbit</code>, if they are available in the expected folder (defined by the function <code>set_root_dirs</code>) on the current computer.</p></li>
+<li><p><strong>Algorithm:</strong> This function reports on the existence of the 9 <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance files for the specified <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span> (GM or LM), <span class="smallcaps">Path</span> and <span class="smallcaps">Orbit</span> in the folder <code>root_dirs[1] + &#8217;/Pxxx/L1_&#8217; + misr_mode + &#8217;/&#8217;</code>, where <code>root_dirs</code> is determined by a call to<br />
+<code>set_root_dirs()</code> and <code>xxx</code> is the <code>misr_path</code> number.</p></li>
+<li><p><strong>Syntax:</strong> <code>rc = get_l1b2_files(misr_mode, misr_path, misr_orbit, $</code><br />
+<code>l1b2_files, DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
+<li><p><strong>Positional parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>misr_mode {STRING} [I]:</code> A 2-character parameter indicating whether to identify Global (<code>GM</code>) or Local (<code>LM</code>) Mode files.</p></li>
+<li><p><code>misr_path {INT} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> number.</p></li>
+<li><p><code>misr_orbit {LONG} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Orbit</span> number.</p></li>
+<li><p><code>l1b2_files {STRING array} [O]:</code> The file specifications (path and filenames) of the 9 <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GRP ToA radiance files of the specified <code>misr_mode</code>, expected to be found in <code>root_dirs[1] + &#8217;/Pxxx/L1_&#8217; + misr_mode + &#8217;/&#8217;</code>, where <code>xxx</code> is the <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> number.</p></li>
+</ul></li>
+<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
+<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
+</ul></li>
+<li><p><strong>Returned value type:</strong> <code>INTEGER</code>.</p></li>
+<li><p><strong>Outcome:</strong></p>
+<ul>
+<li><p>If no exception condition has been detected, this function returns <code>0</code>, and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> was set and if the optional output keyword parameter <code>EXCPT_COND</code> was provided in the call. The output positional parameter <code>l1b2_files</code> contains the specifications of the 9 <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GRP ToA radiance files for the specified <span class="smallcaps">Mode</span>.</p></li>
+<li><p>If an exception condition has been detected, this function returns a non-zero error code, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> was set and if the optional output keyword parameter <code>EXCPT_COND</code> was provided. The output positional parameter <code>l1b2_files</code> is either a null string array or an array of file specifications that contains strictly fewer or strictly more than 9 items, or some of these files may be unreadable.</p></li>
+</ul></li>
+<li><p><strong>Exception conditions:</strong></p>
+<ul>
+<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
+<li><p>Error 110: Input argument <code>misr_mode</code> is invalid.</p></li>
+<li><p>Error 120: Input argument <code>misr_path</code> is invalid.</p></li>
+<li><p>Error 130: Input argument <code>misr_orbit</code> is invalid.</p></li>
+<li><p>Error 199: Unrecognized computer: Update the function <code>set_root_dirs</code>.</p></li>
+<li><p>Error 200: An exception condition occurred in function <code>path2str</code>.</p></li>
+<li><p>Error 210: An exception condition occurred in function <code>orbit2str</code>.</p></li>
+<li><p>Error 300: No <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GRP ToA radiance files have been found in the expected location <code>root_dirs[1] + &#8217;/Pxxx/L1_&#8217; + misr_mode + &#8217;/&#8217;</code>.</p></li>
+<li><p>Error 310: Less than 9 <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GRP ToA radiance files have been found in the expected location <code>root_dirs[1] + &#8217;/Pxxx/L1_&#8217; + misr_mode + &#8217;/&#8217;</code>.</p></li>
+<li><p>Error 320: More than 9 <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GRP ToA radiance files have been found in the expected location <code>root_dirs[1] + &#8217;/Pxxx/L1_&#8217; + misr_mode + &#8217;/&#8217;</code>.</p></li>
+<li><p>Error 400: At least one of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GRP ToA radiance files found is not readable.</p></li>
+</ul></li>
+<li><p><strong>Dependencies:</strong></p>
+<ul>
+<li><p><code>chk_misr_mode.pro</code></p></li>
+<li><p><code>chk_misr_orbit.pro</code></p></li>
+<li><p><code>chk_misr_path.pro</code></p></li>
+<li><p><code>is_readable.pro</code></p></li>
+<li><p><code>orbit2str.pro</code></p></li>
+<li><p><code>path2str.pro</code></p></li>
+<li><p><code>set_root_dirs.pro</code></p></li>
+<li><p><code>strstr.pro</code></p></li>
+</ul></li>
+<li><p><strong>Remarks:</strong></p>
+<ul>
+<li><p><strong>Note 1:</strong> This function assumes that the folder <code>root_dirs[1] + &#8217;/Pxxx/L1_&#8217; + misr_mode + &#8217;/&#8217;</code> contains full <span class="smallcaps">Orbit</span>s, i.e., that files contain data for all <span class="smallcaps">Block</span>s. If this directory also contains subsetted files, i.e., files containing data for only 1 or a few <span class="smallcaps">Block</span>s, it is possible that more than 9 files may be present, but this situation should be alleviated by removing the subsetted files when the full <span class="smallcaps">Orbit</span>s are available.</p></li>
+<li><p><strong>Note 2:</strong> All 9 <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GRP ToA radiance files for the given <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span> and <span class="smallcaps">Orbit</span> are expected to reside in the same folder.</p></li>
+</ul></li>
+<li><p><strong>Examples:</strong></p>
+<pre><code>IDL&gt; misr_mode = &#39;GM&#39;
+IDL&gt; misr_path = 168
+IDL&gt; misr_orbit = 68050
+IDL&gt; rc = get_l1b2_files(misr_mode, misr_path, misr_orbit, $
+   l1b2_files, /DEBUG, EXCPT_COND = excpt_cond)
+IDL&gt; PRINT, &#39;rc = &#39; + strstr(rc) + &#39; and excpt_cond = &gt;&#39; + $
+   excpt_cond + &#39;&lt;&#39;
+rc = 0 and excpt_cond = &gt;&lt;
+IDL&gt; PRINT, FILE_DIRNAME(l1b2_files[0], /MARK_DIRECTORY)
+/Volumes/MISR_Data3/P168/L1_GM/
+IDL&gt; PRINT, FILE_BASENAME(l1b2_files)
+MISR_AM1_GRP_TERRAIN_GM_P168_O068050_AA_F03_0024.hdf MISR_AM1_GRP_TERRAIN_GM_P168_O068050_AF_F03_0024.hdf
+MISR_AM1_GRP_TERRAIN_GM_P168_O068050_AN_F03_0024.hdf MISR_AM1_GRP_TERRAIN_GM_P168_O068050_BA_F03_0024.hdf
+MISR_AM1_GRP_TERRAIN_GM_P168_O068050_BF_F03_0024.hdf MISR_AM1_GRP_TERRAIN_GM_P168_O068050_CA_F03_0024.hdf
+MISR_AM1_GRP_TERRAIN_GM_P168_O068050_CF_F03_0024.hdf MISR_AM1_GRP_TERRAIN_GM_P168_O068050_DA_F03_0024.hdf
+MISR_AM1_GRP_TERRAIN_GM_P168_O068050_DF_F03_0024.hdf</code></pre></li>
+<li><p><strong>References:</strong> None.</p></li>
+<li><p><strong>Versioning:</strong></p>
+<ul>
+<li><p>2017&#8211;07&#8211;16: Version 0.8 &#8212; Initial release under the name <code>chk_l1b2_files</code>.</p></li>
+<li><p>2017&#8211;10&#8211;10: Version 0.9 &#8212; Changed the function name to <code>chk_l1b2_gm_files.pro</code>.</p></li>
+<li><p>2018&#8211;01&#8211;30: Version 1.0 &#8212; Initial public release.</p></li>
+<li><p>2018&#8211;03&#8211;04: Version 1.1 &#8212; Changed the function name to <code>get_l1b2_gm_files.pro</code>.</p></li>
+<li><p>2018&#8211;04&#8211;08: Version 1.2 &#8212; Update this function to use <code>set_root_dirs.pro</code> instead of <code>set_misr_roots.pro</code>.</p></li>
+<li><p>2018&#8211;05&#8211;04: Version 1.3 &#8212; Merge this function with its twin <code>get_l1b2_lm_files.pro</code> and change the name to <code>get_l1b2_files.pro</code>.</p></li>
+<li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
+</ul></li>
+</ul>
+<h2>hr2lr</h2>
+<ul>
+<li><p><strong>Purpose:</strong> This function downsizes a data field at high spatial resolution (<span class="math inline">2048&#8197;&#215;&#8197;512</span>) from a <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Global Mode (GM) Radiance file to a lower spatial resolution array (<span class="math inline">512&#8197;&#215;&#8197;128</span>).</p></li>
+<li><p><strong>Algorithm:</strong> This function simulates the averaging taking place on-board the Terra platform for the 24 non-red data channels of the off-nadir cameras by computing the value of each pixel in the low-resolution data set as the mean of valid (non-zero) values within a subarray of <span class="math inline">4&#8197;&#215;&#8197;4</span> pixels in the high-resolution array, keeping the same variable type as the input positional parameter <code>inarray</code>. Input values are converted to type <code>FLOAT</code> to perform the averaging, and the results are converted back to the original type (with appropriate rounding, if necessary) in the output array.</p></li>
+<li><p><strong>Syntax:</strong> <code>outarray = hr2lr(inarray, DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
+<li><p><strong>Positional parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>inarray {Numeric} [I]:</code> An array of <span class="math inline">2048&#8197;&#215;&#8197;512</span> elements, presumably retrieved from one of the high spatial resolution grids of an <span class="smallcaps">L1B2</span> GRP ToA GM radiance file.</p></li>
+</ul></li>
+<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
+<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
+</ul></li>
+<li><p><strong>Returned value type:</strong> Numeric array, of the same type as <code>inarray</code>.</p></li>
+<li><p><strong>Outcome:</strong></p>
+<ul>
+<li><p>If no exception condition has been detected, this function returns a numeric array of the same type as <code>inarray</code> and dimensioned <span class="math inline">512&#8197;&#215;&#8197;128</span> elements, where each element is the average of the valid (non-zero) values within the corresponding subarray of 16 (<span class="math inline">4&#8197;&#215;&#8197;4</span>) elements in <code>inarray</code>. The output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> was set and if the optional output keyword parameter <code>EXCPT_COND</code> was provided in the call.</p></li>
+<li><p>If an exception condition has been detected, this function returns an <code>INTEGER</code> array dimensioned <span class="math inline">512&#8197;&#215;&#8197;128</span> elements, where each element is set to <code>-1</code>, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided.</p></li>
+</ul></li>
+<li><p><strong>Exception conditions:</strong></p>
+<ul>
+<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
+<li><p>Error 110: Positional parameter <code>inarray</code> is not of a numeric type.</p></li>
+<li><p>Error 120: Positional parameter <code>inarray</code> is not properly dimensioned: must be <span class="math inline">2048&#8197;&#215;&#8197;512</span>.</p></li>
+</ul></li>
+<li><p><strong>Dependencies:</strong></p>
+<ul>
+<li><p><code>is_numeric.pro</code></p></li>
+<li><p><code>strstr.pro</code></p></li>
+</ul></li>
+<li><p><strong>Remarks:</strong></p>
+<ul>
+<li><p><strong>Note 1:</strong> Since this function averages 16 original values to estimate 1 low resolution value, it changes the information content of the original file. Contrast this with the function lr2hr.pro.</p></li>
+</ul></li>
+<li><p><strong>Examples:</strong></p>
+<pre><code>IDL&gt; inarray = FLTARR(2048, 512)
+IDL&gt; outarray = hr2lr(inarray, /DEBUG, EXCPT_COND = excpt_cond)
+IDL&gt; HELP, outarray
+OUTARRAY        FLOAT     = Array[512, 128]</code></pre></li>
+<li><p><strong>References:</strong> None.</p></li>
+<li><p><strong>Versioning:</strong></p>
+<ul>
+<li><p>2012&#8211;11&#8211;22: Version 0.5 &#8212; Initial release by Linda Hunt (as <code>downsize_fullres</code>).</p></li>
+<li><p>2017&#8211;07&#8211;17: Version 0.9 &#8212; Changed the function name to <code>hr2lr</code>, removed arguments <code>factor</code> (fixed, in this context) and <code>maxgood</code> (not used), added code to handle cases when <code>WHERE</code> returns <code>-1</code>), added tests and in-line documentation.</p></li>
+<li><p>2018&#8211;01&#8211;30: Version 1.0 &#8212; Initial public release.</p></li>
+<li><p>2018&#8211;05&#8211;13: Version 1.1 &#8212; In-line documentation update.</p></li>
+<li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
+</ul></li>
+</ul>
+<h2>lr2hr</h2>
+<ul>
+<li><p><strong>Purpose:</strong> This function upsizes a low spatial resolution (<span class="math inline">512&#8197;&#215;&#8197;128</span>) data field from a <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Global Mode (GM) Radiance file to a full (native) spatial resolution (<span class="math inline">2048&#8197;&#215;&#8197;512</span>), i.e., upgrades the dimensions of the input argument to match those of a <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> array in the red spectral band.</p></li>
+<li><p><strong>Algorithm:</strong> This function duplicates 16 times the value of each pixel in the low-resolution data set to generate a pseudo high-resolution array.</p></li>
+<li><p><strong>Syntax:</strong> <code>outarray = lr2hr(inarray, DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
+<li><p><strong>Positional parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>inarray {Numeric} [I]:</code> An array of <span class="math inline">512&#8197;&#215;&#8197;128</span> elements, presumably retrieved from one of the low spatial resolution grids of an <span class="smallcaps">L1B2</span> GRP ToA GM radiance file.</p></li>
+</ul></li>
+<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
+<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
+</ul></li>
+<li><p><strong>Returned value type:</strong> Numeric array.</p></li>
+<li><p><strong>Outcome:</strong></p>
+<ul>
+<li><p>If no exception condition has been detected, this function returns a numeric array of the same type as <code>inarray</code> and dimensioned <span class="math inline">2048&#8197;&#215;&#8197;512</span> elements, where each element of <code>inarray</code> is duplicated 16 (<span class="math inline">4&#8197;&#215;&#8197;4</span>) times in <code>outarray</code>. The output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> was set and if the optional output keyword parameter <code>EXCPT_COND</code> was provided in the call.</p></li>
+<li><p>If an exception condition has been detected, this function returns an <code>INTEGER</code> array dimensioned <span class="math inline">2048&#8197;&#215;&#8197;512</span> elements, where each element is set to <code>-1</code>, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided.</p></li>
+</ul></li>
+<li><p><strong>Exception conditions:</strong></p>
+<ul>
+<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
+<li><p>Error 110: Positional parameter <code>inarray</code> is not of a numeric type.</p></li>
+<li><p>Error 120: Positional parameter <code>inarray</code> is not properly dimensi</p></li>
+</ul></li>
+<li><p><strong>Dependencies:</strong></p>
+<ul>
+<li><p><code>is_numeric.pro</code></p></li>
+<li><p><code>strstr.pro</code></p></li>
+</ul></li>
+<li><p><strong>Remarks:</strong></p>
+<ul>
+<li><p><strong>Note 1:</strong> Since this function only duplicates the original values (16 times), it does not change the information content of the original file. Contrast this with the function hr2lr.pro.</p></li>
+<li><p><strong>Note 2:</strong> The generation of <span class="smallcaps">MISR-HR</span> <span class="smallcaps">L1B3</span> product does <strong>NOT</strong> rely on this function, which is used exclusively for mapping all <span class="smallcaps">MISR-HR</span> <span class="smallcaps">L1B2</span> fields at the same apparent spatial resolution in all cameras and spectral channels.</p></li>
+</ul></li>
+<li><p><strong>Examples:</strong></p>
+<pre><code>IDL&gt; inarray = FLTARR(512, 128)
+IDL&gt; outarray = lr2hr(inarray, /DEBUG, EXCPT_COND = excpt_cond)
+IDL&gt; HELP, outarray
+OUTARRAY        FLOAT     = Array[2048, 512]</code></pre></li>
+<li><p><strong>References:</strong> None.</p></li>
+<li><p><strong>Versioning:</strong></p>
+<ul>
+<li><p>2012&#8211;11&#8211;22: Version 0.5 &#8212; Initial release by Linda Hunt (as <code>upsize_array</code>).</p></li>
+<li><p>2017&#8211;07&#8211;17: Version 0.9 &#8212; Changed the function name to <code>lr2hr</code>, removed arguments <code>factor</code> (fixed, in this context) and <code>maxgood</code> (not used), added tests and in-line documentation.</p></li>
+<li><p>2018&#8211;01&#8211;30: Version 1.0 &#8212; Initial public release.</p></li>
+<li><p>2018&#8211;05&#8211;13: Version 1.1 &#8212; In-line documentation update.</p></li>
+<li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
+</ul></li>
+</ul>
+<h2>map_l1b2_block</h2>
+<ul>
+<li><p><strong>Purpose:</strong> This function generates and saves <code>RGB</code> composite and, optionally, black and white maps of <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance files of the specified <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span> for each of the 9 cameras and for a full <span class="smallcaps">Block</span> of a given <span class="smallcaps">Path</span> and <span class="smallcaps">Orbit</span>. If the <code>PER_BAND</code> keyword is set, each of the 4 spectral bands is mapped in black and white at the high (275 m) spatial resolution, where low spatial resolution fields are upsized by duplication as required. This program also creates a log file to ensure the repeatability and traceability of these outcomes.</p></li>
+<li><p><strong>Algorithm:</strong> This function maps the specified <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance files of the specified <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span> using the following options:</p>
+<ul>
+<li><p>Minimum and maximum scalings can be provided to stretch the images and highlight (or hide) features as needed. Different scaling settings can be provided to treat visible and NIR channels differently; default values are in place if these keywords are not set (0.0 to 0.35 and 0.0 to 0.50, respectively).</p></li>
+<li><p>To ease subsequent comparisons with MISR-HR L1B3 products, all <span class="smallcaps">Global Mode</span> maps are generated as if data were available at the full native spatial resolution (275 m) of MISR, which can be achieved in two ways:</p>
+<ul>
+<li><p>If the <code>RGB_LOW</code> keyword is set, the high-resolution channel (typically the red band for each off-nadir camera) is spatially averaged to 1.1 km (similar to the on-board compression of non-red channels), and all 3 visible channels are upsized to full spatial resolution by duplication before generating the map.</p></li>
+<li><p>If the <code>RGB_HIGH</code> keyword is set, the low-resolution channels (typically the non-red band for each off-nadir camera) are first upsized by duplication to match the 275 m resolution of the red channel before generating the map.</p></li>
+</ul></li>
+<li><p>If the <code>PER_BAND</code> keyword is set, it applies to all cameras and forces the generation of a Black and White map for each spectral band individually.</p></li>
+</ul></li>
+<li><p><strong>Syntax:</strong> <code>rc = map_l1b2_block(misr_mode, misr_path, misr_orbit, misr_block, $</code><br />
+<code>SCL_RGB_MIN = scl_rgb_min, SCL_RGB_MAX = scl_rgb_max, $</code><br />
+<code>SCL_NIR_MIN = scl_nir_min, SCL_NIR_MAX = scl_nir_max, $</code><br />
+<code>RGB_LOW = rgb_low, RGB_HIGH = rgb_high, PER_BAND = per_band, $</code><br />
+<code>DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
+<li><p><strong>Positional parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>misr_path {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> number.</p></li>
+<li><p><code>misr_orbit {LONG} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Orbit</span> number.</p></li>
+<li><p><code>misr_block {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Block</span> number.</p></li>
+</ul></li>
+<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>SCL_RGB_MIN = scl_rgb_min {FLOAT} [I] (Default value: 0.0):</code><br />
+The smallest unscaled <span class="smallcaps">L1B2</span> GRP ToA radiance to be mapped in the visible (<code>RGB</code>) spectral channels.</p>
+<ul>
+<li><p>If set to <code>-1</code>, the minimum scaling for each of the 3 <code>RGB</code> channels will be set to the minimum non-zero value found in those channels (actual stretching).</p></li>
+<li><p>If set to <code>0</code> (or not set), the minimum scaling for each of the 3 <code>RGB</code> channels will be set to <code>0.0</code>.</p></li>
+<li><p>If set to a positive value, the minimum scaling for each of the 3 <code>RGB</code> channels will be set to the indicated value.</p></li>
+</ul></li>
+<li><p><code>SCL_RGB_MAX = scl_rgb_max {FLOAT} [I] (Default value: 0.35):</code><br />
+The largest unscaled <span class="smallcaps">L1B2</span> GRP ToA radiance to be mapped in the visible (<span class="smallcaps">RGB</span>) spectral channels.</p>
+<ul>
+<li><p>If set to <code>-1</code>, the maximum scaling for each of the 3 <code>RGB</code> channels will be set to the maximum non-zero value found in those channels (actual stretching).</p></li>
+<li><p>If set to <code>0</code> (or not set), the maximum scaling for each of the 3 <code>RGB</code> channels will be set to <code>0.35</code>.</p></li>
+<li><p>If set to a positive value, the maximum scaling for each of the 3 <code>RGB</code> channels will be set to the indicated value.</p></li>
+</ul></li>
+<li><p><code>SCL_NIR_MIN = scl_nir_min {FLOAT} [I] (Default value: 0.0):</code><br />
+The smallest unscaled <span class="smallcaps">L1B2</span> GRP ToA radiance to be mapped in the <span class="smallcaps">NIR</span> spectral channel.</p>
+<ul>
+<li><p>If set to <code>-1</code>, the minimum scaling for the <span class="smallcaps">NIR</span> channel will be set to the minimum non-zero value found in that channel.</p></li>
+<li><p>If set to <code>0</code> (or not set), the minimum scaling for the <span class="smallcaps">NIR</span> channel will be set to <code>0.0</code>.</p></li>
+<li><p>If set to a positive value, the minimum scaling for the <span class="smallcaps">NIR</span> channel will be set to the indicated value.</p></li>
+</ul></li>
+<li><p><code>SCL_NIR_MAX = scl_nir_max {FLOAT} [I] (Default value: 0.50):</code><br />
+The largest unscaled <span class="smallcaps">L1B2</span> GRP ToA radiance to be mapped in the <span class="smallcaps">NIR</span> spectral channel.</p>
+<ul>
+<li><p>If set to <code>-1</code>, the maximum scaling for the <span class="smallcaps">NIR</span> channel will be set to the maximum non-zero value found in that channel.</p></li>
+<li><p>If set to <code>0</code> (or not set), the maximum scaling for the <span class="smallcaps">NIR</span> channel will be set to <code>0.5</code>.</p></li>
+<li><p>If set to a positive value, the maximum scaling for the <span class="smallcaps">NIR</span> channel will be set to the indicated value.</p></li>
+</ul></li>
+<li><p><code>RGB_LOW = rgb_low {INTEGER} [I] (Default value: 1):</code> If set (for off-nadir pointing cameras only), this keyword requests that the <span class="smallcaps">Red</span> spectral channel be averaged first to 1.1 km and that the resulting <code>RGB</code> map be upsized to 275 m by replicating pixel values.</p></li>
+<li><p><code>RGB_HIGH = rgb_high {INTEGER} [I]:</code> If set (for off-nadir pointing cameras only), this keyword requests that the non-<span class="smallcaps">Red</span> spectral channels be upsized first to 275 m by replicating pixel values before generating the <code>RGB</code> map.</p></li>
+<li><p><code>PER_BAND = per_band {INTEGER} [I]:</code> If set (for all cameras), this keyword requests that data from each of the available spectral bands be mapped separately in black and white. All maps are generated at the full spatial resolution, where the fields available only at the low resolution are upsized by duplication.</p></li>
+<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
+<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
+</ul></li>
+<li><p><strong>Returned value type:</strong> <code>INTEGER</code>.</p></li>
+<li><p><strong>Outcome:</strong></p>
+<ul>
+<li><p>If no exception condition has been detected, this function returns <code>0</code>, and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> was set and if the optional output keyword parameter <code>EXCPT_COND</code> was provided in the call. This function generates and saves 72 files in the folder<br />
+<code>root_dirs[3] + &#8217;/Pxxx_Oyyyyyy_Bzzz/L1B2_&#8217; + [misr_mode] + &#8217;/&#8217;</code>:</p>
+<ul>
+<li><p>1 plain text log file describing the inputs and outputs to this function, named<br />
+<code>map-log_Pxxx_Oyyyyyy_Bzzz_L1B2_[misr_mode]_toabrf_[acquis_date]_</code><br />
+<code>[MISR-Version]_[creation_date].txt</code>.</p></li>
+<li><p>1 <code>PNG</code> file containing the RGB composite map for the <span class="smallcaps">AN</span> camera (high-res channels only), named<br />
+<code>map_Pxxx_Oyyyyyy_Bzzz_L1B2_[misr_mode]_AN_toabrf-rgb-275_[acquis_date]_</code><br />
+<code>[MISR-Version]_[creation_date].png</code>.</p></li>
+<li><p>4 <code>PNG</code> files containing the B&amp;W maps of the individual spectral bands of the <span class="smallcaps">AN</span> camera (high-res channels only), named<br />
+<code>map_Pxxx_Oyyyyyy_Bzzz_L1B2_[misr_mode]_AN_toabrf-[band_name]-275_</code><br />
+<code>[acquis_date]_[MISR-Version]_[creation_date].png</code>.</p></li>
+<li><p>8 <code>PNG</code> files containing the RGB composite maps for each of the 8 off-nadir cameras, where the red channel is downsized to 1100 m before all pixels are duplicated to 275 m, named<br />
+<code>map_Pxxx_Oyyyyyy_Bzzz_L1B2_[misr_mode]_[camera_name]_toabrf-rgb-mixed-low_</code><br />
+<code>[acquis_date]_[MISR-Version]_[creation_date].png</code>.</p></li>
+<li><p>8 <code>PNG</code> files containing the RGB composite maps for each of the 8 off-nadir cameras, where the blue and green channels are upsized to 275 m to generate the map, named<br />
+<code>map_Pxxx_Oyyyyyy_Bzzz_L1B2_[misr_mode]_[camera_name]_toabrf-rgb-mixed-high_</code><br />
+<code>[acquis_date]_[MISR-Version]_[creation_date].png</code>.</p></li>
+<li><p>8 <code>PNG</code> files containing the B&amp;W maps for each high-resolution <span class="smallcaps">L1B2</span> data channel of the off-nadir cameras in the red spectral band, named<br />
+<code>map_Pxxx_Oyyyyyy_Bzzz_L1B2_[misr_mode]_[camera_name]_toabrf-Red-275_</code><br />
+<code>[acquis_date]_[MISR-Version]_[creation_date].png</code>.</p></li>
+<li><p>24 <code>PNG</code> files containing the B&amp;W maps for each low-resolution <span class="smallcaps">L1B2</span> data channel of the off-nadir cameras in the blue, green and NIR spectral bands, named<br />
+<code>map_Pxxx_Oyyyyyy_Bzzz_L1B2_[misr_mode]_[camera_name]_toabrf-[band_name]</code><br />
+<code>-1100_[acquis_date]_[MISR-Version]_[creation_date].png</code>.</p></li>
+<li><p>9 <code>PNG</code> files containing the colorbars associated with the individual data channels in the visible spectral bands (blue, green, red) in each camera, named<br />
+<code>map-colbar_Pxxx_Oyyyyyy_Bzzz_L1B2_[misr_mode]_[camera_name]_toabrf-VIS_</code><br />
+<code>[acquis_date]_[MISR-Version]_[creation_date].png</code>.</p></li>
+<li><p>9 <code>PNG</code> files containing the colorbars associated with the individual data channels in the NIR spectral band in each camera, named<br />
+<code>map-colbar_Pxxx_Oyyyyyy_Bzzz_L1B2_[misr_mode]_[camera_name]_toabrf-NIR_</code><br />
+<code>[acquis_date]_[MISR-Version]_[creation_date].png</code>.</p></li>
+</ul></li>
+<li><p>If an exception condition has been detected, this function returns a non-zero error code, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. The maps and colorbars are not generated.</p></li>
+</ul></li>
+<li><p><strong>Exception conditions:</strong></p>
+<ul>
+<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
+<li><p>Error 110: Input argument <code>misr_path</code> is invalid.</p></li>
+<li><p>Error 120: Input argument <code>misr_orbit</code> is invalid.</p></li>
+<li><p>Error 130: Input argument <code>misr_block</code> is invalid.</p></li>
+<li><p>Error 210: An exception condition occurred in function <code>path2str.pro</code>.</p></li>
+<li><p>Error 220: An exception condition occurred in function <code>orbit2str.pro</code>.</p></li>
+<li><p>Error 230: An exception condition occurred in function <code>block2str.pro</code>.</p></li>
+<li><p>Error 240: An exception condition occurred in function <code>orbit2date.pro</code>.</p></li>
+<li><p>Error 250: An exception condition occurred in function <code>get_l1b2_files</code>: Either too few or too many <span class="smallcaps">L1B2</span> GRP ToA radiance files of the specified <span class="smallcaps">Mode</span> were found (9 are expected).</p></li>
+<li><p>Error 260: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_SETREGION_BY_PATH_BLOCKRANGE</code>.</p></li>
+<li><p>Error 270: An exception condition occurred in function <code>is_writable.pro</code>.</p></li>
+<li><p>Error 280: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_FILE_VERSION</code>.</p></li>
+<li><p>Error 310: An exception condition occurred in function <code>hr2lr.pro</code> when downsizing the red data channel.</p></li>
+<li><p>Error 320: An exception condition occurred in function <code>lr2hr.pro</code> when upscaling the red data channel.</p></li>
+<li><p>Error 330: An exception condition occurred in function <code>lr2hr.pro</code> when upscaling the green data channel.</p></li>
+<li><p>Error 340: An exception condition occurred in function <code>lr2hr.pro</code> when upscaling the blue data channel.</p></li>
+</ul></li>
+<li><p><strong>Dependencies:</strong></p>
+<ul>
+<li><p><code>MISR Toolkit</code></p></li>
+<li><p><code>block2str.pro</code></p></li>
+<li><p><code>get_l1b2_files.pro</code></p></li>
+<li><p><code>chk_misr_block.pro</code></p></li>
+<li><p><code>chk_misr_orbit.pro</code></p></li>
+<li><p><code>chk_misr_path.pro</code></p></li>
+<li><p><code>hr2lr.pro</code></p></li>
+<li><p><code>is_dir.pro</code></p></li>
+<li><p><code>is_writable.pro</code></p></li>
+<li><p><code>lr2hr.pro</code></p></li>
+<li><p><code>orbit2date.pro</code></p></li>
+<li><p><code>orbit2str.pro</code></p></li>
+<li><p><code>path2str.pro</code></p></li>
+<li><p><code>strstr.pro</code></p></li>
+<li><p><code>today.pro</code></p></li>
+</ul></li>
+<li><p><strong>Remarks:</strong></p>
+<ul>
+<li><p><strong>Note 1:</strong> *** WARNING ***: This routine assigns fixed names to the various maps generated for a given combination of <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span>. If it must be executed multiple times with different options, rename or move the results in a different location to avoid overwriting the maps with newer results.</p></li>
+<li><p><strong>Note 2:</strong> This routine currently does not check whether the input file actually contains data for the specified Block.</p></li>
+<li><p><strong>Note 3:</strong> The input <span class="smallcaps">L1B2</span> GRP ToA radiance files will be expected in the directory <code>root_dirs[1] + &#8217;/Pxxx/L1_[misr_mode]&#8217;</code> where root_dirs[1] is defined by the function <code>set_root_dirs.pro</code> and must exist before this routine is executed.</p></li>
+<li><p><strong>Note 4:</strong> The maps and log file will be saved in the output directory <code>root_dirs[3] + &#8217;/Pxxx_Oyyyyyy_Bzzz/L1B2_[misr_mode]</code> where <code>root_dirs[3]</code> is defined by the function <code>set_root_dirs.pro</code>; if this directory does not exist it is created.</p></li>
+<li><p><strong>Note 5:</strong> The same <code>scl_rgb_min</code> and <code>scl_rgb_max</code> values are used for all 3 <code>RGB</code> spectral channels, whether maps are generated in color or in black and white; separate values <code>scl_nir_min</code> and <code>scl_nir_max</code> are provided to map the <span class="smallcaps">NIR</span> spectral channel. If one or more of these keywords is set to <span class="math inline">&#8197;&#8722;&#8197;1</span>, the image stretchings can vary between cameras.</p></li>
+<li><p><strong>Note 6:</strong> All maps created by this routine are generated at the full spatial resolution <span class="math inline">(2048&#8197;&#215;&#8197;512)</span> pixels; low resolution pixels are duplicated as needed.</p></li>
+<li><p><strong>Note 7:</strong> The optional keywords <code>RGB_LOW</code>, <code>RGB_HIGH</code>, and <code>PER_BAND</code> are non exclusive. If none of these keywords is set, then <code>RGB_LOW</code> is presumed to be requested.</p></li>
+</ul></li>
+<li><p><strong>Examples:</strong></p>
+<pre><code>IDL&gt; rc = map_l1b2_block(168, 68050, 110, $
+   /RGB_LOW, /RGB_HIGH, /PER_BAND, $
+   /DEBUG, EXCPT_COND = excpt_cond)</code></pre></li>
+<li><p><strong>References:</strong> None.</p></li>
+<li><p><strong>Versioning:</strong></p>
+<ul>
+<li><p>2012&#8211;11&#8211;23: Version 0.5 &#8212; Initial release by Linda Hunt (as <code>l1b2_maps.pro</code>).</p></li>
+<li><p>2017&#8211;03&#8211;15: Version 0.8 &#8212; Provide similar but enhanced functionality (option to specify different scaling factors for the visible (<code>RGB</code>) and <span class="smallcaps">NIR</span> spectral channels, all 4 <span class="smallcaps">MISR</span> spectral bands are mapped with the <code>/PER_BAND</code> option), include extended diagnostics, feature expanded in-line documentation, and generate a log file as well as colorbar legends for the <code>B&amp;W</code> maps in the designated output directory.</p></li>
+<li><p>2017&#8211;07&#8211;19: Version 0.9 &#8212; Routine implemented as a function (rather than a program), allow scaling keywords to take <code>-1</code> values for optimal stretching, adds the <code>EXCPT_COND</code> keyword, and update the documentation.</p></li>
+<li><p>2018&#8211;01&#8211;30: Version 1.0 &#8212; Initial public release.</p></li>
+<li><p>2018&#8211;03&#8211;04: Version 1.1 &#8212; Update the function to rely on <code>get_l1b2_gm_files.pro</code> instead of <code>chk_l1b2_gm_files.pro</code>.</p></li>
+<li><p>2018&#8211;04&#8211;08: Version 1.2 &#8212; Update this function to use <code>set_root_dirs.pro</code> instead of <code>set_misr_roots.pro</code>.</p></li>
+<li><p>2018&#8211;05&#8211;02: Version 1.3 &#8212; Merge this function with its twin <code>map_l1b2_lm.pro</code> and change the name to <code>map_l1b2_block.pro</code>.</p></li>
+<li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
+</ul></li>
+</ul>
+<h2>map_l1b2_miss</h2>
+<ul>
+<li><p><strong>Purpose:</strong> This function generates and saves a map of the missing values for each of the 36 <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance files corresponding to a given <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span>.</p></li>
+<li><p><strong>Algorithm:</strong> This function scans the 36 Radiance/RDQI fields contained in the 9 <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere Radiance files for the selected <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span>, and maps the various missing values.</p></li>
+<li><p><strong>Syntax:</strong> <code>rc = map_l1b2_miss, misr_mode, misr_path, misr_orbit, misr_block, $</code><br />
+<code>DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
+<li><p><strong>Positional parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>misr_mode {STRING} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span>.</p></li>
+<li><p><code>misr_path {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> number.</p></li>
+<li><p><code>misr_orbit {LONG} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Orbit</span> number.</p></li>
+<li><p><code>misr_block {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Block</span> number.</p></li>
+</ul></li>
+<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
+<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
+</ul></li>
+<li><p><strong>Returned value type:</strong> <code>INTEGER</code>.</p></li>
+<li><p><strong>Outcome:</strong></p>
+<ul>
+<li><p>If no exception condition has been detected, this function returns <code>0</code>, and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> was set and if the optional output keyword parameter <code>EXCPT_COND</code> was provided in the call. This function generates and saves 37 files in the folder<br />
+<code>root_dirs[3] + &#8217;/Pxxx_Oyyyyyy_Bzzz/L1B2_&#8217; + misr_mode + &#8217;/&#8217;</code>:</p>
+<ul>
+<li><p>1 plain text log file describing the inputs and outputs to this function, named<br />
+<code>map-log_Pxxx_Oyyyyyy_Bzzz_L1B2&#8217; + misr_mode + &#8217;MISS_[camera_name]_[acquis_date]_</code><br />
+<code>[MISR-Version]_[creation-date].txt</code>.</p></li>
+<li><p>36 <code>PNG</code> files containing the maps of the missing values in each of the spectral channels and for each camera, named<br />
+<code>map_Pxxx_Oyyyyyy_Bzzz_L1B2&#8217; + misr_mode + &#8217;MISS_[camera_name]_[acquis_date]_</code><br />
+<code>[MISR-Version]_[creation-date].png</code>.</p></li>
+</ul>
+<p>The color convention is:</p>
+<ul>
+<li><p><strong>Yellow:</strong> Pixels obscured by topography.</p></li>
+<li><p><strong>Blue:</strong> Pixels in the ocean.</p></li>
+<li><p><strong>Dark gray:</strong> Pixels on the edge of the swath.</p></li>
+<li><p><strong>Red:</strong> Pixels containing bad data.</p></li>
+<li><p><strong>Black:</strong> Pixels with nominal data.</p></li>
+</ul></li>
+<li><p>If an exception condition has been detected, this function returns a non-zero error code, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. The requested maps and the associated colorbars are not saved.</p></li>
+</ul></li>
+<li><p><strong>Exception conditions:</strong></p>
+<ul>
+<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
+<li><p>Error 110: Input argument <code>misr_mode</code> is invalid.</p></li>
+<li><p>Error 120: Input argument <code>misr_path</code> is invalid.</p></li>
+<li><p>Error 130: Input argument <code>misr_orbit</code> is invalid.</p></li>
+<li><p>Error 140: Input argument <code>misr_block</code> is invalid.</p></li>
+<li><p>Error 199: Unrecognized computer: Update the function <code>set_root_dirs</code>.</p></li>
+<li><p>Error 210: An exception condition occurred in function <code>path2str.pro</code>.</p></li>
+<li><p>Error 220: An exception condition occurred in function <code>orbit2str.pro</code>.</p></li>
+<li><p>Error 230: An exception condition occurred in function <code>block2str.pro</code>.</p></li>
+<li><p>Error 240: An exception condition occurred in function <code>orbit2date.pro</code>.</p></li>
+<li><p>Error 310: An exception condition occurred in function <code>get_l1b2_files</code>: Either too few or too many <span class="smallcaps">L1B2</span> GRP ToA GM radiance files were found (9 are expected).</p></li>
+<li><p>Error 320: An exception condition occurred in function <code>MTK_FILE_VERSION</code>: Unable to retrieve the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> processing version code from the file name.</p></li>
+<li><p>Error 330: An exception condition occurred in function <code>lr2hr</code> when upscaling the non-red channels of the off-nadir cameras.</p></li>
+<li><p>Error 500: An exception condition occurred in function <code>is_writable.pro</code>.</p></li>
+</ul></li>
+<li><p><strong>Dependencies:</strong></p>
+<ul>
+<li><p><code>MISR Toolkit</code></p></li>
+<li><p><code>block2str.pro</code></p></li>
+<li><p><code>get_l1b2_gm_files.pro</code></p></li>
+<li><p><code>chk_misr_block.pro</code></p></li>
+<li><p><code>chk_misr_mode.pro</code></p></li>
+<li><p><code>chk_misr_orbit.pro</code></p></li>
+<li><p><code>chk_misr_path.pro</code></p></li>
+<li><p><code>is_dir.pro</code></p></li>
+<li><p><code>is_readable.pro</code></p></li>
+<li><p><code>is_writable.pro</code></p></li>
+<li><p><code>lr2hr.pro</code></p></li>
+<li><p><code>orbit2date.pro</code></p></li>
+<li><p><code>orbit2str.pro</code></p></li>
+<li><p><code>path2str.pro</code></p></li>
+<li><p><code>set_root_dirs.pro</code></p></li>
+<li><p><code>strstr.pro</code></p></li>
+<li><p><code>today.pro</code></p></li>
+</ul></li>
+<li><p><strong>Remarks:</strong></p>
+<ul>
+<li><p><strong>Note 1:</strong> This function works equally well with <span class="smallcaps">GM</span> and <span class="smallcaps">LM</span> files.</p></li>
+</ul></li>
+<li><p><strong>Examples:</strong></p>
+<pre><code>[Insert the command and its outcome]</code></pre></li>
+<li><p><strong>References:</strong> None.</p></li>
+<li><p><strong>Versioning:</strong></p>
+<ul>
+<li><p>2016&#8211;04&#8211;26: Version 0.7 &#8212; Initial release under the name <code>map_l1b2_fill</code>.</p></li>
+<li><p>2017&#8211;07&#8211;20: Version 0.8 &#8212; Changed the function name to <code>map_l1b2_gm_fill.pro</code>, upsized low resolution maps and updated documentation.</p></li>
+<li><p>2018&#8211;01&#8211;27: Version 0.9 &#8212; Changed the function name to <code>map_l1b2_gm_miss.pro</code>, and updated documentation.</p></li>
+<li><p>2018&#8211;01&#8211;30: Version 1.0 &#8212; Initial public release.</p></li>
+<li><p>2018&#8211;03&#8211;04: Version 1.1 &#8212; Update the function to rely on <code>get_l1b2_gm_files.pro</code> instead of <code>chk_l1b2_gm_files.pro</code>.</p></li>
+<li><p>2018&#8211;04&#8211;08: Version 1.2 &#8212; Update this function to use <code>set_root_dirs.pro</code> instead of <code>set_misr_roots.pro</code>.</p></li>
+<li><p>2018&#8211;05&#8211;07: Version 1.3 &#8212; Merge this function with its twin <code>map_l1b2_lm_miss.pro</code> and change the name to <code>map_l1b2_miss.pro</code>.</p></li>
+<li><p>2018&#8211;05&#8211;14: Version 1.4 &#8212; Update this function to use the revised version of <code>is_writable.pro</code>.</p></li>
+<li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
+</ul></li>
+</ul>
+<h2>mpocv2fn_l1b2</h2>
+<ul>
+<li><p><strong>Purpose:</strong> This function generates the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance file specification (path and name) corresponding to the input arguments <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span> and <span class="smallcaps">Orbit</span> numbers, the <span class="smallcaps">Camera</span> name and the version number.</p></li>
+<li><p><strong>Algorithm:</strong> This function relies on the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> function <code>MTK_MAKE_FILENAME</code> to generate the desired <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance output filename, and prepends the appropriate directory address on the current computer.</p></li>
+<li><p><strong>Syntax:</strong> <code>rc = mpocv2fn_l1b2(misr_mode, misr_path, misr_orbit, $</code><br />
+<code>misr_camera, misr_version, l1b2_fspec, DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
+<li><p><strong>Positional parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>misr_mode {STRING} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span>.</p></li>
+<li><p><code>misr_path {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> number.</p></li>
+<li><p><code>misr_orbit {LONG} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Orbit</span> number.</p></li>
+<li><p><code>misr_camera {STRING} [I]:</code> The selected <span class="smallcaps">MISR</span> &#160;name.</p></li>
+<li><p><code>misr_version STRING [I]:</code> The <span class="smallcaps">MISR</span> file version number.</p></li>
+<li><p><code>l1b2_fspec {STRING} [O]:</code> The name of the corresponding <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GRP ToA radiance file.</p></li>
+</ul></li>
+<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
+<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
+</ul></li>
+<li><p><strong>Returned value type:</strong> <code>INTEGER</code>.</p></li>
+<li><p><strong>Outcome:</strong></p>
+<ul>
+<li><p>If no exception condition has been detected, this function returns <code>0</code>, and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> was set and if the optional output keyword parameter <code>EXCPT_COND</code> was provided in the call. The output argument <code>l1b2_fspec</code> contains the name of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GRP ToA radiance file.</p></li>
+<li><p>If an exception condition has been detected, this function returns a non-zero error code, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. The output argument <code>l1b2_fspec</code> may be undefined, incomplete or useless.</p></li>
+</ul></li>
+<li><p><strong>Exception conditions:</strong></p>
+<ul>
+<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
+<li><p>Error 110: Input argument <code>misr_mode</code> is invalid.</p></li>
+<li><p>Error 120: Input argument <code>misr_path</code> is invalid.</p></li>
+<li><p>Error 130: Input argument <code>misr_orbit</code> is invalid.</p></li>
+<li><p>Error 140: Input argument <code>misr_camera</code> is invalid.</p></li>
+<li><p>Error 199: Unrecognized computer: Update the function <code>set_root_dirs</code>.</p></li>
+<li><p>Error 210: An exception condition occurred in <code>path2str.pro</code>.</p></li>
+<li><p>Error 310: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_MAKE_FILENAME</code>.</p></li>
+</ul></li>
+<li><p><strong>Dependencies:</strong></p>
+<ul>
+<li><p><code>MISR Toolkit</code></p></li>
+<li><p><code>chk_misr_camera.pro</code></p></li>
+<li><p><code>chk_misr_mode.pro</code></p></li>
+<li><p><code>chk_misr_orbit.pro</code></p></li>
+<li><p><code>chk_misr_path.pro</code></p></li>
+<li><p><code>path2str.pro</code></p></li>
+<li><p><code>set_root_dirs.pro</code></p></li>
+<li><p><code>strstr.pro</code></p></li>
+</ul></li>
+<li><p><strong>Remarks:</strong></p>
+<ul>
+<li><p><strong>Note 1:</strong> This function works equally well with <span class="smallcaps">GM</span> and <span class="smallcaps">LM</span> files.</p></li>
+<li><p><strong>Note 2:</strong> This function performs the reverse operation of <code>fn2pocv_l1b2.pro</code>.</p></li>
+<li><p><strong>Note 3:</strong> This function does not check whether the resulting fialename corresponds to an existing or readable file on the current computer.</p></li>
+</ul></li>
+<li><p><strong>Examples:</strong></p>
+<pre><code>IDL&gt; misr_mode = &#39;LM&#39;
+IDL&gt; misr_path = 168
+IDL&gt; misr_orbit = 68050
+IDL&gt; misr_camera = &#39;CF&#39;
+IDL&gt; misr_version = &#39;F03_0024&#39;
+IDL&gt; rc = mpocv2fn_l1b2(misr_mode, misr_path, $
+   misr_orbit, misr_camera, misr_version, l1b2_fspec, $
+   /DEBUG, EXCPT_COND = excpt_cond)
+IDL&gt; PRINT, &#39;rc = &#39; + strstr(rc) + $
+   &#39; and excpt_cond = &gt;&#39; + excpt_cond + &#39;&lt;&#39;
+rc = 0 and excpt_cond = &gt;&lt;
+IDL&gt; PRINT, &#39;l1b2_fspec = &#39; + l1b2_fspec
+l1b2_fspec = /Volumes/MISR_Data3/P168/L1_LM/
+   MISR_AM1_GRP_TERRAIN_LM_P168_O068050_CF_F03_0024.hdf</code></pre></li>
+<li><p><strong>References:</strong> None.</p></li>
+<li><p><strong>Versioning:</strong></p>
+<ul>
+<li><p>2017&#8211;09&#8211;03: Version 0.9 &#8212; Initial release under the name <code>pocv2fn_l1b2_gm.pro</code></p></li>
+<li><p>2018&#8211;01&#8211;30: Version 1.0 &#8212; Initial public release.</p></li>
+<li><p>2018&#8211;04&#8211;08: Version 1.1 &#8212; Update this function to use <code>set_root_dirs.pro</code> instead of <code>set_misr_roots.pro</code>, and add a test to verify the existence of the specified file at the expected location.</p></li>
+<li><p>2018&#8211;05&#8211;07: Version 1.2 &#8212; Add the <code>misr_mode</code> input positional parameter, merge this function with its twin <code>pocv2fn_l1b2_lm.pro</code> and change the name to <code>pocv2fn_l1b2.pro</code>.</p></li>
+<li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
+</ul></li>
+</ul>
+<h2>plt_scatt_gen</h2>
+<ul>
+<li><p><strong>Purpose:</strong> This function plots the scatter diagram of a pair of MISR L1B2 channels (against each other), optionally with information about their statistical relation. The input positional parameter <code>array_1</code> refers to the independent variable (<span class="math inline"><em>X</em></span> axis), while the input positional parameter <code>array_2</code> designates the dependent variable (<span class="math inline"><em>Y</em></span> axis).</p></li>
+<li><p><strong>Algorithm:</strong> This function relies on the <code>IDL</code> functions <code>SCATTERPLOT</code> and <code>PLOT</code> to generate the required exhibit; the optional statistical information is provided through input keyword parameters.</p></li>
+<li><p><strong>Syntax:</strong> <code>rc = plt_scatt_gen(array_1, array_1_title, array_2, array_2_title, $</code><br />
+<code>pob_str, misr_mode, NPTS = npts, RMSD = rmsd, CORRCOEFF = corrcoeff, $</code><br />
+<code>LIN_COEFF_A = lin_coeff_a, LIN_COEFF_B = lin_coeff_b, CHISQR = chisqr, $</code><br />
+<code>PROB = prob, PREFIX = prefix, VERBOSE = verbose, DEBUG = debug, $</code><br />
+<code>EXCPT_COND = excpt_cond)</code></p></li>
+<li><p><strong>Positional parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>array_1 {FLOAT} [I]:</code> The values of the source <code>(x)</code> <span class="smallcaps">MISR</span> data channel.</p></li>
+<li><p><code>array_1_title {STRING} [I]:</code> The label of the <code>(x)</code> axis.</p></li>
+<li><p><code>array_2 {FLOAT} [I]:</code> The values of the target <code>(y)</code> <span class="smallcaps">MISR</span> data channel.</p></li>
+<li><p><code>array_2_title {STRING} [I]:</code> The label of the <code>(y)</code> axis.</p></li>
+<li><p><code>title {STRING} [I]:</code> The title of the scatterplot figure.</p></li>
+<li><p><code>pob_str {STRING} [I]:</code> A string formatted as <code>Pxxx_Oyyyyyy_Bzzz</code> indicating the <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span> concerned.</p></li>
+<li><p><code>misr_mode {STRING} [I]:</code> The <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span> (either <code>GM</code> or <code>LM</code>).</p></li>
+</ul></li>
+<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>NPTS = npts {LONG} [I] (Default value: None):</code> The number of data points used to compute the statistics.</p></li>
+<li><p><code>RMSD = rmsd {FLOAT} [I] (Default value: None):</code> The Root Mean Square Difference between the two data channels.</p></li>
+<li><p><code>CORRCOEFF = corrcoeff {FLOAT} [I] (Default value: None):</code> The Pearson correlation coefficient between the two data channels.</p></li>
+<li><p><code>LIN_COEFF_A = lin_coeff_a {FLOAT} [I] (Default value: None):</code> The intercept coefficient of the linear fit equation between <code>array_1</code> and <code>array_2</code>.</p></li>
+<li><p><code>LIN_COEFF_B = lin_coeff_b {FLOAT} [I] (Default value: None):</code> The slope coefficient of the linear fit equation between <code>array_1</code> and <code>array_2</code>.</p></li>
+<li><p><code>CHISQR = chisqr {FLOAT} [I] (Default value: None):</code> The value of the Chi square statistics associated with the linear fit equation.</p></li>
+<li><p><code>PROB = prob {FLOAT} [I] (Default value: None):</code> The probability that the computed fit would have a value of <code>CHISQR</code> or greater.</p></li>
+<li><p><code>PREFIX = prefix {INT} [I] (Default value: &#8217;Scatt_&#8217;):</code> Prefix to the name of the log and scatterplot output files.</p></li>
+<li><p><code>VERBOSE = verbose {INT} [I] (Default value: None):</code> Flag to save (<code>1</code>) or skip (<code>0</code>) the log file.</p></li>
+<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
+<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
+</ul></li>
+<li><p><strong>Returned value type:</strong> <code>INTEGER</code>.</p></li>
+<li><p><strong>Outcome:</strong></p>
+<ul>
+<li><p>If no exception condition has been detected, this function returns <code>0</code>, and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> was set and if the optional output keyword parameter <code>EXCPT_COND</code> was provided in the call. The scatterplot and optionally the log file are saved in the expected folder.</p></li>
+<li><p>If an exception condition has been detected, this function returns a non-zero error code, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. The scatterplot and the log file may not exist.</p></li>
+</ul></li>
+<li><p><strong>Exception conditions:</strong></p>
+<ul>
+<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
+<li><p>Error 110: The input positional parameter <code>array_1</code> is not a numeric array.</p></li>
+<li><p>Error 120: The input positional parameter <code>array_2</code> is not a numeric array.</p></li>
+<li><p>Error 130: The input positional parameters <code>array_1</code> and <code>array_2</code> are of different sizes.</p></li>
+<li><p>Error 140: The input positional parameters <code>array_1_title</code> is not of type <code>STRING</code>.</p></li>
+<li><p>Error 150: The input positional parameters <code>array_2_title</code> is not of type <code>STRING</code>.</p></li>
+<li><p>Error 160: The input positional parameters <code>title</code> is not of type <code>STRING</code>.</p></li>
+<li><p>Error 170: The input positional parameter <code>misr_mode</code> is invalid.</p></li>
+<li><p>Error 199: Unrecognized computer: Update the function <code>set_root_dirs</code>.</p></li>
+<li><p>Error 200: The optional keyword parameter <code>npts</code> is not of type <code>INTEGER</code>.</p></li>
+<li><p>Error 210: The optional keyword parameter <code>rmsd</code> is not of type <code>FLOAT</code>.</p></li>
+<li><p>Error 220: The optional keyword parameter <code>corrcoeff</code> is not of type <code>FLOAT</code>.</p></li>
+<li><p>Error 230: The optional keyword parameter <code>lin_coeff_a</code> is not of type <code>FLOAT</code>.</p></li>
+<li><p>Error 240: The optional keyword parameter <code>lin_coeff_b</code> is not of type <code>FLOAT</code>.</p></li>
+<li><p>Error 250: The optional keyword parameter <code>chisqr</code> is not of type <code>FLOAT</code>.</p></li>
+<li><p>Error 260: The optional keyword parameter <code>prob</code> is not of type <code>FLOAT</code>.</p></li>
+<li><p>Error 500: An exception condition occurred in <code>is_writable.pro</code>.</p></li>
+</ul></li>
+<li><p><strong>Dependencies:</strong></p>
+<ul>
+<li><p><code>chk_misr_mode.pro</code></p></li>
+<li><p><code>is_array.pro</code></p></li>
+<li><p><code>is_integer.pro</code></p></li>
+<li><p><code>is_numeric.pro</code></p></li>
+<li><p><code>is_string.pro</code></p></li>
+<li><p><code>is_writable.pro</code></p></li>
+<li><p><code>set_root_dirs.pro</code></p></li>
+<li><p><code>set_value_range.pro</code></p></li>
+<li><p><code>strstr.pro</code></p></li>
+</ul></li>
+<li><p><strong>Remarks:</strong></p>
+<ul>
+<li><p><strong>Note 1:</strong> This function works equally well for <span class="smallcaps">GM</span> and <span class="smallcaps">LM</span> files.</p></li>
+</ul></li>
+<li><p><strong>Examples:</strong></p>
+<pre><code>[See practical example in the output of function
+best_fit_l1b2.pro.]</code></pre></li>
+<li><p><strong>References:</strong> None.</p></li>
+<li><p><strong>Versioning:</strong></p>
+<ul>
+<li><p>2018&#8211;05&#8211;02: Version 0.9 &#8212; Initial release.</p></li>
+<li><p>2018&#8211;05&#8211;16: Version 1.0 &#8212; Initial public release.</p></li>
+<li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
+</ul></li>
+</ul>
+</body>
+</html>
