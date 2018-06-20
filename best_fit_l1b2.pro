@@ -139,6 +139,9 @@ FUNCTION best_fit_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    ;      routine
    ;      MTK_READDATA while reading one of the other data channels.
    ;
+   ;  *   Error 340: Target and source databufs do not contain the same
+   ;      number of elements.
+   ;
    ;  *   Error 400: An exception condition occurred in
    ;      get_l1b2_files.pro.
    ;
@@ -242,6 +245,9 @@ FUNCTION best_fit_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    ;  *   2017–05–12: Version 1.0 — Initial public release.
    ;
    ;  *   2018–05–18: Version 1.5 — Implement new coding standards.
+   ;
+   ;  *   2018–06–14: Version 1.6 — Bug fix in setting the spatial
+   ;      resolutions of the target and source data buffers.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
@@ -443,12 +449,10 @@ FUNCTION best_fit_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
 
    ;  Set the resolution of the target data channel (a flag used later on to
    ;  downscale or upscale data fields as appropriate):
-   IF ((misr_mode EQ 'GM') AND ((misr_camera NE 'AN') AND $
-      (misr_band NE 'Red'))) THEN BEGIN
-      target_resol = 1100
-   ENDIF ELSE BEGIN
-      target_resol = 275
-   ENDELSE
+   target_resol = 275
+   IF ((misr_mode EQ 'GM') AND (misr_camera NE 'AN')) THEN BEGIN
+      IF (misr_band NE 'Red') THEN target_resol = 1100
+   ENDIF
 
    ;  Generate the MISR AGP land cover masks for the 7 original classes at
    ;  the spatial resolution of the target data channel:
@@ -473,8 +477,8 @@ FUNCTION best_fit_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
       REFORM(masks[3, *, *]) OR $
       REFORM(masks[4, *, *])
 
-   ;  Locate the 9 L1B2 input files corresponding to the specified MISR Path,
-   ;  Orbit and Mode (here listed in alphabetical order of their names, AA,
+   ;  Locate the 9 L1B2 input files corresponding to the specified MISR Mode,
+   ;  Path, and Orbit (here listed in alphabetical order of their names, AA,
    ;  AF, AN, BA, BF, CA, CF, DA, DF):
    rc = get_l1b2_files(misr_mode, misr_path, misr_orbit, l1b2_files, $
       DEBUG = debug, EXCPT_COND = excpt_cond)
@@ -545,6 +549,10 @@ FUNCTION best_fit_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    bst_oce_chi = 1000000.0
    bst_lnd_chi = 1000000.0
 
+   ; Initialize the bext Pearson correlation coefficient so far to 0.0:
+   bst_oce_cc = 0.0
+   bst_lnd_cc = 0.0
+
    ;  Define a single index (i) into those 35 results and loop over the 9 MISR
    ;  L1B2 files (or cameras, in alphabetical order):
    iter = 0
@@ -574,7 +582,14 @@ FUNCTION best_fit_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
          IF ((source_cam EQ misr_camera) AND $
             (source_bnd EQ misr_band)) THEN BEGIN
             CONTINUE
-         ENDIF
+         ENDIF ELSE BEGIN
+
+   ;  Set the resolution of the source data channel:
+            source_resol = 275
+            IF ((misr_mode EQ 'GM') AND (source_cam NE 'AN')) THEN BEGIN
+               IF (source_bnd NE 'Red') THEN source_resol = 1100
+            ENDIF
+         ENDELSE
 
    ;  Save the camera and band names for the current iteration:
          cam_oce_fit[iter] = source_cam
@@ -595,20 +610,25 @@ FUNCTION best_fit_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
             RETURN, error_code
          ENDIF
 
-   ;  For GM data channels only, adjust the spatial resolution of the current
-   ;  source data channel to match that of the target data channel:
-         IF (misr_mode EQ 'GM') THEN BEGIN
-            IF (target_resol EQ 1100) THEN BEGIN
-               IF ((source_cam EQ 'AN') OR (source_bnd EQ 'Red')) $
-                  THEN BEGIN
-                  source_databuf = hr2lr(source_databuf)
-               ENDIF
-            ENDIF ELSE BEGIN
-               IF ((source_cam NE 'AN') OR (source_bnd NE 'Red')) $
-                  THEN BEGIN
-                  source_databuf = lr2hr(source_databuf)
-               ENDIF
-            ENDELSE
+   ;  Ensure that the spatial resolutions of the target and the source data
+   ;  channels match, and if not, adjust the spatial resolution of the source
+   ;  data channel:
+         IF ((target_resol EQ 1100) AND (source_resol EQ 275)) THEN BEGIN
+            source_databuf = hr2lr(source_databuf)
+         ENDIF
+         IF ((target_resol EQ 275) AND (source_resol EQ 1100)) THEN BEGIN
+            source_databuf = lr2hr(source_databuf)
+         ENDIF
+         IF ((debug) AND (size(source_databuf, /N_ELEMENTS) NE $
+            size(target_databuf, /N_ELEMENTS))) THEN BEGIN
+            error_code = 340
+            excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
+               ': Target databuf contains ' + $
+               strstr(size(target_databuf, /N_ELEMENTS)) + $
+               ' elements but source target contains ' + $
+               strstr(size(source_databuf, /N_ELEMENTS)) + $
+               ' elements.'
+            RETURN, error_code
          ENDIF
 
    ;  Locate the pixels with valid (> 0) values in both the source and the
@@ -863,7 +883,8 @@ FUNCTION best_fit_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
       PRINTF, log_unit, 'Saved on: ', date_time, FORMAT = fmt1
       PRINTF, log_unit
 
-      PRINTF, log_unit, 'Date of MISR acquisition: ' + acquis_date
+      PRINTF, log_unit, 'Date of MISR acquisition: ' + acquis_date, $
+         FORMAT = fmt1
       PRINTF, log_unit
 
       PRINTF, log_unit, 'MISR Path: ', strstr(misr_path), FORMAT = fmt1
@@ -871,6 +892,7 @@ FUNCTION best_fit_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
       PRINTF, log_unit, 'MISR Block: ', strstr(misr_block), FORMAT = fmt1
       PRINTF, log_unit, 'Target Camera: ', misr_camera, FORMAT = fmt1
       PRINTF, log_unit, 'Target Band: ', misr_band, FORMAT = fmt1
+      PRINTF, log_unit, 'Target Resolution: ', target_resol, FORMAT = fmt1
       PRINTF, log_unit
 
       PRINTF, log_unit, 'Results for ocean pixels:'

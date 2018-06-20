@@ -349,7 +349,7 @@ FUNCTION map_l1b2_miss, misr_mode, misr_path, misr_orbit, misr_block, $
    ;  directory 'map_path' is not writable, and create it if it does not
    ;  exist:
    rc = is_writable(map_path, DEBUG = debug, EXCPT_COND = excpt_cond)
-   IF ((debug) AND ((rc EQ 0) OR (rc EQ -1)) THEN BEGIN
+   IF ((debug) AND ((rc EQ 0) OR (rc EQ -1))) THEN BEGIN
       error_code = 500
       excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
          ': ' + excpt_cond
