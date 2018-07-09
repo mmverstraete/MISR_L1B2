@@ -170,6 +170,9 @@ FUNCTION diag_l1b2_block, l1b2_file, misr_block, meta_data, $
    ;      diag_l1b2_block.pro.
    ;
    ;  *   2018–06–07: Version 1.5 — Implement new coding standards.
+   ;
+   ;  *   2018–07–07: Version 1.6 — Update this routine to report on the
+   ;      location of pixels with an RDQI value of 2.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
@@ -540,6 +543,26 @@ FUNCTION diag_l1b2_block, l1b2_file, misr_block, meta_data, $
             tag2 = tagfn + '_RDQI2'
             val2 = nrdqi2
             meta_data = CREATE_STRUCT(meta_data, tag2, val2)
+
+   ;  If there are poor pixels, record their locations:
+            IF (nrdqi2 GT 0) THEN BEGIN
+               IF ((misr_mode EQ 'GM') AND $
+                  ((misr_camera NE 'AN') AND (misr_band NE 'Red'))) THEN BEGIN
+                  line_length = 512
+               ENDIF ELSE BEGIN
+                  line_length = 2048
+               ENDELSE
+               line_num = INTARR(nrdqi2)
+               sample_num = INTARR(nrdqi2)
+               FOR k = 0, nrdqi2 - 1 DO BEGIN
+                  line_num[k] = idx_rd2[k] / line_length
+                  sample_num[k] = idx_rd2[k] MOD line_length
+                  meta_data = CREATE_STRUCT(meta_data, 'Poor_pix_' + $
+                     misr_mode + '_' + misr_camera + '_' + misr_band + '_' + $
+                     strstr(k), 'L' + strstr(line_num[k]) + $
+                     ', S' + strstr(sample_num[k]))
+               ENDFOR
+            ENDIF
 
    ;  Count the number of pixels with (RDQI = 3) in that field:
             idx_rd3 = WHERE(databuf EQ 3, nrdqi3)

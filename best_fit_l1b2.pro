@@ -18,11 +18,14 @@ FUNCTION best_fit_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    ;  of the optimal linear function required to estimate values in the
    ;  target data channel as output positional parameters.
    ;
-   ;  SYNTAX: rc = best_fit_l1b2(misr_mode, misr_path, misr_orbit, $
-   ;  misr_block, misr_camera, misr_band, best_camera, best_band, $
-   ;  best_a, best_b, best_chisq, best_prob, AGP_VERSION = agp_version, $
-   ;  VERBOSE = verbose, SCATTERPLOT = scatterplot, $
-   ;  DEBUG = debug, EXCPT_COND = excpt_cond)
+   ;  SYNTAX: best_fit_l1b2(misr_mode, misr_path, misr_orbit, $
+   ;  misr_block, misr_camera, misr_band, best_camera_oce, $
+   ;  best_band_oce, best_npts_oce, best_rmsd_oce, best_cor_oce, $
+   ;  best_a_oce, best_b_oce, best_chisq_oce, best_prob_oce, $
+   ;  best_camera_lnd, best_band_lnd, best_npts_lnd, best_rmsd_lnd, $
+   ;  best_cor_lnd, best_a_lnd, best_b_lnd, best_chisq_lnd, $
+   ;  best_prob_lnd, AGP_VERSION = agp_version, VERBOSE = verbose, $
+   ;  SCATTERPLOT = scatterplot, DEBUG = debug, EXCPT_COND = excpt_cond)
    ;
    ;  POSITIONAL PARAMETERS [INPUT/OUTPUT]:
    ;
@@ -38,26 +41,81 @@ FUNCTION best_fit_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    ;
    ;  *   misr_band {STRING} [I]: The target MISR BAND name.
    ;
-   ;  *   best_camera {STRING} [O]: The name of the best MISR CAMERA to
-   ;      estimate the values in the target data channel.
+   ;  *   best_camera_oce {STRING} [O]: The name of the best MISR CAMERA
+   ;      to estimate the values in the target data channel over deep
+   ;      lakes and oceanic regions.
    ;
-   ;  *   best_band {STRING} [O]: The name of the best MISR BAND to
-   ;      estimate the values in the target data channel.
+   ;  *   best_band_oce {STRING} [O]: The name of the best MISR BAND to
+   ;      estimate the values in the target data channel over deep lakes
+   ;      and oceanic regions.
    ;
-   ;  *   best_a {FLOAT} [O]: The coefficient a of the best linear fit.
+   ;  *   best_npts_oce {LONG} [O]: The number of valid pixels common to
+   ;      the target and the source data channels used to compute the
+   ;      statistics over deep lakes and oceanic regions.
    ;
-   ;  *   best_b {FLOAT} [O]: The coefficient b of the best linear fit.
+   ;  *   best_rmsd_oce {FLOAT} [O]: The root mean square value of the
+   ;      differences between the best linear fit and the data over deep
+   ;      lakes and oceanic regions.
    ;
-   ;  *   best_chisq {FLOAT} [O]: The Chi square statistics of the best
-   ;      linear fit.
+   ;  *   best_cor_oce {FLOAT} [O]: The correlation coefficient between
+   ;      the valid pixels common to the target and the source data
+   ;      channels over deep lakes and oceanic regions.
    ;
-   ;  *   best_prob {FLOAT} [O]: The probability that the computed fit
-   ;      would have a value of CHISQ or greater.
+   ;  *   best_a_oce {FLOAT} [O]: The coefficient a in the best linear fit
+   ;      equation between the source and the target data channels over
+   ;      deep lakes and oceanic regions.
+   ;
+   ;  *   best_b_oce {FLOAT} [O]: The coefficient b in the best linear fit
+   ;      equation between the source and the target data channels over
+   ;      deep lakes and oceanic regions.
+   ;
+   ;  *   best_chisq_oce {FLOAT} [O]: The value of the Chi square
+   ;      statistics (minimmized to define the linear fit) over deep lakes
+   ;      and oceanic regions.
+   ;
+   ;  *   best_prob_oce {FLOAT} [O]: The probability that the computed fit
+   ;      would have a value of Chi square or greater over deep lakes and
+   ;      oceanic regions.
+   ;
+   ;  *   best_camera_lnd {STRING} [O]: The name of the best MISR CAMERA
+   ;      to estimate the values in the target data channel over
+   ;      terrestrial regions.
+   ;
+   ;  *   best_band_lnd {STRING} [O]: The name of the best MISR BAND to
+   ;      estimate the values in the target data channel over terrestrial
+   ;      regions.
+   ;
+   ;  *   best_npts_lnd {LONG} [O]: The number of valid pixels common to
+   ;      the target and the source data channels used to compute the
+   ;      statistics over terrestrial regions.
+   ;
+   ;  *   best_rmsd_lnd {FLOAT} [O]: The root mean square value of the
+   ;      differences between the best linear fit and the data over
+   ;      terrestrial regions.
+   ;
+   ;  *   best_cor_oce {FLOAT} [O]: The correlation coefficient between
+   ;      the valid pixels common to the target and the source data
+   ;      channels over terrestrial regions.
+   ;
+   ;  *   best_a_oce {FLOAT} [O]: The coefficient a in the best linear fit
+   ;      equation between the source and the target data channels over
+   ;      terrestrial regions.
+   ;
+   ;  *   best_b_oce {FLOAT} [O]: The coefficient b in the best linear fit
+   ;      equation between the source and the target data channels over
+   ;      terrestrial regions.
+   ;
+   ;  *   best_chisq_oce {FLOAT} [O]: The value of the Chi square
+   ;      statistics (minimmized to define the linear fit) over
+   ;      terrestrial regions.
+   ;
+   ;  *   best_prob_oce {FLOAT} [O]: The probability that the computed fit
+   ;      would have a value of Chi square or greater over terrestrial
+   ;      regions.
    ;
    ;  KEYWORD PARAMETERS [INPUT/OUTPUT]:
    ;
-   ;  *   ∘]
-   ;      AGP_VERSION = agp_version {STRING} [I] (Default value: ’F01_24’):
+   ;  *   AGP_VERSION = agp_version {STRING} [I] (Default value: ’F01_24’):
    ;      The AGP version identifier to use.
    ;
    ;  *   VERBOSE = verbose {INT} [I]: Flag to output (1) or skip (0) the
@@ -110,9 +168,6 @@ FUNCTION best_fit_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    ;      invalid.
    ;
    ;  *   Error 160: The input positional parameter misr_band is invalid.
-   ;
-   ;  *   Error 199: Unrecognized computer: Update the function
-   ;      set_root_dirs.
    ;
    ;  *   Error 200: An exception condition occurred in path2str.pro.
    ;
@@ -248,6 +303,11 @@ FUNCTION best_fit_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    ;
    ;  *   2018–06–14: Version 1.6 — Bug fix in setting the spatial
    ;      resolutions of the target and source data buffers.
+   ;
+   ;  *   2018–07–09: Version 1.7 — Update this routine to rely on the new
+   ;      function
+   ;      get_host_info.pro and the updated version of the function
+   ;      set_root_dirs.pro.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
@@ -297,12 +357,25 @@ FUNCTION best_fit_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    IF (~KEYWORD_SET(agp_version)) THEN agp_version = 'F01_24'
 
    ;  Initialize the output positional parameter(s):
-   best_camera = ''
-   best_band = ''
-   best_a = 0.0
-   best_b = 0.0
-   best_chisq = 0.0
-   best_prob = 0.0
+   best_camera_oce = ''
+   best_band_oce = ''
+   best_npts_oce = 0L
+   best_rmsd_oce = 0.0
+   best_cor_oce = 0.0
+   best_a_oce = 0.0
+   best_b_oce = 0.0
+   best_chisq_oce = 0.0
+   best_prob_oce = 0.0
+
+   best_camera_lnd = ''
+   best_band_lnd = ''
+   best_npts_lnd = 0L
+   best_rmsd_lnd = 0.0
+   best_cor_lnd = 0.0
+   best_a_lnd = 0.0
+   best_b_lnd = 0.0
+   best_chisq_lnd = 0.0
+   best_prob_lnd = 0.0
 
    IF (debug) THEN BEGIN
 
@@ -389,18 +462,11 @@ FUNCTION best_fit_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    n_bnds = misr_specs.NBands
    misr_bnds = misr_specs.BandNames
 
-   ;  Identify the current computer:
-   SPAWN, 'hostname -s', computer
-   computer = computer[0]
+   ;  Identify the current operating system and computer name:
+   rc = get_host_info(os_name, comp_name)
 
    ;  Set the standard locations for MISR and MISR-HR files on this computer:
    root_dirs = set_root_dirs()
-   IF ((debug) AND (root_dirs[0] EQ 'Unrecognized computer')) THEN BEGIN
-      error_code = 199
-      excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
-         ': Unrecognized computer.'
-      RETURN, error_code
-   ENDIF
 
    ;  Get today's date and time:
    date_time = today(FMT = 'nice')
@@ -879,7 +945,7 @@ FUNCTION best_fit_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
       PRINTF, log_unit, "Folder name: ", "'" + FILE_DIRNAME(log_fspec, $
          /MARK_DIRECTORY) + "'", FORMAT = fmt1
       PRINTF, log_unit, 'Generated by: ', rout_name, FORMAT = fmt1
-      PRINTF, log_unit, 'Generated on: ', computer, FORMAT = fmt1
+      PRINTF, log_unit, 'Generated on: ', comp_name, FORMAT = fmt1
       PRINTF, log_unit, 'Saved on: ', date_time, FORMAT = fmt1
       PRINTF, log_unit
 

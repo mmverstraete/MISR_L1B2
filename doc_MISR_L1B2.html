@@ -25,7 +25,7 @@
 <li><p><strong>Returned value type:</strong> N/A.</p></li>
 <li><p><strong>Outcome:</strong></p>
 <ul>
-<li><p>If no exception condition has been detected, the keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> was set and if the optional output keyword parameter <code>EXCPT_COND</code> was provided in the call. An output file named <code>avail_L1B2_[hostname]_[creation_date].txt</code> and located in the folder <code>root_dirs[3] + &#8217;/Available/L1B2_&#8217; + misr_mode</code> contains information on the availability of <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> files of the specified <span class="smallcaps">Mode</span> in the folders of <code>root_dirs[1]</code> on the current computer <code>hostname</code> at the time of execution <code>[creation_date]</code>.</p></li>
+<li><p>If no exception condition has been detected, the keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> was set and if the optional output keyword parameter <code>EXCPT_COND</code> was provided in the call. An output file named <code>avail_L1B2_[comp_name]_[creation_date].txt</code> and located in the folder <code>root_dirs[3] + &#8217;/Available/L1B2_&#8217; + misr_mode</code> contains information on the availability of <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> files of the specified <span class="smallcaps">Mode</span> in the folders of <code>root_dirs[1]</code> on the computer <code>comp_name</code> at the time of execution <code>[creation_date]</code>.</p></li>
 <li><p>If an exception condition has been detected, the optional output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered and this program prints out the error message if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. The output file may be inexistent, incomplete or useless.</p></li>
 </ul></li>
 <li><p><strong>Exception conditions:</strong></p>
@@ -53,7 +53,7 @@
 <li><p><strong>Note 3:</strong> Assuming (1) that the <span class="smallcaps">L1B2</span> Geometric Parameters Product (GPP) and <span class="smallcaps">L2</span> Land Surface Product (LSP) files are systematically acquired together with the <span class="smallcaps">L1B2</span> GRP files, (2) that the standard Ancillary Geographic Product (AGP) files for those <span class="smallcaps">Paths</span> are available, and (3) that the acquisition of <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GRP files include complete <span class="smallcaps">Orbits</span> (as opposed to subsets of one or a few <span class="smallcaps">Blocks</span>), this program reports on the spatial domain and temporal range for which <span class="smallcaps">MISR-HR</span> products derived from the Global Mode data can be generated on this computer.</p></li>
 </ul></li>
 <li><p><strong>Examples:</strong></p>
-<pre><code>[On MicMac2:]
+<pre><code>[On MicMac2:]comp_name
 
 IDL&gt; avail_l1b2, &#39;GM&#39;, /DEBUG, EXCPT_COND = excpt_cond
 The output file
@@ -86,6 +86,7 @@ Content: MISR L1B2 GM data availability on computer MicMac2.
 <li><p>2018&#8211;05&#8211;03: Version 1.2 &#8212; Merge this function with its twin <code>avail_l1b2_lm.pro</code> and change the name to <code>avail_l1b2.pro</code>.</p></li>
 <li><p>2018&#8211;05&#8211;14: Version 1.3 &#8212; Update this function to use the revised version of <code>is_writable.pro</code> and update the documentation.</p></li>
 <li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
+<li><p>2018&#8211;07&#8211;05: Version 1.6 &#8212; Update this routine to rely on the new function <code>get_host_info.pro</code> and the updated version of the function <code>set_root_dirs.pro</code>.</p></li>
 </ul></li>
 </ul>
 <h2>avail_l1b2_data</h2>
@@ -177,11 +178,14 @@ IDL&gt; PRINT, misr_l1b2_data.DIRSIZES
 <ul>
 <li><p><strong>Purpose:</strong> This function determines the best linear fit formula to estimate values in the target <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> data channel specified by a <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span>, <span class="smallcaps">Block</span>, <span class="smallcaps">Camera</span> and <span class="smallcaps">Band</span>, and optionally saves a log file and a graphic scatterplot containing that information.</p></li>
 <li><p><strong>Algorithm:</strong> This function computes the linear fits between the specified target data channel and the other 35 <span class="smallcaps">MISR</span> data channels for the same <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span>, and returns the parameters of the optimal linear function required to estimate values in the target data channel as output positional parameters.</p></li>
-<li><p><strong>Syntax:</strong> <code>rc = best_fit_l1b2(misr_mode, misr_path, misr_orbit, $</code><br />
-<code>misr_block, misr_camera, misr_band, best_camera, best_band, $</code><br />
-<code>best_a, best_b, best_chisq, best_prob, AGP_VERSION = agp_version, $</code><br />
-<code>VERBOSE = verbose, SCATTERPLOT = scatterplot, $</code><br />
-<code>DEBUG = debug, EXCPT_COND = excpt_cond</code>)</p></li>
+<li><p><strong>Syntax:</strong> <code>best_fit_l1b2(misr_mode, misr_path, misr_orbit, $</code><br />
+<code>misr_block, misr_camera, misr_band, best_camera_oce, $</code><br />
+<code>best_band_oce, best_npts_oce, best_rmsd_oce, best_cor_oce, $</code><br />
+<code>best_a_oce, best_b_oce, best_chisq_oce, best_prob_oce, $</code><br />
+<code>best_camera_lnd, best_band_lnd, best_npts_lnd, best_rmsd_lnd, $</code><br />
+<code>best_cor_lnd, best_a_lnd, best_b_lnd, best_chisq_lnd, $</code><br />
+<code>best_prob_lnd, AGP_VERSION = agp_version, VERBOSE = verbose, $</code><br />
+<code>SCATTERPLOT = scatterplot, DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
 <li><p><strong>Positional parameters [Input/Output]:</strong></p>
 <ul>
 <li><p><code>misr_mode {STRING} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span>.</p></li>
@@ -190,16 +194,28 @@ IDL&gt; PRINT, misr_l1b2_data.DIRSIZES
 <li><p><code>misr_block {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Block</span> number.</p></li>
 <li><p><code>misr_camera {STRING} [I]:</code> The target <span class="smallcaps">MISR</span> <span class="smallcaps">Camera</span> name.</p></li>
 <li><p><code>misr_band {STRING} [I]:</code> The target <span class="smallcaps">MISR</span> <span class="smallcaps">Band</span> name.</p></li>
-<li><p><code>best_camera {STRING} [O]:</code> The name of the best <span class="smallcaps">MISR</span> <span class="smallcaps">Camera</span> to estimate the values in the target data channel.</p></li>
-<li><p><code>best_band {STRING} [O]:</code> The name of the best <span class="smallcaps">MISR</span> <span class="smallcaps">Band</span> to estimate the values in the target data channel.</p></li>
-<li><p><code>best_a {FLOAT} [O]:</code> The coefficient <code>a</code> of the best linear fit.</p></li>
-<li><p><code>best_b {FLOAT} [O]:</code> The coefficient <code>b</code> of the best linear fit.</p></li>
-<li><p><code>best_chisq {FLOAT} [O]:</code> The Chi square statistics of the best linear fit.</p></li>
-<li><p><code>best_prob {FLOAT} [O]:</code> The probability that the computed fit would have a value of <code>CHISQ</code> or greater.</p></li>
+<li><p><code>best_camera_oce {STRING} [O]:</code> The name of the best <span class="smallcaps">MISR</span> <span class="smallcaps">Camera</span> to estimate the values in the target data channel over deep lakes and oceanic regions.</p></li>
+<li><p><code>best_band_oce {STRING} [O]:</code> The name of the best <span class="smallcaps">MISR</span> <span class="smallcaps">Band</span> to estimate the values in the target data channel over deep lakes and oceanic regions.</p></li>
+<li><p><code>best_npts_oce {LONG} [O]:</code> The number of valid pixels common to the target and the source data channels used to compute the statistics over deep lakes and oceanic regions.</p></li>
+<li><p><code>best_rmsd_oce {FLOAT} [O]:</code> The root mean square value of the differences between the best linear fit and the data over deep lakes and oceanic regions.</p></li>
+<li><p><code>best_cor_oce {FLOAT} [O]:</code> The correlation coefficient between the valid pixels common to the target and the source data channels over deep lakes and oceanic regions.</p></li>
+<li><p><code>best_a_oce {FLOAT} [O]:</code> The coefficient <span class="math inline"><em>a</em></span> in the best linear fit equation between the source and the target data channels over deep lakes and oceanic regions.</p></li>
+<li><p><code>best_b_oce {FLOAT} [O]:</code> The coefficient <span class="math inline"><em>b</em></span> in the best linear fit equation between the source and the target data channels over deep lakes and oceanic regions.</p></li>
+<li><p><code>best_chisq_oce {FLOAT} [O]:</code> The value of the Chi square statistics (minimmized to define the linear fit) over deep lakes and oceanic regions.</p></li>
+<li><p><code>best_prob_oce {FLOAT} [O]:</code> The probability that the computed fit would have a value of Chi square or greater over deep lakes and oceanic regions.</p></li>
+<li><p><code>best_camera_lnd {STRING} [O]:</code> The name of the best <span class="smallcaps">MISR</span> <span class="smallcaps">Camera</span> to estimate the values in the target data channel over terrestrial regions.</p></li>
+<li><p><code>best_band_lnd {STRING} [O]:</code> The name of the best <span class="smallcaps">MISR</span> <span class="smallcaps">Band</span> to estimate the values in the target data channel over terrestrial regions.</p></li>
+<li><p><code>best_npts_lnd {LONG} [O]:</code> The number of valid pixels common to the target and the source data channels used to compute the statistics over terrestrial regions.</p></li>
+<li><p><code>best_rmsd_lnd {FLOAT} [O]:</code> The root mean square value of the differences between the best linear fit and the data over terrestrial regions.</p></li>
+<li><p><code>best_cor_oce {FLOAT} [O]:</code> The correlation coefficient between the valid pixels common to the target and the source data channels over terrestrial regions.</p></li>
+<li><p><code>best_a_oce {FLOAT} [O]:</code> The coefficient <span class="math inline"><em>a</em></span> in the best linear fit equation between the source and the target data channels over terrestrial regions.</p></li>
+<li><p><code>best_b_oce {FLOAT} [O]:</code> The coefficient <span class="math inline"><em>b</em></span> in the best linear fit equation between the source and the target data channels over terrestrial regions.</p></li>
+<li><p><code>best_chisq_oce {FLOAT} [O]:</code> The value of the Chi square statistics (minimmized to define the linear fit) over terrestrial regions.</p></li>
+<li><p><code>best_prob_oce {FLOAT} [O]:</code> The probability that the computed fit would have a value of Chi square or greater over terrestrial regions.</p></li>
 </ul></li>
 <li><p><strong>Keyword parameters [Input/Output]:</strong></p>
 <ul>
-<li><p><span class="math inline">&#8728;</span>] <code>AGP_VERSION = agp_version {STRING} [I] (Default value: &#8217;F01_24&#8217;):</code> The AGP version identifier to use.</p></li>
+<li><p><code>AGP_VERSION = agp_version {STRING} [I] (Default value: &#8217;F01_24&#8217;):</code> The AGP version identifier to use.</p></li>
 <li><p><code>VERBOSE = verbose {INT} [I]:</code> Flag to output (<code>1</code>) or skip (<code>0</code>) the details of the computations in a log file.</p></li>
 <li><p><code>SCATTERPLOT = scatterplot {INT} [I] (Default value: 0):</code> Flag to generate (<code>1</code>) or skip (<code>0</code>) a scatterplot of the two best correlated data channels.</p></li>
 <li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
@@ -220,7 +236,6 @@ IDL&gt; PRINT, misr_l1b2_data.DIRSIZES
 <li><p>Error 140: The input positional parameter <code>misr_block</code> is invalid.</p></li>
 <li><p>Error 150: The input positional parameter <code>misr_camera</code> is invalid.</p></li>
 <li><p>Error 160: The input positional parameter <code>misr_band</code> is invalid.</p></li>
-<li><p>Error 199: Unrecognized computer: Update the function <code>set_root_dirs</code>.</p></li>
 <li><p>Error 200: An exception condition occurred in <code>path2str.pro</code>.</p></li>
 <li><p>Error 210: An exception condition occurred in <code>orbit2str.pro</code>.</p></li>
 <li><p>Error 220: An exception condition occurred in <code>block2str.pro</code>.</p></li>
@@ -299,6 +314,8 @@ rc = 0 and excpt_cond = &gt;&lt;</code></pre></li>
 <li><p>2017&#8211;05&#8211;12: Version 1.0 &#8212; Initial public release.</p></li>
 <li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
 <li><p>2018&#8211;06&#8211;14: Version 1.6 &#8212; Bug fix in setting the spatial resolutions of the target and source data buffers.</p></li>
+<li><p>2018&#8211;07&#8211;09: Version 1.7 &#8212; Update this routine to rely on the new function<br />
+<code>get_host_info.pro</code> and the updated version of the function <code>set_root_dirs.pro</code>.</p></li>
 </ul></li>
 </ul>
 <h2>cor_l1b2</h2>
@@ -341,7 +358,6 @@ rc = 0 and excpt_cond = &gt;&lt;</code></pre></li>
 <li><p>Error 120: Input argument <code>misr_path</code> is invalid.</p></li>
 <li><p>Error 130: Input argument <code>misr_orbit</code> is invalid.</p></li>
 <li><p>Error 140: Input argument <code>misr_block</code> is invalid.</p></li>
-<li><p>Error 199: Unrecognized computer: Update the function <code>set_root_dirs</code>.</p></li>
 <li><p>Error 210: An exception condition occurred in function <code>path2str.pro</code>.</p></li>
 <li><p>Error 220: An exception condition occurred in function <code>orbit2str.pro</code>.</p></li>
 <li><p>Error 230: An exception condition occurred in function <code>block2str.pro</code>.</p></li>
@@ -360,6 +376,7 @@ rc = 0 and excpt_cond = &gt;&lt;</code></pre></li>
 <li><p><code>chk_misr_path.pro</code></p></li>
 <li><p><code>cor_l1b2_block.pro</code></p></li>
 <li><p><code>force_path_sep.pro</code></p></li>
+<li><p><code>get_host_info.pro</code></p></li>
 <li><p><code>is_writable.pro</code></p></li>
 <li><p><code>orbit2date.pro</code></p></li>
 <li><p><code>orbit2str.pro</code></p></li>
@@ -390,6 +407,7 @@ corr_P168_O068050_B110_L1B2_GM_toabrf_2012-10-03_F03_0024_2018-01-26.sav</code><
 <li><p>2018&#8211;03&#8211;04: Version 1.1 &#8212; Update the function to rely on <code>get_l1b2_gm_files.pro</code> instead of <code>chk_l1b2_gm_files.pro</code>.</p></li>
 <li><p>2018&#8211;05&#8211;02: Version 1.2 &#8212; Merge this function with its twin <code>cor_l1b2_lm.pro</code> and change the name to <code>cor_l1b2.pro</code>.</p></li>
 <li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
+<li><p>2018&#8211;07&#8211;05: Version 1.6 &#8212; Update this routine to rely on the new function <code>get_host_info.pro</code> and the updated version of the function <code>set_root_dirs.pro</code>.</p></li>
 </ul></li>
 </ul>
 <h2>cor_l1b2_block</h2>
@@ -522,7 +540,6 @@ stats_hr, in the folder root_dirs[3] + &#39;P168_O068050_B110/L1B2_GM/&#39;.</co
 <li><p>Error 120: Input argument <code>misr_path</code> is invalid.</p></li>
 <li><p>Error 130: Input argument <code>misr_orbit</code> is invalid.</p></li>
 <li><p>Error 140: Input argument <code>misr_block</code> is invalid.</p></li>
-<li><p>Error 199: Unrecognized computer: Update the function <code>set_root_dirs</code>.</p></li>
 <li><p>Error 200: An exception condition occurred in function <code>path2str.pro</code>.</p></li>
 <li><p>Error 210: An exception condition occurred in function <code>orbit2str.pro</code>.</p></li>
 <li><p>Error 220: An exception condition occurred in function <code>block2str.pro</code>.</p></li>
@@ -538,6 +555,7 @@ stats_hr, in the folder root_dirs[3] + &#39;P168_O068050_B110/L1B2_GM/&#39;.</co
 <li><p><code>chk_misr_orbit.pro</code></p></li>
 <li><p><code>chk_misr_path.pro</code></p></li>
 <li><p><code>diag_l1b2_block.pro</code></p></li>
+<li><p><code>get_host_info.pro</code></p></li>
 <li><p><code>get_l1b2_files.pro</code></p></li>
 <li><p><code>is_writable.pro</code></p></li>
 <li><p><code>orbit2date.pro</code></p></li>
@@ -568,6 +586,7 @@ results in the creation of 9 plain text files, 9 .sav files and
 <li><p>2018&#8211;06&#8211;01: Version 1.3 &#8212; Merge this function with its twin <code>diag_l1b2_lm.pro</code> and change the name back to <code>diag_l1b2.pro</code>.</p></li>
 <li><p>2018&#8211;06&#8211;07: Version 1.5 &#8212; Implement new coding standards.</p></li>
 <li><p>2018&#8211;06&#8211;17: Version 1.6 &#8212; Add <span class="smallcaps">MISR</span> version number in the names of the output files.</p></li>
+<li><p>2018&#8211;07&#8211;07: Version 1.7 &#8212; Update this routine to rely on the new function <code>get_host_info.pro</code> and the updated version of the function <code>set_root_dirs.pro</code>; and to take advantage of the updated version of function <code>diag_l1b2_block.pro</code>.</p></li>
 </ul></li>
 </ul>
 <h2>diag_l1b2_block</h2>
@@ -652,6 +671,7 @@ and located in the folder<br />
 <li><p>2018&#8211;01&#8211;30: Version 1.0 &#8212; Initial public release.</p></li>
 <li><p>2018&#8211;06&#8211;01: Version 1.1 &#8212; Merge this function with its twin <code>diag_l1b2_lm_block.pro</code> and change the name back to <code>diag_l1b2_block.pro</code>.</p></li>
 <li><p>2018&#8211;06&#8211;07: Version 1.5 &#8212; Implement new coding standards.</p></li>
+<li><p>2018&#8211;07&#8211;07: Version 1.6 &#8212; Update this routine to report on the location of pixels with an <code>RDQI</code> value of 2.</p></li>
 </ul></li>
 </ul>
 <h2>doc_l1b2</h2>
