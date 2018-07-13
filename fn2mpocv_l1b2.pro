@@ -153,6 +153,10 @@ FUNCTION fn2mpocv_l1b2, l1b2_file, misr_mode, misr_path, misr_orbit, $
    ;      fn2mpocv_l1b2.pro.
    ;
    ;  *   2018–05–18: Version 1.5 — Implement new coding standards.
+   ;
+   ;  *   2018–07–13: Version 1.6 — Modify the code to ensure that the
+   ;      output variable misr_camera is a scalar string and update the
+   ;      documentation.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
@@ -283,7 +287,7 @@ FUNCTION fn2mpocv_l1b2, l1b2_file, misr_mode, misr_path, misr_orbit, $
       RETURN, error_code
    ENDIF
 
-   ;  Retrieve the MISR Camera name (See the routine MTK_FILEATTR_LIST
+   ;  Retrieve the MISR Camera number (See the routine MTK_FILEATTR_LIST
    ;  to get the list of legal attribute names):
    status = MTK_FILEATTR_GET(l1b2_file, 'Camera', val)
    IF ((debug) AND (status NE 0)) THEN BEGIN
@@ -293,9 +297,10 @@ FUNCTION fn2mpocv_l1b2, l1b2_file, misr_mode, misr_path, misr_orbit, $
       RETURN, error_code
    ENDIF
 
-   ;  Get the MISR camera names:
+   ;  Retrieve the MISR camera name:
    res = set_misr_specs()
-   misr_camera = res.CameraNames[val - 1]
+   mc = res.CameraNames[val - 1]
+   misr_camera = mc[0]
 
    ;  Retrieve the MISR version number:
    status = MTK_FILE_VERSION(l1b2_file, misr_version)
