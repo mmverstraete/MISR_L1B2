@@ -2,7 +2,8 @@ FUNCTION plt_scatt_gen, array_1, array_1_title, array_2, array_2_title, $
    title, pob_str, misr_mode, NPTS = npts, RMSD = rmsd, $
    CORRCOEFF = corrcoeff, LIN_COEFF_A = lin_coeff_a, $
    LIN_COEFF_B = lin_coeff_b, CHISQR = chisqr, PROB = prob, $
-   PREFIX = prefix, VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond
+   SET_MIN_SCATT = set_min_scatt, PREFIX = prefix, VERBOSE = verbose, $
+   DEBUG = debug, EXCPT_COND = excpt_cond
 
    ;Sec-Doc
    ;  PURPOSE: This function plots the scatter diagram of a pair of MISR
@@ -20,8 +21,8 @@ FUNCTION plt_scatt_gen, array_1, array_1_title, array_2, array_2_title, $
    ;  rc = plt_scatt_gen(array_1, array_1_title, array_2, array_2_title, $
    ;  pob_str, misr_mode, NPTS = npts, RMSD = rmsd, CORRCOEFF = corrcoeff, $
    ;  LIN_COEFF_A = lin_coeff_a, LIN_COEFF_B = lin_coeff_b, CHISQR = chisqr, $
-   ;  PROB = prob, PREFIX = prefix, VERBOSE = verbose, DEBUG = debug, $
-   ;  EXCPT_COND = excpt_cond)
+   ;  PROB = prob, SET_MIN_SCATT = set_min_scatt, PREFIX = prefix, VERBOSE = verbose, $
+   ;  DEBUG = debug, EXCPT_COND = excpt_cond)
    ;
    ;  POSITIONAL PARAMETERS [INPUT/OUTPUT]:
    ;
@@ -67,6 +68,13 @@ FUNCTION plt_scatt_gen, array_1, array_1_title, array_2, array_2_title, $
    ;
    ;  *   PROB = prob {FLOAT} [I] (Default value: None): The probability
    ;      that the computed fit would have a value of CHISQR or greater.
+   ;
+   ;  *   SET_MIN_SCATT = set_min_scatt {STRING} [I] (Default value: None):
+   ;      The minimum value to be used on the X and Y axes of the
+   ;      histograms. WARNING: This value must be provided as a STRING
+   ;      because the value 0.0 is frequently desirable as the minimum for
+   ;      the scatterplot, but that numerical value would be
+   ;      misinterpreted as NOT setting the keyword.
    ;
    ;  *   PREFIX = prefix {INT} [I] (Default value: ’Scatt_’): Prefix to
    ;      the name of the log and scatterplot output files.
@@ -187,6 +195,9 @@ FUNCTION plt_scatt_gen, array_1, array_1_title, array_2, array_2_title, $
    ;  *   2018–05–16: Version 1.0 — Initial public release.
    ;
    ;  *   2018–05–18: Version 1.5 — Implement new coding standards.
+   ;
+   ;  *   2018–08–07: Version 1.6 — Add the optional
+   ;      SET_MIN_SCATT = set_min_scatt keyword parameter.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
@@ -320,7 +331,7 @@ FUNCTION plt_scatt_gen, array_1, array_1_title, array_2, array_2_title, $
 
    ;  Return to the calling routine with an error message if the optional input
    ;  keyword parameter npts is not of a numeric type:
-      IF ((KEYWORD_SET(npts)) AND (is_integer(npts) NE 1)) THEN BEGIN
+      IF (KEYWORD_SET(npts) AND (is_integer(npts) NE 1)) THEN BEGIN
          error_code = 200
          excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
             ': The optional keyword parameter npts is not of type INTEGER.'
@@ -331,7 +342,7 @@ FUNCTION plt_scatt_gen, array_1, array_1_title, array_2, array_2_title, $
 
    ;  Return to the calling routine with an error message if the optional input
    ;  keyword parameter rmsd is not of a numeric type:
-      IF ((KEYWORD_SET(rmsd)) AND (is_numeric(rmsd) NE 1)) THEN BEGIN
+      IF (KEYWORD_SET(rmsd) AND (is_numeric(rmsd) NE 1)) THEN BEGIN
          error_code = 210
          excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
          ': The optional keyword parameter rmsd is not of type FLOAT.'
@@ -342,7 +353,7 @@ FUNCTION plt_scatt_gen, array_1, array_1_title, array_2, array_2_title, $
 
    ;  Return to the calling routine with an error message if the optional input
    ;  keyword parameter corrcoeff is not of a numeric type:
-      IF ((KEYWORD_SET(corrcoeff)) AND (is_numeric(corrcoeff) NE 1)) THEN BEGIN
+      IF (KEYWORD_SET(corrcoeff) AND (is_numeric(corrcoeff) NE 1)) THEN BEGIN
          error_code = 220
          excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
          ': The optional keyword parameter corrcoeff is not of type FLOAT.'
@@ -353,7 +364,7 @@ FUNCTION plt_scatt_gen, array_1, array_1_title, array_2, array_2_title, $
 
    ;  Return to the calling routine with an error message if the optional input
    ;  keyword parameter lin_coeff_a is not of a numeric type:
-      IF ((KEYWORD_SET(lin_coeff_a)) AND $
+      IF (KEYWORD_SET(lin_coeff_a) AND $
          (is_numeric(lin_coeff_a) NE 1)) THEN BEGIN
          error_code = 230
          excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
@@ -365,7 +376,7 @@ FUNCTION plt_scatt_gen, array_1, array_1_title, array_2, array_2_title, $
 
    ;  Return to the calling routine with an error message if the optional input
    ;  keyword parameter lin_coeff_b is not of a numeric type:
-      IF ((KEYWORD_SET(lin_coeff_b)) AND $
+      IF (KEYWORD_SET(lin_coeff_b) AND $
          (is_numeric(lin_coeff_b) NE 1)) THEN BEGIN
          error_code = 240
          excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
@@ -377,7 +388,7 @@ FUNCTION plt_scatt_gen, array_1, array_1_title, array_2, array_2_title, $
 
    ;  Return to the calling routine with an error message if the optional input
    ;  keyword parameter chisqr is not of a numeric type:
-      IF ((KEYWORD_SET(chisqr)) AND (is_numeric(chisqr) NE 1)) THEN BEGIN
+      IF (KEYWORD_SET(chisqr) AND (is_numeric(chisqr) NE 1)) THEN BEGIN
          error_code = 250
          excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
          ': The optional keyword parameter chisqr is not of type FLOAT.'
@@ -388,14 +399,27 @@ FUNCTION plt_scatt_gen, array_1, array_1_title, array_2, array_2_title, $
 
    ;  Return to the calling routine with an error message if the optional input
    ;  keyword parameter prob is not of a numeric type:
-      IF ((KEYWORD_SET(prob)) AND (is_numeric(prob) NE 1)) THEN BEGIN
+      IF (KEYWORD_SET(prob) AND (is_numeric(prob) NE 1)) THEN BEGIN
          error_code = 260
          excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
-         ': The optional keyword parameter prob is not of type FLOAT.'
+            ': The optional keyword parameter prob is not of type FLOAT.'
          RETURN, error_code
       ENDIF ELSE BEGIN
          prob = FLOAT(prob)
       ENDELSE
+
+   ;  Return to the calling routine with an error message if the optional input
+   ;  keyword parameter set_min_scatt is not a STRING (this is required because
+   ;  the value 0.0 is frequently desirable as the minimum for the scatterplot,
+   ;  but that numerical value would be interpreted as NOT setting the keyword):
+      IF (KEYWORD_SET(set_min_scatt) AND $
+         (is_numstring(strstr(set_min_scatt)) NE 1)) THEN BEGIN
+         error_code = 270
+         excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
+            ': The optional keyword parameter set_min_scatt is not ' + $
+            'provided as a numeric STRING value.'
+         RETURN, error_code
+      ENDIF
    ENDIF
 
    ;  Set the standard locations for MISR and MISR-HR files on this computer:
@@ -420,6 +444,13 @@ FUNCTION plt_scatt_gen, array_1, array_1_title, array_2, array_2_title, $
    min_range_2 = res[0]
    max_range_2 = res[1]
 
+   ;  Reset the minima of the plotting ranges for the X and Y axes if a value
+   ;  has been provided through the optional parameter SET_MIN_SCATT:
+   IF (KEYWORD_SET(set_min_scatt)) THEN BEGIN
+      min_range_1 = set_min_scatt
+      min_range_2 = set_min_scatt
+   ENDIF
+
    ;  Generate the scatterplot:
    my_scat = SCATTERPLOT(array_1, $
       array_2, $
@@ -427,6 +458,8 @@ FUNCTION plt_scatt_gen, array_1, array_1_title, array_2, array_2_title, $
       DIMENSIONS = [600, 600], $
       XRANGE = [min_range_1, max_range_1], $
       YRANGE = [min_range_2, max_range_2], $
+      XSTYLE = 1, $
+      YSTYLE = 1, $
       XTITLE = array_1_title, $
       YTITLE = array_2_title, $
       TITLE = title)

@@ -174,148 +174,114 @@ IDL&gt; PRINT, misr_l1b2_data.DIRSIZES
 <li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
 </ul></li>
 </ul>
-<h2>best_fit_l1b2</h2>
+<h2>best_fits_l1b2</h2>
 <ul>
-<li><p><strong>Purpose:</strong> This function determines the best linear fit formula to estimate values in the target <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> data channel specified by a <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span>, <span class="smallcaps">Block</span>, <span class="smallcaps">Camera</span> and <span class="smallcaps">Band</span>, and optionally saves a log file and a graphic scatterplot containing that information.</p></li>
-<li><p><strong>Algorithm:</strong> This function computes the linear fits between the specified target data channel and the other 35 <span class="smallcaps">MISR</span> data channels for the same <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span>, and returns the parameters of the optimal linear function required to estimate values in the target data channel as output positional parameters.</p></li>
-<li><p><strong>Syntax:</strong> <code>best_fit_l1b2(misr_mode, misr_path, misr_orbit, $</code><br />
-<code>misr_block, misr_camera, misr_band, best_camera_oce, $</code><br />
-<code>best_band_oce, best_npts_oce, best_rmsd_oce, best_cor_oce, $</code><br />
-<code>best_a_oce, best_b_oce, best_chisq_oce, best_prob_oce, $</code><br />
-<code>best_camera_lnd, best_band_lnd, best_npts_lnd, best_rmsd_lnd, $</code><br />
-<code>best_cor_lnd, best_a_lnd, best_b_lnd, best_chisq_lnd, $</code><br />
-<code>best_prob_lnd, AGP_VERSION = agp_version, VERBOSE = verbose, $</code><br />
-<code>SCATTERPLOT = scatterplot, DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
+<li><p><strong>Purpose:</strong> This function generates statistical information, including best linear fits, that can be used to estimate a bad or missing value in the target <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> radiance array identified by the selected <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span>, <span class="smallcaps">Block</span>, <span class="smallcaps">Camera</span> and <span class="smallcaps">Band</span>, based on non-missing values available in one of the other 35 source (camera and band) data channels for the same <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span> data acquisition.</p></li>
+<li><p><strong>Algorithm:</strong> This function compute the Pearson correlation coefficients, best linear fits and associated statistical parameters between the target data channel and all other (35) source data channels available for the selected <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span> data acquisition. Depending on the value of the input positional parameter <code>n_masks</code>, these statistics may be computed for all available values in the source and target data channels (<code>n_masks</code> set to 1), separately for land masses and water bodies (<code>n_masks</code> set to 2), or separately for clear land masses, clear water bodies and cloud patches.</p></li>
+<li><p><strong>Syntax:</strong> <code>rc = best_fits_l1b2(misr_mode, misr_path, misr_orbit, misr_block, $</code><br />
+<code>misr_camera, misr_band, n_masks, land_mask, water_mask, $</code><br />
+<code>clear_land_masks, clear_water_masks, cloud_masks, best_fits, $</code><br />
+<code>AGP_VERSION = agp_version, VERBOSE = verbose, SCATTERPLOT = scatterplot, $</code><br />
+<code>DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
 <li><p><strong>Positional parameters [Input/Output]:</strong></p>
 <ul>
 <li><p><code>misr_mode {STRING} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span>.</p></li>
 <li><p><code>misr_path {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> number.</p></li>
 <li><p><code>misr_orbit {LONG} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Orbit</span> number.</p></li>
 <li><p><code>misr_block {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Block</span> number.</p></li>
-<li><p><code>misr_camera {STRING} [I]:</code> The target <span class="smallcaps">MISR</span> <span class="smallcaps">Camera</span> name.</p></li>
-<li><p><code>misr_band {STRING} [I]:</code> The target <span class="smallcaps">MISR</span> <span class="smallcaps">Band</span> name.</p></li>
-<li><p><code>best_camera_oce {STRING} [O]:</code> The name of the best <span class="smallcaps">MISR</span> <span class="smallcaps">Camera</span> to estimate the values in the target data channel over deep lakes and oceanic regions.</p></li>
-<li><p><code>best_band_oce {STRING} [O]:</code> The name of the best <span class="smallcaps">MISR</span> <span class="smallcaps">Band</span> to estimate the values in the target data channel over deep lakes and oceanic regions.</p></li>
-<li><p><code>best_npts_oce {LONG} [O]:</code> The number of valid pixels common to the target and the source data channels used to compute the statistics over deep lakes and oceanic regions.</p></li>
-<li><p><code>best_rmsd_oce {FLOAT} [O]:</code> The root mean square value of the differences between the best linear fit and the data over deep lakes and oceanic regions.</p></li>
-<li><p><code>best_cor_oce {FLOAT} [O]:</code> The correlation coefficient between the valid pixels common to the target and the source data channels over deep lakes and oceanic regions.</p></li>
-<li><p><code>best_a_oce {FLOAT} [O]:</code> The coefficient <span class="math inline"><em>a</em></span> in the best linear fit equation between the source and the target data channels over deep lakes and oceanic regions.</p></li>
-<li><p><code>best_b_oce {FLOAT} [O]:</code> The coefficient <span class="math inline"><em>b</em></span> in the best linear fit equation between the source and the target data channels over deep lakes and oceanic regions.</p></li>
-<li><p><code>best_chisq_oce {FLOAT} [O]:</code> The value of the Chi square statistics (minimmized to define the linear fit) over deep lakes and oceanic regions.</p></li>
-<li><p><code>best_prob_oce {FLOAT} [O]:</code> The probability that the computed fit would have a value of Chi square or greater over deep lakes and oceanic regions.</p></li>
-<li><p><code>best_camera_lnd {STRING} [O]:</code> The name of the best <span class="smallcaps">MISR</span> <span class="smallcaps">Camera</span> to estimate the values in the target data channel over terrestrial regions.</p></li>
-<li><p><code>best_band_lnd {STRING} [O]:</code> The name of the best <span class="smallcaps">MISR</span> <span class="smallcaps">Band</span> to estimate the values in the target data channel over terrestrial regions.</p></li>
-<li><p><code>best_npts_lnd {LONG} [O]:</code> The number of valid pixels common to the target and the source data channels used to compute the statistics over terrestrial regions.</p></li>
-<li><p><code>best_rmsd_lnd {FLOAT} [O]:</code> The root mean square value of the differences between the best linear fit and the data over terrestrial regions.</p></li>
-<li><p><code>best_cor_oce {FLOAT} [O]:</code> The correlation coefficient between the valid pixels common to the target and the source data channels over terrestrial regions.</p></li>
-<li><p><code>best_a_oce {FLOAT} [O]:</code> The coefficient <span class="math inline"><em>a</em></span> in the best linear fit equation between the source and the target data channels over terrestrial regions.</p></li>
-<li><p><code>best_b_oce {FLOAT} [O]:</code> The coefficient <span class="math inline"><em>b</em></span> in the best linear fit equation between the source and the target data channels over terrestrial regions.</p></li>
-<li><p><code>best_chisq_oce {FLOAT} [O]:</code> The value of the Chi square statistics (minimmized to define the linear fit) over terrestrial regions.</p></li>
-<li><p><code>best_prob_oce {FLOAT} [O]:</code> The probability that the computed fit would have a value of Chi square or greater over terrestrial regions.</p></li>
+<li><p><code>misr_camera {STRING} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Camera</span> (target).</p></li>
+<li><p><code>misr_band {STRING} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Band</span> (target).</p></li>
+<li><p><code>n_masks {INTEGER} [I]:</code> The number of masks to use: <code>1</code> to compute bulk statistics for all geophysical target types, <code>2</code> to compute statistics separately for land masses and water bodies, or <code>3</code> to compute statistics separately for clear land masses, clear water bodies and cloud patches.</p></li>
+<li><p><code>land_mask {BYTE array} [I]:</code> The land mask for the selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> and <span class="smallcaps">Block</span>, as specified by the corresponding <span class="smallcaps">AGP</span> file, valid for all cameras.</p></li>
+<li><p><code>water_mask {BYTE array} [I]:</code> The water mask for the selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> and <span class="smallcaps">Block</span>, as specified by the corresponding <span class="smallcaps">AGP</span> file, valid for all cameras.</p></li>
+<li><p><code>clear_land_masks {BYTE array} [I]:</code> The set of 9 masks identifying the clear land masses in each camera data file.</p></li>
+<li><p><code>clear_water_masks {BYTE array} [I]:</code> The set of 9 masks identifying the clear water bodies in each camera data file.</p></li>
+<li><p><code>cloud_masks {BYTE array} [I]:</code> The set of 9 masks identifying the cloud patches in each camera data file.</p></li>
+<li><p><code>best_fits {STRUCTURE} [O]:</code> The output structure containing the desired statistical information.</p></li>
 </ul></li>
 <li><p><strong>Keyword parameters [Input/Output]:</strong></p>
 <ul>
 <li><p><code>AGP_VERSION = agp_version {STRING} [I] (Default value: &#8217;F01_24&#8217;):</code> The AGP version identifier to use.</p></li>
-<li><p><code>VERBOSE = verbose {INT} [I]:</code> Flag to output (<code>1</code>) or skip (<code>0</code>) the details of the computations in a log file.</p></li>
-<li><p><code>SCATTERPLOT = scatterplot {INT} [I] (Default value: 0):</code> Flag to generate (<code>1</code>) or skip (<code>0</code>) a scatterplot of the two best correlated data channels.</p></li>
+<li><p><code>VERBOSE = verbose {INTEGER} [I] (Default value: 0):</code> Flag to request saving operational details in a separate log file.</p></li>
+<li><p><code>SCATTERPLOT = scatterplot {INT} [I] (Default value: 0):</code> Flag to generate (1) or skip (0) a scatterplot of the two best correlated data channels for each of the cases specified by <code>n_masks</code>.</p></li>
 <li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
 <li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
 </ul></li>
 <li><p><strong>Returned value type:</strong> <code>INTEGER</code>.</p></li>
 <li><p><strong>Outcome:</strong></p>
 <ul>
-<li><p>If no exception condition has been detected, this function returns <code>0</code>, and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> was set and if the optional output keyword parameter <code>EXCPT_COND</code> was provided in the call. The output positional parameters and the optional output files contain the results generated by this function.</p></li>
-<li><p>If an exception condition has been detected, this function returns a non-zero error code, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. The output positional parameters and eventual output files may be undefined, inexistent, incomplete or useless.</p></li>
+<li><p>If no exception condition has been detected, this function returns <code>0</code>, and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided in the call. If the input positional parameter <code>n_masks</code> is set to <code>1</code>, all valid values that are common to the source and the target data channels are used; if it is set to <code>2</code>, those statistics are computed separately for the land areas and water bodies, as classified by the corresponding static <span class="smallcaps">MISR</span> <span class="smallcaps">AGP</span> map; and if it is set to <code>3</code>, those statistics are computed separately for the clear land masses, the clear water bodies, and the cloudy patches in the scene. The output positional parameter <code>best_fits</code> contains the desired statistical information and the scatterplots as well as the log file have been saved if requested.</p></li>
+<li><p>If an exception condition has been detected, this function returns a non-zero error code, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. The output positional parameter <code>best_fits</code> may be empty and the scatterplots as well as the log file may be inexistent, incomplete or useless.</p></li>
 </ul></li>
 <li><p><strong>Exception conditions:</strong></p>
 <ul>
 <li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
-<li><p>Error 110: The input positional parameter <code>misr_mode</code> is invalid.</p></li>
-<li><p>Error 120: The input positional parameter <code>misr_path</code> is invalid.</p></li>
-<li><p>Error 130: The input positional parameter <code>misr_orbit</code> is invalid.</p></li>
-<li><p>Error 140: The input positional parameter <code>misr_block</code> is invalid.</p></li>
-<li><p>Error 150: The input positional parameter <code>misr_camera</code> is invalid.</p></li>
-<li><p>Error 160: The input positional parameter <code>misr_band</code> is invalid.</p></li>
+<li><p>Error 110: Input positional parameter <code>misr_mode</code> is invalid.</p></li>
+<li><p>Error 120: Input positional parameter <code>misr_path</code> is invalid.</p></li>
+<li><p>Error 130: Input positional parameter <code>misr_orbit</code> is invalid.</p></li>
+<li><p>Error 140: Input positional parameter <code>misr_block</code> is invalid.</p></li>
+<li><p>Error 150: Input positional parameter <code>misr_camera</code> is invalid.</p></li>
+<li><p>Error 160: Input positional parameter <code>misr_band</code> is invalid.</p></li>
+<li><p>Error 170: Input positional parameter <code>n_masks</code> is not an integer.</p></li>
+<li><p>Error 172: Input positional parameter <code>n_masks</code> is invalid.</p></li>
 <li><p>Error 200: An exception condition occurred in <code>path2str.pro</code>.</p></li>
 <li><p>Error 210: An exception condition occurred in <code>orbit2str.pro</code>.</p></li>
 <li><p>Error 220: An exception condition occurred in <code>block2str.pro</code>.</p></li>
-<li><p>Error 240: An exception condition occurred in <code>orbit2date.pro</code>.</p></li>
-<li><p>Error 250: An exception condition occurred in <code>make_agp_masks.pro</code>.</p></li>
+<li><p>Error 230: An exception condition occurred in <code>orbit2date.pro</code>.</p></li>
 <li><p>Error 300: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
 <code>MTK_SETREGION_BY_PATH_BLOCKRANGE</code>.</p></li>
-<li><p>Error 310: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
-<code>MTK_READDATA</code> while reading the target data channel.</p></li>
-<li><p>Error 320: An exception condition occurred in <code>fn2pocv_l1b2.pro</code>.</p></li>
-<li><p>Error 330: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
-<code>MTK_READDATA</code> while reading one of the other data channels.</p></li>
-<li><p>Error 340: Target and source databufs do not contain the same number of elements.</p></li>
+<li><p>Error 310: An exception condition occurred in <code>fn2mpocv_l1b2.pro</code>.</p></li>
+<li><p>Error 320: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_READDATA</code>.</p></li>
+<li><p>Error 330: An exception condition occurred in <code>fn2mpocv_l1b2.pro</code>.</p></li>
+<li><p>Error 340: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_READDATA</code>.</p></li>
+<li><p>Error 350: The source and target data buffers are of different sizes.</p></li>
 <li><p>Error 400: An exception condition occurred in <code>get_l1b2_files.pro</code>.</p></li>
-<li><p>Error 500: An exception condition occurred in <code>plt_scatt_gen.pro</code> (ocean).</p></li>
-<li><p>Error 510: An exception condition occurred in <code>plt_scatt_gen.pro</code> (land).</p></li>
-<li><p>Error 520: An exception condition occurred in <code>is_writable.pro</code>.</p></li>
+<li><p>Error 510: An exception condition occurred in <code>plt_scatt_gen</code> when generating the scatterplot for land masses.</p></li>
+<li><p>Error 520: An exception condition occurred in <code>plt_scatt_gen</code> when generating the scatterplot for water bodies.</p></li>
+<li><p>Error 530: An exception condition occurred in <code>plt_scatt_gen</code> when generating the scatterplot for cloud patches.</p></li>
+<li><p>Error 540: An exception condition occurred in <code>is_writable</code>.</p></li>
 </ul></li>
 <li><p><strong>Dependencies:</strong></p>
 <ul>
 <li><p><code>MISR Toolkit</code></p></li>
-<li><p><code>block2str.pro</code></p></li>
-<li><p><code>chk_misr_band.pro</code></p></li>
-<li><p><code>chk_misr_block.pro</code></p></li>
-<li><p><code>chk_misr_camera.pro</code></p></li>
-<li><p><code>chk_misr_mode.pro</code></p></li>
-<li><p><code>chk_misr_orbit.pro</code></p></li>
-<li><p><code>chk_misr_path.pro</code></p></li>
-<li><p><code>fn2pocv_l1b2_gm.pro</code></p></li>
-<li><p><code>get_l1b2_files.pro</code></p></li>
-<li><p><code>hr2lr.pro</code></p></li>
-<li><p><code>is_writable.pro</code></p></li>
-<li><p><code>lr2hr.pro</code></p></li>
-<li><p><code>make_agp_masks.pro</code></p></li>
-<li><p><code>orbit2date.pro</code></p></li>
-<li><p><code>orbit2str.pro</code></p></li>
-<li><p><code>path2str.pro</code></p></li>
-<li><p><code>plt_scatt_gen.pro</code></p></li>
-<li><p><code>set_misr_specs.pro</code></p></li>
-<li><p><code>set_root_dirs.pro</code></p></li>
+<li><p><code>chk_misr_band</code></p></li>
+<li><p><code>chk_misr_block</code></p></li>
+<li><p><code>chk_misr_camera</code></p></li>
+<li><p><code>chk_misr_mode</code></p></li>
+<li><p><code>chk_misr_orbit</code></p></li>
+<li><p><code>chk_misr_path</code></p></li>
+<li><p><code>is_integer</code></p></li>
+<li><p><code>is_writable</code></p></li>
+<li><p><code>plt_scatt_gen</code></p></li>
 <li><p><code>strstr.pro</code></p></li>
-<li><p><code>today.pro</code></p></li>
 </ul></li>
 <li><p><strong>Remarks:</strong></p>
 <ul>
-<li><p><strong>Note 1:</strong> This function works equally well for <span class="smallcaps">GM</span> and <span class="smallcaps">LM</span> files.</p></li>
-<li><p><strong>Note 2:</strong> If the input positional parameter <code>misr_mode</code> is <code>GM</code> and if the target is a low-resolution data channel, the 12 high-resolution data channels are downscaled with the function <code>hr2lr.pro</code> before computing the best fit; conversely, if the target is a high-resolution data channel, the 24 low-resolution data channels are upscaled with the function <code>lr2hr.pro</code> before computing the best fit.</p></li>
+<li><p><strong>Note 1:</strong> This function returns the results in decreasing order of the Pearson correlation coefficient between the source and the target.</p></li>
 </ul></li>
 <li><p><strong>Examples:</strong></p>
-<pre><code>IDL&gt; misr_path = 168
+<pre><code>IDL&gt; misr_mode = &#39;GM&#39;
+IDL&gt; misr_path = 168
 IDL&gt; misr_orbit = 68050
-IDL&gt; misr_block = 111
-IDL&gt; misr_camera = &#39;AN&#39;
-IDL&gt; misr_band = &#39;Blue&#39;
-IDL&gt; misr_mode = &#39;LM&#39;
-IDL&gt; rc = best_fit_l1b2(misr_path, misr_orbit, misr_block, $
-   misr_camera, misr_band, misr_mode, best_camera, best_band, $
-   best_a, best_b, best_chisq, best_prob, /VERBOSE, $
-   /SCATTERPLOT, /DEBUG, EXCPT_COND = excpt_cond)
-IDL&gt; Done with Camera AA and Band Blue
-     Done with Camera AA and Band Green
-     ...
-     Done with Camera DF and Band NIR
-The scatterplot has been saved in
-   ~/MISR_HR/Outcomes/P168_O068050_B111/L1B2_LM/
-   Bestfit_L1B2 BRF LM P168 O068050 B111 AN Blue.png
-The log file has been saved in
-   ~/MISR_HR/Outcomes/P168_O068050_B111/L1B2_LM/
-   Bestfit_L1B2 BRF LM P168 O068050 B111 AN Blue.txt
-IDL&gt; PRINT, &#39;rc = &#39; + strstr(rc) + , excpt_cond = &gt;&#39; + excpt_cond + &#39;&lt;&#39;
-rc = 0 and excpt_cond = &gt;&lt;</code></pre></li>
+IDL&gt; misr_block = 110
+IDL&gt; misr_camera = &#39;DF&#39;
+IDL&gt; misr_band = &#39;NIR&#39;
+IDL&gt; rc1 = make_l1b2_masks(misr_path, misr_orbit, misr_block, land_mask, $
+IDL&gt;    water_mask, rccm_cloud, clear_land_masks, clear_water_masks, $
+IDL&gt;    cloud_masks, /DEBUG, EXCPT_COND = excpt_cond)
+IDL&gt; n_masks = 3
+IDL&gt; rc3 = best_fits_l1b2(misr_mode, misr_path, misr_orbit, $
+IDL&gt;    misr_block, misr_camera, misr_band, n_masks, land_mask, $
+IDL&gt;    water_mask, clear_land_masks, clear_water_masks, cloud_masks, $
+IDL&gt;    best_fits, /VERBOSE, /DEBUG, EXCPT_COND = excpt_cond)
+The log file has been saved in /Users/michel/MISR_HR/Outcomes/P168_O068050_B110/L1B2_GM/
+   Bestfits_L1B2_BRF_GM_P168_O068050_B110_DF_NIR.txt</code></pre></li>
 <li><p><strong>References:</strong> None.</p></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
-<li><p>2018&#8211;05&#8211;11: Version 0.9 &#8212; Initial release.</p></li>
-<li><p>2017&#8211;05&#8211;12: Version 1.0 &#8212; Initial public release.</p></li>
-<li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
-<li><p>2018&#8211;06&#8211;14: Version 1.6 &#8212; Bug fix in setting the spatial resolutions of the target and source data buffers.</p></li>
-<li><p>2018&#8211;07&#8211;09: Version 1.7 &#8212; Update this routine to rely on the new function<br />
-<code>get_host_info.pro</code> and the updated version of the function <code>set_root_dirs.pro</code>.</p></li>
+<li><p>2018&#8211;08&#8211;09: Version 0.9 &#8212; Initial release.</p></li>
 </ul></li>
 </ul>
 <h2>cor_l1b2</h2>
@@ -674,6 +640,63 @@ and located in the folder<br />
 <li><p>2018&#8211;07&#8211;07: Version 1.6 &#8212; Update this routine to report on the location of pixels with an <code>RDQI</code> value of 2.</p></li>
 </ul></li>
 </ul>
+<h2>diag_rdqi_block</h2>
+<ul>
+<li><p><strong>Purpose:</strong> This function collects and stores statistical about the types and quality of radiance values in <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> files.</p></li>
+<li><p><strong>Algorithm:</strong> This program/function [how the routine does it]...</p></li>
+<li><p><strong>Syntax:</strong> <code>rc = diag_rdqi_block(l1b2_file, misr_block, meta_data, $</code><br />
+<code>DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
+<li><p><strong>Positional parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>l1b2_file {STRING} [I]:</code> The name of a <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> file to be inspected.</p></li>
+<li><p><code>misr_block {INTEGER} [I]:</code> The <span class="smallcaps">MISR</span> <span class="smallcaps">Block</span> number to be inspected within that file.</p></li>
+<li><p><code>meta_data {STRUCTURE} [O]:</code> The output structure containing the results of the inspection.</p></li>
+</ul></li>
+<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
+<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
+</ul></li>
+<li><p><strong>Returned value type:</strong> <code>INTEGER</code>.</p></li>
+<li><p><strong>Outcome:</strong></p>
+<ul>
+<li><p>If no exception condition has been detected, this function returns <code>0</code>, and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided in the call. The output positional parameter <code>meta_data</code> contains statistical information about the prevalence of various types of values, in particular with <code>RDQI</code> flags of 0 to 3.</p></li>
+<li><p>If an exception condition has been detected, this function returns a non-zero error code, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. The output positional parameter <code>meta_data</code> may be undefined, inexistent, incomplete or useless.</p></li>
+</ul></li>
+<li><p><strong>Exception conditions:</strong></p>
+<ul>
+<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
+<li><p>Error 110: Input positional parameter <code>l1b2_file</code> is unreadable.</p></li>
+<li><p>Error 120: Input argument <code>misr_block</code> is invalid.</p></li>
+<li><p>Error 200: An exception condition occurred in <code>orbit2date.pro</code>.</p></li>
+<li><p>Error 300: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_SETREGION_BY_PATH_BLOCKRANGE</code>.</p></li>
+<li><p>Error 310: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_FILE_TO_GRIDLIST</code>.</p></li>
+<li><p>Error 320: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_FILE_GRID_TO_FIELDLIST</code>.</p></li>
+<li><p>Error 330: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_READDATA</code>.</p></li>
+</ul></li>
+<li><p><strong>Dependencies:</strong></p>
+<ul>
+<li><p><code>MISR Toolkit</code></p></li>
+<li><p><code>chk_misr_block.pro</code></p></li>
+<li><p><code>is_readable.pro</code></p></li>
+<li><p><code>orbit2date.pro</code></p></li>
+<li><p><code>today.pro</code></p></li>
+<li><p><code>strstr.pro</code></p></li>
+</ul></li>
+<li><p><strong>Remarks:</strong> None.</p></li>
+<li><p><strong>Examples:</strong></p>
+<pre><code>[Insert the command and its outcome]</code></pre></li>
+<li><p><strong>References:</strong> None.</p></li>
+<li><p><strong>Versioning:</strong></p>
+<ul>
+<li><p>2018&#8211;08&#8211;14: Version 0.9 &#8212; Initial release.</p></li>
+<li><p>2018&#8211;08&#8211;15: Version 1.0 &#8212; Initial public release.</p></li>
+</ul></li>
+</ul>
 <h2>doc_l1b2</h2>
 <ul>
 <li><p><strong>Purpose:</strong> This program generates an exhaustive characterization of the data contained in the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance files corresponding to the specified input positional parameters , <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span>. and <span class="smallcaps">Block</span>.</p></li>
@@ -768,6 +791,155 @@ diag_l1b2, cor_l1b2, map_l1b2_block, and map_l1b2_miss.</code></pre></li>
 <li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
 </ul></li>
 </ul>
+<h2>doc_l1b2_miss</h2>
+<ul>
+<li><p><strong>Purpose:</strong> This program inspects a series of <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> files, in either Global or Local Mode, for specified <span class="smallcaps">Paths</span>, <span class="smallcaps">Orbits</span> and <span class="smallcaps">Blocks</span>, to assess the prevalence of missing pixels and pixels with an RDQI of 2.</p></li>
+<li><p><strong>Algorithm:</strong> This program reads a plain text input file <code>inspect</code> defining the set of <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> <span class="smallcaps">Modes</span>, <span class="smallcaps">Paths</span>, <span class="smallcaps">Orbits</span> and <span class="smallcaps">Blocks</span> to inspect, then searches the designated data from all available cameras and bands for missing values (<code>UINT</code> value <code>65523</code>) or pixels with an <code>RDQI</code> of 2, compiles statistics on the prevalence of those 2 types of pixels in that set, and saves the results into a plain text file, in the same directory as the input file, with the same basename and the suffix <code>_out</code> and the extension <code>.txt</code>.</p></li>
+<li><p><strong>Syntax:</strong> <code>doc_l1b2_miss, inspect, DEBUG = debug, EXCPT_COND = excpt_cond</code></p></li>
+<li><p><strong>Positional parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>inspect {STRING} [I]:</code> The full name (path, name and <code>.txt</code> extension) of a plain text file, which can be located anywhere on the disk system accessible to this computer, and defining the set of <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> files to inspect. Each line in that file contains a statement of work encapsulated in 4 strings, separated by commas:</p>
+<ul>
+<li><p>the <span class="smallcaps">Mode</span>, or ranges of <span class="smallcaps">Modes</span></p></li>
+<li><p>the <span class="smallcaps">Path</span>, or ranges of <span class="smallcaps">Paths</span></p></li>
+<li><p>the <span class="smallcaps">Orbit</span>, or ranges of <span class="smallcaps">Orbits</span></p></li>
+<li><p>the <span class="smallcaps">Block</span>, or ranges of <span class="smallcaps">Blocks</span></p></li>
+</ul>
+<p>where</p>
+<ul>
+<li><p><span class="smallcaps">Mode</span> is either <code>[GM]</code>, or <code>[LM]</code>,</p></li>
+<li><p><span class="smallcaps">Path</span> is formatted as <code>Pxxx</code>, where <code>xxx</code> is a valid <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> number,</p></li>
+<li><p><span class="smallcaps">Orbit</span> is formatted as <code>Oyyyyyy</code>, where <code>yyyyyy</code> is a valid <span class="smallcaps">MISR</span> <span class="smallcaps">Orbit</span> number,</p></li>
+<li><p><span class="smallcaps">Block</span> is formatted as <code>Bzzz</code>, where <code>zzz</code> is a valid <span class="smallcaps">MISR</span> <span class="smallcaps">Block</span> number, and</p></li>
+<li><p>&#8216;ranges&#8217; are coded as <code>[item1]-[item2]</code>, where all <code>items</code> from <code>[item1]</code> to <code>[item2]</code> inclusive are to be inspected.</p></li>
+</ul></li>
+</ul></li>
+<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
+<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
+</ul></li>
+<li><p><strong>Returned value type:</strong> N/A.</p></li>
+<li><p><strong>Outcome:</strong></p>
+<ul>
+<li><p>If no exception condition has been detected, this function returns [<code>0</code>, or default returned value], and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided in the call. [Optional, if appropriate:] The output positional parameter(s) [and output file(s)] contain(s) the results generated by this function.</p></li>
+<li><p>If an exception condition has been detected, this function returns [a non-zero error code, or some non-sandard returned value], and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. [Optional, if appropriate:] Output positional parameters [and output files] may be undefined, inexistent, incomplete or useless.</p>
+<p>For programs:</p></li>
+<li><p>If no exception condition has been detected, the keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> was set and if the optional output keyword parameter <code>EXCPT_COND</code> was provided in the call. [Optional, if appropriate:] The output positional parameter(s) [and output file(s)] contain(s) the results generated by this program.</p></li>
+<li><p>If an exception condition has been detected, the optional output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. [Optional, if appropriate:] Output positional parameters [and output files] may be undefined, inexistent, incomplete or useless.</p></li>
+</ul></li>
+<li><p><strong>Exception conditions:</strong></p>
+<ul>
+<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
+<li><p>Error 110: Input positional parameter xxx is not of type yyy.</p></li>
+<li><p>Error 200: An exception condition occurred in <code>routine.pro</code>.</p></li>
+<li><p>Error 300: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_SETREGION_BY_PATH_BLOCKRANGE</code>.</p></li>
+</ul></li>
+<li><p><strong>Dependencies:</strong></p>
+<ul>
+<li><p><code>MISR Toolkit</code></p></li>
+<li><p><code>strstr.pro</code></p></li>
+</ul></li>
+<li><p><strong>Remarks:</strong></p>
+<ul>
+<li><p><strong>Note 1:</strong> This function...</p></li>
+</ul></li>
+<li><p><strong>Examples:</strong></p>
+<pre><code>[Insert the command and its outcome]</code></pre></li>
+<li><p><strong>References:</strong></p>
+<ul>
+<li></li>
+<li><p>Paper and DOI</p></li>
+</ul></li>
+<li><p><strong>Versioning:</strong></p>
+<ul>
+<li><p>2016&#8211;06&#8211;13: Version 0.9 &#8212; Initial release.</p></li>
+<li><p>2017&#8211;11&#8211;10: Version 1.0 &#8212; Initial public release.</p></li>
+<li><p>2018&#8211;01&#8211;30: Version 1.1 &#8212; Implement optional debugging.</p></li>
+<li><p>2018&#8211;06&#8211;01: Version 1.5 &#8212; Implement new coding standards.</p></li>
+</ul></li>
+</ul>
+<h2>fill_cloud_masks</h2>
+<ul>
+<li><p><strong>Purpose:</strong> This function generates revised versions of the 9 original <span class="smallcaps">RCCM</span> cloud masks, where missing values are replaced by probable estimates of the cloudiness at those locations. The codes for non-missing values are left untouched.</p></li>
+<li><p><strong>Algorithm:</strong> This function inspects the 5 by 5 neighbors of each missing pixel in each of the 9 <span class="smallcaps">MISR</span> <span class="smallcaps">RCCM</span> files specified by the input positional parameters <code>misr_mode</code>, <code>misr_path</code>, <code>misr_orbit</code>, <code>misr_block</code>, and replaces those missing values by probable estimates of the cloudiness at those locations, based on the statistics of their neighbors. In low confidence or ambiguous cases, the retrievability of the standard land product is consulted to determine whether the area is likely to be clear or cloudy.</p></li>
+<li><p><strong>Syntax:</strong> <code>rc = fill_cloud_masks(misr_mode, misr_path, misr_orbit, $</code><br />
+<code>misr_block, rccm_cloud, rev_rccm_cloud, $</code><br />
+<code>DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
+<li><p><strong>Positional parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>misr_mode {STRING} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span>.</p></li>
+<li><p><code>misr_path {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> number.</p></li>
+<li><p><code>misr_orbit {LONG} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Orbit</span> number.</p></li>
+<li><p><code>misr_block {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Block</span> number.</p></li>
+<li><p><code>rccm_cloud {BYTE array} [I]:</code> The <span class="smallcaps">MISR</span> <span class="smallcaps">RCCM</span> cloud mask product.</p></li>
+<li><p><code>rev_rccm_cloud {BYTE array} [O]:</code> The revised <span class="smallcaps">RCCM</span> cloud mask product.</p></li>
+</ul></li>
+<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
+<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
+</ul></li>
+<li><p><strong>Returned value type:</strong> <code>INTEGER</code>.</p></li>
+<li><p><strong>Outcome:</strong></p>
+<ul>
+<li><p>If no exception condition has been detected, this function returns <code>0</code>, and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided in the call. The output positional parameter <code>rev_rccm_cloud</code> contains the revised cloud mask, presumably with fewer or no missing values. The pixels in this revised cloud mask <code>rev_rccm_cloud</code> can take on the following values:</p>
+<ul>
+<li><p>0: No retrieval (original <span class="smallcaps">RCCM</span> assignment).</p></li>
+<li><p>1: Cloud with high confidence (original <span class="smallcaps">RCCM</span> assignment).</p></li>
+<li><p>2: Cloud with low confidence (original <span class="smallcaps">RCCM</span> assignment).</p></li>
+<li><p>3: Clear with low confidence (original <span class="smallcaps">RCCM</span> assignment).</p></li>
+<li><p>4: Clear with high confidence (original <span class="smallcaps">RCCM</span> assignment).</p></li>
+<li><p>5: Missing pixel considered probably cloudy (as per this function).</p></li>
+<li><p>6: Missing pixel considered probably clear (as per this function).</p></li>
+<li><p>253: Missing pixel is not observed due to topography obscuration.</p></li>
+<li><p>254: Missing pixel is not observed because it is within the eastern or western edges, i.e., outside the field of view of the camera.</p></li>
+<li><p>255: Original fill value <code>-1</code> of the <span class="smallcaps">RCCM</span> file.</p></li>
+</ul></li>
+<li><p>If an exception condition has been detected, this function returns a non-zero error code, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. The output positional parameter <code>rev_rccm_cloud</code> may be undefined, inexistent, incomplete or useless.</p></li>
+</ul></li>
+<li><p><strong>Exception conditions:</strong></p>
+<ul>
+<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
+<li><p>Error 110: Input positional parameter <code>misr_mode</code> is invalid.</p></li>
+<li><p>Error 120: Input positional parameter <code>misr_path</code> is invalid.</p></li>
+<li><p>Error 130: Input positional parameter <code>misr_orbit</code> is invalid.</p></li>
+<li><p>Error 140: Input positional parameter <code>misr_block</code> is invalid.</p></li>
+<li><p>Error 200: An exception condition occurred in <code>make_land_retr_mask.pro</code>.</p></li>
+<li><p>Error 210: An exception condition occurred in <code>make_rdqi_fill_masks.pro</code>.</p></li>
+<li><p>Error 220: An exception condition occurred in <code>hr2lr.pro</code>.</p></li>
+<li><p>Error 230: An exception condition occurred in <code>make_rdqi_fill_masks.pro</code>.</p></li>
+<li><p>Error 240: An exception condition occurred in <code>hr2lr.pro</code>.</p></li>
+</ul></li>
+<li><p><strong>Dependencies:</strong></p>
+<ul>
+<li><p><code>chk_misr_block.pro</code></p></li>
+<li><p><code>chk_misr_mode.pro</code></p></li>
+<li><p><code>chk_misr_orbit.pro</code></p></li>
+<li><p><code>chk_misr_path.pro</code></p></li>
+<li><p><code>hr2lr.pro</code></p></li>
+<li><p><code>make_land_retr_mask.pro</code></p></li>
+<li><p><code>make_rdqi_fill_masks.pro</code></p></li>
+<li><p><code>set_misr_specs.pro</code></p></li>
+<li><p><code>strstr.pro</code></p></li>
+</ul></li>
+<li><p><strong>Remarks:</strong></p>
+<ul>
+<li><p><strong>Note 1:</strong> The <span class="smallcaps">MISR</span> <span class="smallcaps">RCCM</span> files do not include a quality indicator like <span class="smallcaps">RDQI</span>, nor fill values to flag edge or obscured pixels, however, the cloud mask information is available separately for each spectral band. These are retrieved separately from the appropriate <span class="smallcaps">L1B2</span> file (of the same <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span>) and inserted in the revised cloud mask generated by this function.</p></li>
+</ul></li>
+<li><p><strong>Examples:</strong></p>
+<pre><code>[Insert the command and its outcome]</code></pre></li>
+<li><p><strong>References:</strong></p>
+<ul>
+<li><p>Mike Bull, Jason Matthews, Duncan McDonald, Alexander Menzies, Catherine Moroney, Kevin Mueller, Susan Paradise and Mike Smyth (2011) &#8217;Data Products Specifications&#8217;, JPL D-13963, Revision S, page 85, available from <a href="https://eosweb.larc.nasa.gov/project/misr/DPS_v50_RevS.pdf" class="uri">https://eosweb.larc.nasa.gov/project/misr/DPS_v50_RevS.pdf</a>.</p></li>
+</ul></li>
+<li><p><strong>Versioning:</strong></p>
+<ul>
+<li><p>2018&#8211;08&#8211;08: Version 0.9 &#8212; Initial release by Linda Hunt.</p></li>
+<li><p>2018&#8211;08&#8211;20: Version 1.0 &#8212; Initial public release.</p></li>
+</ul></li>
+</ul>
 <h2>fn2mpocv_l1b2</h2>
 <ul>
 <li><p><strong>Purpose:</strong> This function extracts informatio on the <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span>, <span class="smallcaps">Camera</span> and version number from the specified <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance filename.</p></li>
@@ -852,6 +1024,7 @@ misr_version = F03_0024</code></pre></li>
 <li><p>2018&#8211;05&#8211;07: Version 1.1 &#8212; Add the <code>misr_mode</code> output positional parameter, merge this function with its twin <code>fn2pocv_l1b2_lm.pro</code> and change the name to<br />
 <code>fn2mpocv_l1b2.pro</code>.</p></li>
 <li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
+<li><p>2018&#8211;07&#8211;13: Version 1.6 &#8212; Modify the code to ensure that the output variable <code>misr_camera</code> is a scalar string and update the documentation.</p></li>
 </ul></li>
 </ul>
 <h2>get_bad_l1b2</h2>
@@ -1104,6 +1277,79 @@ OUTARRAY        FLOAT     = Array[2048, 512]</code></pre></li>
 <li><p>2018&#8211;01&#8211;30: Version 1.0 &#8212; Initial public release.</p></li>
 <li><p>2018&#8211;05&#8211;13: Version 1.1 &#8212; In-line documentation update.</p></li>
 <li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
+</ul></li>
+</ul>
+<h2>make_rdqi_fill_masks</h2>
+<ul>
+<li><p><strong>Purpose:</strong> This function returns masks of fill values and <span class="smallcaps">RDQI</span> from the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> radiance file specified by the input positional parameters.</p></li>
+<li><p><strong>Algorithm:</strong> This function reads the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> radiance file specified by the input positional parameters <code>misr_mode</code>, <code>misr_path</code>, <code>misr_orbit</code>, <code>misr_block</code>, and <code>misr_camera</code>, and extracts, for the selected <code>misr_band</code>, the <span class="smallcaps">RDQI</span> and the fill values: pixels obscured by topography, not observed by the camera, over the ocean, or unusable data (<span class="smallcaps">RDQI</span> = 3).</p></li>
+<li><p><strong>Syntax:</strong> <code>rc = make_rdqi_fill_masks, misr_mode, misr_path, $</code><br />
+<code>misr_orbit, misr_block, misr_camera, misr_band, fill_mask, $</code><br />
+<code>rdqi_mask, DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
+<li><p><strong>Positional parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>misr_mode {STRING} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span>.</p></li>
+<li><p><code>misr_path {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> number.</p></li>
+<li><p><code>misr_orbit {LONG} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Orbit</span> number.</p></li>
+<li><p><code>misr_block {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Block</span> number.</p></li>
+<li><p><code>misr_camera {STRING} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Camera</span> name.</p></li>
+<li><p><code>misr_band {STRING} [I]:</code> The selected <span class="smallcaps">MISR</span> spectral <span class="smallcaps">Band</span> name.</p></li>
+<li><p><code>fill_mask {UNSIGNED INTEGER array} [O]:</code> The mask containing the fill values for the selected camera and spectral band.</p></li>
+<li><p><code>rdqi_mask {BYTE array} [O]:</code> The mask containing the <span class="smallcaps">RDQI</span> values for the selected camera and spectral band.</p></li>
+</ul></li>
+<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>VERSION = version {STRING} [I] (Default value: &#8217;F03_0024&#8217;):</code> The selected version number of the L1B2 files.</p></li>
+<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
+<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
+</ul></li>
+<li><p><strong>Returned value type:</strong> <code>INTEGER</code>.</p></li>
+<li><p><strong>Outcome:</strong></p>
+<ul>
+<li><p>If no exception condition has been detected, this function returns <code>0</code>, and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided in the call. The output positional parameters <code>fill_mask</code> and <code>rdqi_mask</code> contain the results generated by this function.</p></li>
+<li><p>If an exception condition has been detected, this function returns a non-zero error code, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. The output positional parameters <code>fill_mask</code> and <code>rdqi_mask</code> may be undefined, inexistent, incomplete or useless.</p></li>
+</ul></li>
+<li><p><strong>Exception conditions:</strong></p>
+<ul>
+<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
+<li><p>Error 110: Input positional parameter <code>misr_mode</code> is invalid.</p></li>
+<li><p>Error 120: Input positional parameter <code>misr_path</code> is invalid.</p></li>
+<li><p>Error 130: Input positional parameter <code>misr_orbit</code> is invalid.</p></li>
+<li><p>Error 140: Input positional parameter <code>misr_block</code> is invalid.</p></li>
+<li><p>Error 150: Input positional parameter <code>misr_camera</code> is invalid.</p></li>
+<li><p>Error 160: Input positional parameter <code>misr_band</code> is invalid.</p></li>
+<li><p>Error 200: An exception condition occurred in <code>path2str.pro</code>.</p></li>
+<li><p>Error 300: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_MAKE_FILENAME</code>.</p></li>
+<li><p>Error 310: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_SETREGION_BY_PATH_BLOCKRANGE</code>.</p></li>
+<li><p>Error 320: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_READDATA</code>.</p></li>
+<li><p>Error 400: The <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> file implied by the input arguments to this function could not be found, or was found in multiple places.</p></li>
+</ul></li>
+<li><p><strong>Dependencies:</strong></p>
+<ul>
+<li><p><code>MISR Toolkit</code></p></li>
+<li><p><code>chk_misr_band.pro</code></p></li>
+<li><p><code>chk_misr_block.pro</code></p></li>
+<li><p><code>chk_misr_camera.pro</code></p></li>
+<li><p><code>chk_misr_mode.pro</code></p></li>
+<li><p><code>chk_misr_orbit.pro</code></p></li>
+<li><p><code>chk_misr_path.pro</code></p></li>
+<li><p><code>path2str.pro</code></p></li>
+<li><p><code>strstr.pro</code></p></li>
+</ul></li>
+<li><p><strong>Remarks:</strong> None.</p></li>
+<li><p><strong>Examples:</strong></p>
+<pre><code>[Insert the command and its outcome]</code></pre></li>
+<li><p><strong>References:</strong></p>
+<ul>
+<li><p>Mike Bull, Jason Matthews, Duncan McDonald, Alexander Menzies, Catherine Moroney, Kevin Mueller, Susan Paradise and Mike Smyth (2011) &#8217;Data Products Specifications&#8217;, JPL D-13963, Revision S, page 71&#8211;72, available from <a href="https://eosweb.larc.nasa.gov/project/misr/DPS_v50_RevS.pdf" class="uri">https://eosweb.larc.nasa.gov/project/misr/DPS_v50_RevS.pdf</a>.</p></li>
+</ul></li>
+<li><p><strong>Versioning:</strong></p>
+<ul>
+<li><p>2018&#8211;08&#8211;08: Version 0.9 &#8212; Initial release by Linda Hunt.</p></li>
+<li><p>2018&#8211;08&#8211;20: Version 1.0 &#8212; Initial public release.</p></li>
 </ul></li>
 </ul>
 <h2>map_l1b2_block</h2>
@@ -1473,8 +1719,8 @@ l1b2_fspec = /Volumes/MISR_Data3/P168/L1_LM/
 <li><p><strong>Syntax:</strong> <code>rc = plt_scatt_gen(array_1, array_1_title, array_2, array_2_title, $</code><br />
 <code>pob_str, misr_mode, NPTS = npts, RMSD = rmsd, CORRCOEFF = corrcoeff, $</code><br />
 <code>LIN_COEFF_A = lin_coeff_a, LIN_COEFF_B = lin_coeff_b, CHISQR = chisqr, $</code><br />
-<code>PROB = prob, PREFIX = prefix, VERBOSE = verbose, DEBUG = debug, $</code><br />
-<code>EXCPT_COND = excpt_cond)</code></p></li>
+<code>PROB = prob, SET_MIN_SCATT = set_min_scatt, PREFIX = prefix, VERBOSE = verbose, $</code><br />
+<code>DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
 <li><p><strong>Positional parameters [Input/Output]:</strong></p>
 <ul>
 <li><p><code>array_1 {FLOAT} [I]:</code> The values of the source <code>(x)</code> <span class="smallcaps">MISR</span> data channel.</p></li>
@@ -1494,6 +1740,7 @@ l1b2_fspec = /Volumes/MISR_Data3/P168/L1_LM/
 <li><p><code>LIN_COEFF_B = lin_coeff_b {FLOAT} [I] (Default value: None):</code> The slope coefficient of the linear fit equation between <code>array_1</code> and <code>array_2</code>.</p></li>
 <li><p><code>CHISQR = chisqr {FLOAT} [I] (Default value: None):</code> The value of the Chi square statistics associated with the linear fit equation.</p></li>
 <li><p><code>PROB = prob {FLOAT} [I] (Default value: None):</code> The probability that the computed fit would have a value of <code>CHISQR</code> or greater.</p></li>
+<li><p><code>SET_MIN_SCATT = set_min_scatt {STRING} [I] (Default value: None):</code> The minimum value to be used on the <code>X</code> and <code>Y</code> axes of the histograms. WARNING: This value must be provided as a <code>STRING</code> because the value <code>0.0</code> is frequently desirable as the minimum for the scatterplot, but that numerical value would be misinterpreted as NOT setting the keyword.</p></li>
 <li><p><code>PREFIX = prefix {INT} [I] (Default value: &#8217;Scatt_&#8217;):</code> Prefix to the name of the log and scatterplot output files.</p></li>
 <li><p><code>VERBOSE = verbose {INT} [I] (Default value: None):</code> Flag to save (<code>1</code>) or skip (<code>0</code>) the log file.</p></li>
 <li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
@@ -1550,6 +1797,7 @@ best_fit_l1b2.pro.]</code></pre></li>
 <li><p>2018&#8211;05&#8211;02: Version 0.9 &#8212; Initial release.</p></li>
 <li><p>2018&#8211;05&#8211;16: Version 1.0 &#8212; Initial public release.</p></li>
 <li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
+<li><p>2018&#8211;08&#8211;07: Version 1.6 &#8212; Add the optional <code>SET_MIN_SCATT = set_min_scatt</code> keyword parameter.</p></li>
 </ul></li>
 </ul>
 </body>
