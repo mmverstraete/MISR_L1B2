@@ -1,5 +1,5 @@
 FUNCTION make_rdqi_fill_masks, misr_mode, misr_path, misr_orbit, misr_block, $
-   misr_camera, misr_band, fill_mask, rdqi_mask, VERSION = version, $
+   misr_camera, misr_band, fill_mask, rdqi_mask, L1B2_VERSION = l1b2_version, $
    DEBUG = debug, EXCPT_COND = excpt_cond
 
    ;Sec-Doc
@@ -40,8 +40,8 @@ FUNCTION make_rdqi_fill_masks, misr_mode, misr_path, misr_orbit, misr_block, $
    ;
    ;  KEYWORD PARAMETERS [INPUT/OUTPUT]:
    ;
-   ;  *   VERSION = version {STRING} [I] (Default value: ’F03_0024’): The
-   ;      selected version number of the L1B2 files.
+   ;  *   L1B2_VERSION = l1b2_version {STRING} [I] (Default value: ’F03_0024’):
+   ;      The selected version number of the L1B2 files.
    ;
    ;  *   DEBUG = debug {INT} [I] (Default value: 0): Flag to activate (1)
    ;      or skip (0) debugging tests.
@@ -142,6 +142,9 @@ FUNCTION make_rdqi_fill_masks, misr_mode, misr_path, misr_orbit, misr_block, $
    ;  *   2018–08–08: Version 0.9 — Initial release by Linda Hunt.
    ;
    ;  *   2018–08–20: Version 1.0 — Initial public release.
+   ;
+   ;  *   2018–08–29: Version 1.1 — Update VERSION keyword parameter to
+   ;      L1B2_VERSION for consistency with other functions.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
@@ -185,7 +188,7 @@ FUNCTION make_rdqi_fill_masks, misr_mode, misr_path, misr_orbit, misr_block, $
    excpt_cond = ''
 
    ;  Set the default values of essential input keyword parameters:
-   IF (~KEYWORD_SET(version)) THEN version = 'F03_0024'
+   IF (~KEYWORD_SET(l1b2_version)) THEN l1b2_version = 'F03_0024'
    IF (KEYWORD_SET(debug)) THEN debug = 1 ELSE debug = 0
 
    IF (debug) THEN BEGIN
@@ -263,9 +266,6 @@ FUNCTION make_rdqi_fill_masks, misr_mode, misr_path, misr_orbit, misr_block, $
       ENDIF
    ENDIF
 
-   ;  Set the MISR specifications:
-   ;misr_specs = set_misr_specs()
-
    ;  Set the standard locations for MISR and MISR-HR files on this computer:
    root_dirs = set_root_dirs()
 
@@ -290,7 +290,7 @@ FUNCTION make_rdqi_fill_masks, misr_mode, misr_path, misr_orbit, misr_block, $
 
    ;  Generate the name of the L1B2 file:
    status = MTK_MAKE_FILENAME(path, product, misr_camera, pathstr, $
-      orbitstr, version, mfile)
+      orbitstr, l1b2_version, mfile)
    IF (debug AND (status NE 0)) THEN BEGIN
       error_code = 300
       excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $

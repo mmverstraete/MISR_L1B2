@@ -281,7 +281,8 @@ The log file has been saved in /Users/michel/MISR_HR/Outcomes/P168_O068050_B110/
 <li><p><strong>References:</strong> None.</p></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
-<li><p>2018&#8211;08&#8211;09: Version 0.9 &#8212; Initial release.</p></li>
+<li><p>2018&#8211;08&#8211;09: Version 0.8 &#8212; Initial release.</p></li>
+<li><p>2018&#8211;09&#8211;19: Version 0.9 &#8212; Upgrade the code to compute the statistics only on valid data, i.e., where <code>BRF</code> &gt; 0.0 (as before) and <code>RDQI</code> &lt; 2 (new), and to generate nominal results whenever there are no common valid pixel values suitable to compute the statistics.</p></li>
 </ul></li>
 </ul>
 <h2>cor_l1b2</h2>
@@ -860,86 +861,6 @@ diag_l1b2, cor_l1b2, map_l1b2_block, and map_l1b2_miss.</code></pre></li>
 <li><p>2018&#8211;06&#8211;01: Version 1.5 &#8212; Implement new coding standards.</p></li>
 </ul></li>
 </ul>
-<h2>fill_cloud_masks</h2>
-<ul>
-<li><p><strong>Purpose:</strong> This function generates revised versions of the 9 original <span class="smallcaps">RCCM</span> cloud masks, where missing values are replaced by probable estimates of the cloudiness at those locations. The codes for non-missing values are left untouched.</p></li>
-<li><p><strong>Algorithm:</strong> This function inspects the 5 by 5 neighbors of each missing pixel in each of the 9 <span class="smallcaps">MISR</span> <span class="smallcaps">RCCM</span> files specified by the input positional parameters <code>misr_mode</code>, <code>misr_path</code>, <code>misr_orbit</code>, <code>misr_block</code>, and replaces those missing values by probable estimates of the cloudiness at those locations, based on the statistics of their neighbors. In low confidence or ambiguous cases, the retrievability of the standard land product is consulted to determine whether the area is likely to be clear or cloudy.</p></li>
-<li><p><strong>Syntax:</strong> <code>rc = fill_cloud_masks(misr_mode, misr_path, misr_orbit, $</code><br />
-<code>misr_block, rccm_cloud, rev_rccm_cloud, $</code><br />
-<code>DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
-<li><p><strong>Positional parameters [Input/Output]:</strong></p>
-<ul>
-<li><p><code>misr_mode {STRING} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span>.</p></li>
-<li><p><code>misr_path {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> number.</p></li>
-<li><p><code>misr_orbit {LONG} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Orbit</span> number.</p></li>
-<li><p><code>misr_block {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Block</span> number.</p></li>
-<li><p><code>rccm_cloud {BYTE array} [I]:</code> The <span class="smallcaps">MISR</span> <span class="smallcaps">RCCM</span> cloud mask product.</p></li>
-<li><p><code>rev_rccm_cloud {BYTE array} [O]:</code> The revised <span class="smallcaps">RCCM</span> cloud mask product.</p></li>
-</ul></li>
-<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
-<ul>
-<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
-<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
-</ul></li>
-<li><p><strong>Returned value type:</strong> <code>INTEGER</code>.</p></li>
-<li><p><strong>Outcome:</strong></p>
-<ul>
-<li><p>If no exception condition has been detected, this function returns <code>0</code>, and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided in the call. The output positional parameter <code>rev_rccm_cloud</code> contains the revised cloud mask, presumably with fewer or no missing values. The pixels in this revised cloud mask <code>rev_rccm_cloud</code> can take on the following values:</p>
-<ul>
-<li><p>0: No retrieval (original <span class="smallcaps">RCCM</span> assignment).</p></li>
-<li><p>1: Cloud with high confidence (original <span class="smallcaps">RCCM</span> assignment).</p></li>
-<li><p>2: Cloud with low confidence (original <span class="smallcaps">RCCM</span> assignment).</p></li>
-<li><p>3: Clear with low confidence (original <span class="smallcaps">RCCM</span> assignment).</p></li>
-<li><p>4: Clear with high confidence (original <span class="smallcaps">RCCM</span> assignment).</p></li>
-<li><p>5: Missing pixel considered probably cloudy (as per this function).</p></li>
-<li><p>6: Missing pixel considered probably clear (as per this function).</p></li>
-<li><p>253: Missing pixel is not observed due to topography obscuration.</p></li>
-<li><p>254: Missing pixel is not observed because it is within the eastern or western edges, i.e., outside the field of view of the camera.</p></li>
-<li><p>255: Original fill value <code>-1</code> of the <span class="smallcaps">RCCM</span> file.</p></li>
-</ul></li>
-<li><p>If an exception condition has been detected, this function returns a non-zero error code, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. The output positional parameter <code>rev_rccm_cloud</code> may be undefined, inexistent, incomplete or useless.</p></li>
-</ul></li>
-<li><p><strong>Exception conditions:</strong></p>
-<ul>
-<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
-<li><p>Error 110: Input positional parameter <code>misr_mode</code> is invalid.</p></li>
-<li><p>Error 120: Input positional parameter <code>misr_path</code> is invalid.</p></li>
-<li><p>Error 130: Input positional parameter <code>misr_orbit</code> is invalid.</p></li>
-<li><p>Error 140: Input positional parameter <code>misr_block</code> is invalid.</p></li>
-<li><p>Error 200: An exception condition occurred in <code>make_land_retr_mask.pro</code>.</p></li>
-<li><p>Error 210: An exception condition occurred in <code>make_rdqi_fill_masks.pro</code>.</p></li>
-<li><p>Error 220: An exception condition occurred in <code>hr2lr.pro</code>.</p></li>
-<li><p>Error 230: An exception condition occurred in <code>make_rdqi_fill_masks.pro</code>.</p></li>
-<li><p>Error 240: An exception condition occurred in <code>hr2lr.pro</code>.</p></li>
-</ul></li>
-<li><p><strong>Dependencies:</strong></p>
-<ul>
-<li><p><code>chk_misr_block.pro</code></p></li>
-<li><p><code>chk_misr_mode.pro</code></p></li>
-<li><p><code>chk_misr_orbit.pro</code></p></li>
-<li><p><code>chk_misr_path.pro</code></p></li>
-<li><p><code>hr2lr.pro</code></p></li>
-<li><p><code>make_land_retr_mask.pro</code></p></li>
-<li><p><code>make_rdqi_fill_masks.pro</code></p></li>
-<li><p><code>set_misr_specs.pro</code></p></li>
-<li><p><code>strstr.pro</code></p></li>
-</ul></li>
-<li><p><strong>Remarks:</strong></p>
-<ul>
-<li><p><strong>Note 1:</strong> The <span class="smallcaps">MISR</span> <span class="smallcaps">RCCM</span> files do not include a quality indicator like <span class="smallcaps">RDQI</span>, nor fill values to flag edge or obscured pixels, however, the cloud mask information is available separately for each spectral band. These are retrieved separately from the appropriate <span class="smallcaps">L1B2</span> file (of the same <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span>) and inserted in the revised cloud mask generated by this function.</p></li>
-</ul></li>
-<li><p><strong>Examples:</strong></p>
-<pre><code>[Insert the command and its outcome]</code></pre></li>
-<li><p><strong>References:</strong></p>
-<ul>
-<li><p>Mike Bull, Jason Matthews, Duncan McDonald, Alexander Menzies, Catherine Moroney, Kevin Mueller, Susan Paradise and Mike Smyth (2011) &#8217;Data Products Specifications&#8217;, JPL D-13963, Revision S, page 85, available from <a href="https://eosweb.larc.nasa.gov/project/misr/DPS_v50_RevS.pdf" class="uri">https://eosweb.larc.nasa.gov/project/misr/DPS_v50_RevS.pdf</a>.</p></li>
-</ul></li>
-<li><p><strong>Versioning:</strong></p>
-<ul>
-<li><p>2018&#8211;08&#8211;08: Version 0.9 &#8212; Initial release by Linda Hunt.</p></li>
-<li><p>2018&#8211;08&#8211;20: Version 1.0 &#8212; Initial public release.</p></li>
-</ul></li>
-</ul>
 <h2>fn2mpocv_l1b2</h2>
 <ul>
 <li><p><strong>Purpose:</strong> This function extracts informatio on the <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span>, <span class="smallcaps">Camera</span> and version number from the specified <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance filename.</p></li>
@@ -1279,6 +1200,122 @@ OUTARRAY        FLOAT     = Array[2048, 512]</code></pre></li>
 <li><p>2018&#8211;05&#8211;18: Version 1.5 &#8212; Implement new coding standards.</p></li>
 </ul></li>
 </ul>
+<h2>make_l1b2_masks</h2>
+<ul>
+<li><p><strong>Purpose:</strong> This function generates a set of 36 masks (one for each camera and spectral band) to indicate the spatial distribution of target types within the seleted <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span> area. All masks are created at the full spatial resolution of the instrument (275 m), and the nature of the target types being discriminated is controlled by the input positional parameter <code>n_masks</code>.</p></li>
+<li><p><strong>Algorithm:</strong> The amount of processing performed by this function depends on the value of the input positional parameter <code>n_masks</code>, which can only take the values <code>1</code>, <code>2</code> or <code>3</code>:</p>
+<ul>
+<li><p><code>IF (n_masks GT 0)</code>, the masks distinguish between edge, valid, poor (<span class="smallcaps">RDQI</span> = 2), bad (<span class="smallcaps">RDQI</span> = 3) and obscured pixels.</p></li>
+<li><p><code>IF (n_masks GT 1)</code>, the masks distinguish between edge, valid land, valid water, poor (<span class="smallcaps">RDQI</span> = 2), bad (<span class="smallcaps">RDQI</span> = 3) and obscured pixels, using the static information available in the relevant <span class="smallcaps">AGP</span> data file.</p></li>
+<li><p><code>IF (n_masks GT 2)</code>, the masks distinguish between edge, valid clear land, valid clear water, cloudy, poor (<span class="smallcaps">RDQI</span> = 2), bad (<span class="smallcaps">RDQI</span> = 3) and obscured pixels, using the time-dependent information available in the relevant <span class="smallcaps">RCCM</span> data files.</p></li>
+</ul></li>
+<li><p><strong>Syntax:</strong> <code>rc = make_l1b2_masks(misr_mode, misr_path, misr_orbit, misr_block, $</code><br />
+<code>n_masks, l1b2_masks, MAPS = maps, AGP_VERSION = agp_version, $</code><br />
+<code>L1B2_VERSION = l1b2_version, RCCM_VERSION = rccm_version, $</code><br />
+<code>DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
+<li><p><strong>Positional parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>misr_mode {STRING} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span>.</p></li>
+<li><p><code>misr_path {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> number.</p></li>
+<li><p><code>misr_orbit {LONG} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Orbit</span> number.</p></li>
+<li><p><code>misr_block {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Block</span> number.</p></li>
+<li><p><code>n_masks {INT} [I]:</code> The index specifying which types of masks are required.</p></li>
+<li><p><code>l1b2_masks {BYTE array [9, 4, 2048, 512]} [O]:</code> The <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> masks, at the full spatial resolution, for the 9 cameras and 4 spectral bands.</p></li>
+</ul></li>
+<li><p><strong>Keyword parameters [Input/Output]:</strong></p>
+<ul>
+<li><p><code>MAPS = maps {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) saving the maps of the masks.</p></li>
+<li><p><code>AGP_VERSION = agp_version {STRING} [I] (Default value: &#8217;F01_24&#8217;):</code> The <span class="smallcaps">AGP</span> version identifier to use.</p></li>
+<li><p><code>L1B2_VERSION = l1b2_version {STRING} [I] (Default value: &#8217;F03_0024&#8217;):</code> The <span class="smallcaps">L1B2</span> version identifier to use.</p></li>
+<li><p><code>RCCM_VERSION = rccm_version {STRING} [I] (Default value: &#8217;F04_0025&#8217;):</code> The <span class="smallcaps">RCCM</span> version identifier to use.</p></li>
+<li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
+<li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
+</ul></li>
+<li><p><strong>Returned value type:</strong> <code>INTEGER</code>.</p></li>
+<li><p><strong>Outcome:</strong></p>
+<ul>
+<li><p>If no exception condition has been detected, this function returns <code>0</code>, and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided in the call. The output positional parameter array <code>l1b2_masks</code> contains the 36 masks at the full spatial resolution of the <span class="smallcaps">MISR</span> instrument (275 m), one for each camera and spectral band, where the pixel values have the following meanings:</p>
+<ul>
+<li><p><code>IF (n_masks GT 0)</code>: The mask value of unobserved (e.g., edge) pixels is <code>0B</code>, the mask value of valid pixels is set to <code>1B</code>, the mask value of poor (<span class="smallcaps">RDQI</span> = 2) pixels is set <code>253B</code>, the mask value of bad (<span class="smallcaps">RDQI</span> = 3) pixels is set <code>254B</code>, and the mask value of pixels obscured by topography is set to <code>255B</code>.</p></li>
+<li><p><code>IF (n_masks GT 1)</code>: In addition to the categories recognized with <code>n_masks = 1</code>, valid pixels are further partitioned as land pixels, set to <code>1B</code>, and water pixels, set to <code>2B</code>.</p></li>
+<li><p><code>IF (n_masks GT 2)</code>: In addition to the categories recognized with <code>n_masks = 1</code>, valid pixels are further partitioned as clear land pixels, set to <code>1B</code>, clear water pixels, set to <code>2B</code>, and cloudy pixels, set to <code>3B</code>.</p></li>
+</ul>
+<p>If the input keyword parameter <code>MAPS</code> is set, mask maps are saved in the folder <code>root_dirs[3] + pob_str + PATH_SEP() + &#8217;L1B2_GM&#8217; + PATH_SEP()</code>.</p></li>
+<li><p>If an exception condition has been detected, this function returns a non-zero error code, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. The output positional parameter <code>l1b2_masks</code> and the mask maps may be undefined, inexistent, incomplete or useless.</p></li>
+</ul></li>
+<li><p><strong>Exception conditions:</strong></p>
+<ul>
+<li><p>Error 100: One or more positional parameter(s) are missing.</p></li>
+<li><p>Error 110: Input positional parameter <code>misr_mode</code> is invalid.</p></li>
+<li><p>Error 120: Input positional parameter <code>misr_path</code> is invalid.</p></li>
+<li><p>Error 130: Input positional parameter <code>misr_orbit</code> is invalid.</p></li>
+<li><p>Error 140: Input positional parameter <code>misr_block</code> is invalid.</p></li>
+<li><p>Error 150: Input positional parameter <code>n_masks</code> is invalid.</p></li>
+<li><p>Error 200: An exception condition occurred in <code>path2str.pro</code>.</p></li>
+<li><p>Error 210: An exception condition occurred in <code>orbit2str.pro</code>.</p></li>
+<li><p>Error 220: An exception condition occurred in <code>block2str.pro</code>.</p></li>
+<li><p>Error 230: Either none or more than one <span class="smallcaps">L1B2</span> files were found.</p></li>
+<li><p>Error 240: An exception condition occurred in <code>lr2hr.pro</code>.</p></li>
+<li><p>Error 250: An exception condition occurred in <code>lr2hr.pro</code>.</p></li>
+<li><p>Error 260: An exception condition occurred in <code>make_water_mask.pro</code>.</p></li>
+<li><p>Error 270: An exception condition occurred in <code>lr2hr.pro</code>.</p></li>
+<li><p>Error 280: An exception condition occurred in <code>make_cloud_masks.pro</code>.</p></li>
+<li><p>Error 290: An exception condition occurred in <code>lr2hr.pro</code>.</p></li>
+<li><p>Error 300: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_SETREGION_BY_PATH_BLOCKRANGE</code>.</p></li>
+<li><p>Error 310: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_MAKE_FILENAME</code>.</p></li>
+<li><p>Error 320: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_READDATA</code>.</p></li>
+<li><p>Error 330: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
+<code>MTK_READDATA</code>.</p></li>
+<li><p>Error 500: An exception condition occurred in <code>is_writable.pro</code>.</p></li>
+<li><p>Error 510: An exception condition occurred in <code>make_bytemap.pro</code>.</p></li>
+<li><p>Error 520: An exception condition occurred in <code>make_bytemap.pro</code>.</p></li>
+<li><p>Error 530: An exception condition occurred in <code>make_bytemap.pro</code>.</p></li>
+</ul></li>
+<li><p><strong>Dependencies:</strong></p>
+<ul>
+<li><p><code>MISR Toolkit</code></p></li>
+<li><p><code>block2str.pro</code></p></li>
+<li><p><code>chk_misr_block.pro</code></p></li>
+<li><p><code>chk_misr_mode.pro</code></p></li>
+<li><p><code>chk_misr_orbit.pro</code></p></li>
+<li><p><code>chk_misr_path.pro</code></p></li>
+<li><p><code>is_writable.pro</code></p></li>
+<li><p><code>lr2hr.pro</code></p></li>
+<li><p><code>make_bytemap.pro</code></p></li>
+<li><p><code>make_cloud_masks.pro</code></p></li>
+<li><p><code>make_water_mask.pro</code></p></li>
+<li><p><code>orbit2str.pro</code></p></li>
+<li><p><code>path2str.pro</code></p></li>
+<li><p><code>set_misr_specs.pro</code></p></li>
+<li><p><code>set_root_dirs.pro</code></p></li>
+<li><p><code>strstr.pro</code></p></li>
+</ul></li>
+<li><p><strong>Remarks:</strong></p>
+<ul>
+<li><p><strong>Note 1:</strong> This function generates <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> masks at the full spatial resolution of 275 m because these are needed to process the high-resolution data channels of the <span class="smallcaps">L1B2</span> Global Mode or the Local Mode files, and because the distribution of edge and obscured pixels is resolution dependent. However, some of the key inputs to create those masks (in particular the <span class="smallcaps">AGP</span> and <span class="smallcaps">RCCM</span> files) are only available at the reduced spatial resolution: these are upscaled as needed with the function <code>lr2hr.pro</code>.</p></li>
+<li><p><strong>Note 2:</strong> If the optional keyword parameter <code>MAPS</code> is set, this functions saves 36, 72 or 108 mask maps when the input positional parameter <code>n_masks</code> is set to 1, 2, or 3, respectively.</p></li>
+</ul></li>
+<li><p><strong>Examples:</strong></p>
+<pre><code>IDL&gt; misr_mode = &#39;GM&#39;
+IDL&gt; misr_path = 168
+IDL&gt; misr_orbit = 68050
+IDL&gt; misr_block = 113
+IDL&gt; n_masks = 3
+IDL&gt; rc = make_l1b2_masks(misr_mode, misr_path, $
+   misr_orbit, misr_block, n_masks, l1b2_masks, $
+   /MAPS, /DEBUG, EXCPT_COND = excpt_cond)
+IDL&gt; PRINT, &#39;rc = &#39;, rc, &#39; excpt_cond = &gt;&#39; + excpt_cond + &#39;&lt;&#39;
+rc =        0 excpt_cond = &gt;&lt;</code></pre></li>
+<li><p><strong>References:</strong> None.</p></li>
+<li><p><strong>Versioning:</strong></p>
+<ul>
+<li><p>2018&#8211;08&#8211;27: Version 0.8 &#8212; Initial release.</p></li>
+<li><p>2018&#8211;09&#8211;19: Version 0.9 &#8212; Update the code to use the current version of function .</p></li>
+</ul></li>
+</ul>
 <h2>make_rdqi_fill_masks</h2>
 <ul>
 <li><p><strong>Purpose:</strong> This function returns masks of fill values and <span class="smallcaps">RDQI</span> from the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> radiance file specified by the input positional parameters.</p></li>
@@ -1299,7 +1336,7 @@ OUTARRAY        FLOAT     = Array[2048, 512]</code></pre></li>
 </ul></li>
 <li><p><strong>Keyword parameters [Input/Output]:</strong></p>
 <ul>
-<li><p><code>VERSION = version {STRING} [I] (Default value: &#8217;F03_0024&#8217;):</code> The selected version number of the L1B2 files.</p></li>
+<li><p><code>L1B2_VERSION = l1b2_version {STRING} [I] (Default value: &#8217;F03_0024&#8217;):</code> The selected version number of the L1B2 files.</p></li>
 <li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
 <li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
 </ul></li>
@@ -1350,6 +1387,7 @@ OUTARRAY        FLOAT     = Array[2048, 512]</code></pre></li>
 <ul>
 <li><p>2018&#8211;08&#8211;08: Version 0.9 &#8212; Initial release by Linda Hunt.</p></li>
 <li><p>2018&#8211;08&#8211;20: Version 1.0 &#8212; Initial public release.</p></li>
+<li><p>2018&#8211;08&#8211;29: Version 1.1 &#8212; Update <code>VERSION</code> keyword parameter to <code>L1B2_VERSION</code> for consistency with other functions.</p></li>
 </ul></li>
 </ul>
 <h2>map_l1b2_block</h2>

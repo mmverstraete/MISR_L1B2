@@ -234,7 +234,13 @@ FUNCTION best_fits_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    ;
    ;  VERSIONING:
    ;
-   ;  *   2018–08–09: Version 0.9 — Initial release.
+   ;  *   2018–08–09: Version 0.8 — Initial release.
+   ;
+   ;  *   2018–09–19: Version 0.9 — Upgrade the code to compute the
+   ;      statistics only on valid data, i.e., where BRF > 0.0 (as before)
+   ;      and RDQI < 2 (new), and to generate nominal results whenever
+   ;      there are no common valid pixel values suitable to compute the
+   ;      statistics.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
@@ -540,6 +546,18 @@ FUNCTION best_fits_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
       RETURN, error_code
    ENDIF
 
+   ;  Read the RDQI field for the same grid of the target channel:
+   target_field_rd = misr_band + ' RDQI'
+   status = MTK_READDATA(target_l1b2_file, target_grid, target_field_rd, $
+      region, target_databuf_rd, mapinfo)
+   IF ((debug) AND (status NE 0)) THEN BEGIN
+      error_code = 322
+      excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
+         ': Error encountered in MTK_READDATA while reading ' + $
+         target_l1b2_file
+      RETURN, error_code
+   ENDIF
+
    ; Initialize the best Pearson correlation coefficient so far to 0.0:
    best_land_cors[*] = 0.0
    IF (n_masks GT 1) THEN best_water_cors[*] = 0.0
@@ -608,6 +626,18 @@ FUNCTION best_fits_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
             RETURN, error_code
          ENDIF
 
+   ;  Read the RDQI field for the same grid of the source channel:
+         source_field_rd = source_bnd + ' RDQI'
+         status = MTK_READDATA(source_l1b2_file, source_grid, source_field_rd, $
+            region, source_databuf_rd, mapinfo)
+         IF ((debug) AND (status NE 0)) THEN BEGIN
+            error_code = 342
+            excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
+               ': Error encountered in MTK_READDATA while reading ' + $
+               target_l1b2_file
+            RETURN, error_code
+         ENDIF
+
    ;  Ensure that the spatial resolutions of the target and the source data
    ;  channels match, and if not, adjust the spatial resolution of the source
    ;  data channel:
@@ -629,46 +659,58 @@ FUNCTION best_fits_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
             RETURN, error_code
          ENDIF
 
-   ;  Locate the land pixels with valid (> 0) BRF values in both the source
-   ;  and the target data channels:
+   ;  Locate the land pixels with valid (BRF > 0 and RDQI < 2) values in
+   ;  both the source and the target data channels:
          IF (n_masks EQ 1) THEN BEGIN
             kdx_lnd = WHERE((source_databuf[*, *] GT 0.0) AND $
-               (target_databuf[*, *] GT 0.0), n_lnd_pts)
+               (source_databuf_rd[*, *] LT 2) AND $
+               (target_databuf[*, *] GT 0.0) AND $
+               (target_databuf_rd[*, *] LT 2), n_lnd_pts)
             best_land_npts[iter] = n_lnd_pts
          ENDIF
          IF (n_masks EQ 2) THEN BEGIN
             kdx_lnd = WHERE((source_databuf[*, *] GT 0.0) AND $
+               (source_databuf_rd[*, *] LT 2) AND $
                (target_databuf[*, *] GT 0.0) AND $
+               (target_databuf_rd[*, *] LT 2) AND $
                (land_mask EQ 1B), n_lnd_pts)
             best_land_npts[iter] = n_lnd_pts
          ENDIF
          IF (n_masks EQ 3) THEN BEGIN
             kdx_lnd = WHERE((source_databuf[*, *] GT 0.0) AND $
+               (source_databuf_rd[*, *] LT 2) AND $
                (target_databuf[*, *] GT 0.0) AND $
+               (target_databuf_rd[*, *] LT 2) AND $
                (clear_land_masks[cam, *, *] EQ 2B), n_lnd_pts)
             best_land_npts[iter] = n_lnd_pts
          ENDIF
 
-   ;  Locate the water pixels with valid (> 0) BRF values in both the source
-   ;  and the target data channels:
+   ;  Locate the water pixels with valid (BRF > 0 and RDQI < 2) values in
+   ;  both the source and the target data channels:
          IF (n_masks EQ 2) THEN BEGIN
             kdx_wat = WHERE((source_databuf[*, *] GT 0.0) AND $
+               (source_databuf_rd[*, *] LT 2) AND $
                (target_databuf[*, *] GT 0.0) AND $
+               (target_databuf_rd[*, *] LT 2) AND $
                (water_mask EQ 1B), n_wat_pts)
             best_water_npts[iter] = n_wat_pts
          ENDIF
          IF (n_masks GE 3) THEN BEGIN
             kdx_wat = WHERE((source_databuf[*, *] GT 0.0) AND $
+               (source_databuf_rd[*, *] LT 2) AND $
                (target_databuf[*, *] GT 0.0) AND $
+               (target_databuf_rd[*, *] LT 2) AND $
                (clear_water_masks[cam, *, *] EQ 2B), n_wat_pts)
             best_water_npts[iter] = n_wat_pts
          ENDIF
 
-   ;  Locate the cloud pixels with valid (> 0) BRF values in both the source
-   ;  and the target data channels:
+   ;  Locate the cloud pixels with valid (BRF > 0 and RDQI < 2) values in
+   ;  both the source and the target data channels:
          IF (n_masks EQ 3) THEN BEGIN
             kdx_cld = WHERE((source_databuf[*, *] GT 0.0) AND $
+               (source_databuf_rd[*, *] LT 2) AND $
                (target_databuf[*, *] GT 0.0) AND $
+               (target_databuf_rd[*, *] LT 2) AND $
                (cloud_masks[cam, *, *] EQ 1B), n_cld_pts)
             best_cloud_npts[iter] = n_cld_pts
          ENDIF
@@ -680,19 +722,19 @@ FUNCTION best_fits_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
          IF (n_lnd_pts GT 0) THEN BEGIN
 
    ;  Extract the land values wherever the source and the target are both
-   ;  available:
+   ;  valid and available:
             source_lnd_data = source_databuf[kdx_lnd]
             target_lnd_data = target_databuf[kdx_lnd]
 
    ;  Compute the root-mean-square deviation (RMSD) between the source and
-   ;  the target land values wherever they are both available:
+   ;  the target land values wherever they are both valid and available:
             numer = TOTAL((source_lnd_data - target_lnd_data) * $
                (source_lnd_data - target_lnd_data))
             rmsd = SQRT(numer / n_lnd_pts)
             best_land_rsmds[iter] = rmsd
 
    ;  Compute the correlation coefficient between the source and the target
-   ;  land values wherever they are both available:
+   ;  land values wherever they are both valid and available:
             cc = CORRELATE(source_lnd_data, target_lnd_data, /DOUBLE)
             cc_lnd = FLOAT(cc)
             best_land_cors[iter] = cc_lnd
@@ -707,14 +749,23 @@ FUNCTION best_fits_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
             ENDIF
 
    ;  Compute the linear fit equation to estimate the target from the source
-   ;  land values wherever they are both available:
+   ;  land values wherever they are both valid and available:
             res = LINFIT(source_lnd_data, target_lnd_data, CHISQR = chi, $
                PROB = prob, /DOUBLE)
             best_land_as[iter] = res[0]
             best_land_bs[iter] = res[1]
             best_land_chisqs[iter] = chi
             best_land_probs[iter] = prob
-         ENDIF
+
+   ;  Consider the case where there are no common valid land pixel values:
+         ENDIF ELSE BEGIN
+            best_land_rsmds[iter] = 1.0E10
+            best_land_cors[iter] = 0.0
+            best_land_as[iter] = 0.0
+            best_land_bs[iter] = 0.0
+            best_land_chisqs[iter] = 1.0E10
+            best_land_probs[iter] = 0.0
+         ENDELSE
 
    ;  === Statistics for water bodies ===
 
@@ -756,7 +807,16 @@ FUNCTION best_fits_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
                best_water_bs[iter] = res[1]
                best_water_chisqs[iter] = chi
                best_water_probs[iter] = prob
-            ENDIF
+
+   ;  Consider the case where there are no common valid water pixel values:
+            ENDIF ELSE BEGIN
+               best_water_rsmds[iter] = 1.0E10
+               best_water_cors[iter] = 0.0
+               best_water_as[iter] = 0.0
+               best_water_bs[iter] = 0.0
+               best_water_chisqs[iter] = 1.0E10
+               best_water_probs[iter] = 0.0
+            ENDELSE
          ENDIF
 
    ;  === Statistics for cloud patches ===
@@ -799,7 +859,15 @@ FUNCTION best_fits_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
                best_cloud_bs[iter] = res[1]
                best_cloud_chisqs[iter] = chi
                best_cloud_probs[iter] = prob
-            ENDIF
+   ;  Consider the case where there are no common valid cloud pixel values:
+            ENDIF ELSE BEGIN
+               best_cloud_rsmds[iter] = 1.0E10
+               best_cloud_cors[iter] = 0.0
+               best_cloud_as[iter] = 0.0
+               best_cloud_bs[iter] = 0.0
+               best_cloud_chisqs[iter] = 1.0E10
+               best_cloud_probs[iter] = 0.0
+            ENDELSE
          ENDIF
 
          iter = iter + 1
