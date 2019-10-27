@@ -1,5 +1,12 @@
-FUNCTION mpocv2fn_l1b2, misr_mode, misr_path, misr_orbit, misr_camera, $
-   misr_version, l1b2_fspec, DEBUG = debug, EXCPT_COND = excpt_cond
+FUNCTION mpocv2fn_l1b2, $
+   misr_mode, $
+   misr_path, $
+   misr_orbit, $
+   misr_camera, $
+   misr_version, $
+   l1b2_fspec, $
+   DEBUG = debug, $
+   EXCPT_COND = excpt_cond
 
    ;Sec-Doc
    ;  PURPOSE: This function generates the MISR L1B2 Georectified Radiance
@@ -15,7 +22,8 @@ FUNCTION mpocv2fn_l1b2, misr_mode, misr_path, misr_orbit, misr_camera, $
    ;  the current computer.
    ;
    ;  SYNTAX: rc = mpocv2fn_l1b2(misr_mode, misr_path, misr_orbit, $
-   ;  misr_camera, misr_version, l1b2_fspec, DEBUG = debug, EXCPT_COND = excpt_cond)
+   ;  misr_camera, misr_version, l1b2_fspec, DEBUG = debug, $
+   ;  EXCPT_COND = excpt_cond)
    ;
    ;  POSITIONAL PARAMETERS [INPUT/OUTPUT]:
    ;
@@ -41,7 +49,7 @@ FUNCTION mpocv2fn_l1b2, misr_mode, misr_path, misr_orbit, misr_camera, $
    ;      Description of the exception condition if one has been
    ;      encountered, or a null string otherwise.
    ;
-   ;  RETURNED VALUE TYPE: INTEGER.
+   ;  RETURNED VALUE TYPE: INT.
    ;
    ;  OUTCOME:
    ;
@@ -70,14 +78,21 @@ FUNCTION mpocv2fn_l1b2, misr_mode, misr_path, misr_orbit, misr_camera, $
    ;
    ;  *   Error 130: Input argument misr_orbit is invalid.
    ;
+   ;  *   Error 132: The input positional parameter misr_orbit is
+   ;      inconsistent with the input positional parameter misr_path.
+   ;
+   ;  *   Error 134: An exception condition occurred in is_frompath.pro.
+   ;
+   ;  *   Error 136: Unexpected return code received from is_frompath.pro.
+   ;
    ;  *   Error 140: Input argument misr_camera is invalid.
    ;
    ;  *   Error 199: Unrecognized computer: Update the function
    ;      set_root_dirs.
    ;
-   ;  *   Error 210: An exception condition occurred in path2str.pro.
+   ;  *   Error 200: An exception condition occurred in path2str.pro.
    ;
-   ;  *   Error 310: An exception condition occurred in the MISR TOOLKIT
+   ;  *   Error 600: An exception condition occurred in the MISR TOOLKIT
    ;      routine
    ;      MTK_MAKE_FILENAME.
    ;
@@ -93,9 +108,11 @@ FUNCTION mpocv2fn_l1b2, misr_mode, misr_path, misr_orbit, misr_camera, $
    ;
    ;  *   chk_misr_path.pro
    ;
+   ;  *   is_frompath.pro
+   ;
    ;  *   path2str.pro
    ;
-   ;  *   set_root_dirs.pro
+   ;  *   set_roots_vers.pro
    ;
    ;  *   strstr.pro
    ;
@@ -127,7 +144,14 @@ FUNCTION mpocv2fn_l1b2, misr_mode, misr_path, misr_orbit, misr_camera, $
    ;      l1b2_fspec = /Volumes/MISR_Data3/P168/L1_LM/
    ;         MISR_AM1_GRP_TERRAIN_LM_P168_O068050_CF_F03_0024.hdf
    ;
-   ;  REFERENCES: None.
+   ;  REFERENCES:
+   ;
+   ;  *   Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019)
+   ;      _Improving the usability of the MISR L1B2 Georectified Radiance
+   ;      Product (2000–present) in land surface applications_,
+   ;      Earth System Science Data, Vol. xxx, p. yy–yy, available from
+   ;      https://www.earth-syst-sci-data.net/essd-2019-zz/ (DOI:
+   ;      10.5194/zzz).
    ;
    ;  VERSIONING:
    ;
@@ -143,13 +167,34 @@ FUNCTION mpocv2fn_l1b2, misr_mode, misr_path, misr_orbit, misr_camera, $
    ;
    ;  *   2018–05–07: Version 1.2 — Add the misr_mode input positional
    ;      parameter, merge this function with its twin pocv2fn_l1b2_lm.pro
-   ;      and change the name to pocv2fn_l1b2.pro.
+   ;      and change the name to
+   ;      pocv2fn_l1b2.pro.
    ;
    ;  *   2018–05–18: Version 1.5 — Implement new coding standards.
+   ;
+   ;  *   2018–12–12: Version 1.6 — Update this function to use
+   ;      set_roots_vers.pro instead of set_root_dirs.pro.
+   ;
+   ;  *   2019–03–01: Version 2.00 — Systematic update of all routines to
+   ;      implement stricter coding standards and improve documentation.
+   ;
+   ;  *   2019–04–11: Version 2.01 — Bug fix: correct an error message on
+   ;      line 300.
+   ;
+   ;  *   2019–05–04: Version 2.02 — Update the code to report the
+   ;      specific error message of MTK routines.
+   ;
+   ;  *   2019–06–11: Version 2.03 — Update the code to include ELSE
+   ;      options in all CASE statements and update the documentation.
+   ;
+   ;  *   2019–08–20: Version 2.1.0 — Adopt revised coding and
+   ;      documentation standards (in particular regarding the use of
+   ;      verbose and the assignment of numeric return codes), and switch
+   ;      to 3-parts version identifiers.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
-   ;  *   Copyright (C) 2017-2018 Michel M. Verstraete.
+   ;  *   Copyright (C) 2017-2019 Michel M. Verstraete.
    ;
    ;      Permission is hereby granted, free of charge, to any person
    ;      obtaining a copy of this software and associated documentation
@@ -157,16 +202,17 @@ FUNCTION mpocv2fn_l1b2, misr_mode, misr_path, misr_orbit, misr_camera, $
    ;      restriction, including without limitation the rights to use,
    ;      copy, modify, merge, publish, distribute, sublicense, and/or
    ;      sell copies of the Software, and to permit persons to whom the
-   ;      Software is furnished to do so, subject to the following
+   ;      Software is furnished to do so, subject to the following three
    ;      conditions:
    ;
-   ;      The above copyright notice and this permission notice shall be
-   ;      included in all copies or substantial portions of the Software.
+   ;      1. The above copyright notice and this permission notice shall
+   ;      be included in its entirety in all copies or substantial
+   ;      portions of the Software.
    ;
-   ;      THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND,
-   ;      EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-   ;      OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-   ;      NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+   ;      2. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY
+   ;      KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+   ;      WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+   ;      AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
    ;      HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
    ;      WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
    ;      FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
@@ -174,22 +220,28 @@ FUNCTION mpocv2fn_l1b2, misr_mode, misr_path, misr_orbit, misr_camera, $
    ;
    ;      See: https://opensource.org/licenses/MIT.
    ;
+   ;      3. The current version of this Software is freely available from
+   ;
+   ;      https://github.com/mmverstraete.
+   ;
    ;  *   Feedback
    ;
    ;      Please send comments and suggestions to the author at
-   ;      MMVerstraete@gmail.com.
+   ;      MMVerstraete@gmail.com
    ;Sec-Cod
+
+   COMPILE_OPT idl2, HIDDEN
 
    ;  Get the name of this routine:
    info = SCOPE_TRACEBACK(/STRUCTURE)
    rout_name = info[N_ELEMENTS(info) - 1].ROUTINE
 
-   ;  Initialize the default return code and the exception condition message:
+   ;  Initialize the default return code:
    return_code = 0
-   excpt_cond = ''
 
-   ;  Set the default values of essential input keyword parameters:
+   ;  Set the default values of flags and essential output keyword parameters:
    IF (KEYWORD_SET(debug)) THEN debug = 1 ELSE debug = 0
+   excpt_cond = ''
 
    ;  Initialize the output positional parameter(s):
    l1b2_fspec = ''
@@ -239,30 +291,65 @@ FUNCTION mpocv2fn_l1b2, misr_mode, misr_path, misr_orbit, misr_camera, $
       ENDIF
 
    ;  Return to the calling routine with an error message if the input
+   ;  positional parameter 'misr_orbit' is inconsistent with the input
+   ;  positional parameter 'misr_path':
+      res = is_frompath(misr_path, misr_orbit, $
+         DEBUG = debug, EXCPT_COND = excpt_cond)
+      IF (res NE 1) THEN BEGIN
+         CASE 1 OF
+            (res EQ 0): BEGIN
+               error_code = 132
+               excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
+                  rout_name + ': The input positional parameter ' + $
+                  'misr_orbit is inconsistent with the input positional ' + $
+                  'parameter misr_path.'
+               RETURN, error_code
+            END
+            (res EQ -1): BEGIN
+               error_code = 134
+               excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
+                  rout_name + ': ' + excpt_cond
+               RETURN, error_code
+            END
+            ELSE: BEGIN
+               error_code = 136
+               excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
+                  rout_name + ': Unexpected return code ' + strstr(res) + $
+                  ' from is_frompath.pro.'
+               RETURN, error_code
+            END
+         ENDCASE
+      ENDIF
+
+   ;  Return to the calling routine with an error message if the input
    ;  positional parameter 'misr_camera' is invalid:
       rc = chk_misr_camera(misr_camera, DEBUG = debug, EXCPT_COND = excpt_cond)
       IF (rc NE 0) THEN BEGIN
          error_code = 140
          excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
-            ': ' + excpt_cond(idx)
+            ': ' + excpt_cond
          RETURN, error_code
       ENDIF
    ENDIF
 
-   ;  Set the standard locations for MISR and MISR-HR files on this computer:
-   root_dirs = set_root_dirs()
-   IF ((debug) AND (root_dirs[0] EQ 'Unrecognized computer')) THEN BEGIN
+   ;  Set the default folders and version identifiers of the MISR and
+   ;  MISR-HR files on this computer, and return to the calling routine if
+   ;  there is an internal error, but not if the computer is unrecognized, as
+   ;  root addresses can be overridden by input keyword parameters:
+   rc_roots = set_roots_vers(root_dirs, versions, $
+      DEBUG = debug, EXCPT_COND = excpt_cond)
+   IF (debug AND (rc_roots GE 100)) THEN BEGIN
       error_code = 199
       excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
-         ': Unrecognized computer.'
+         ': ' + excpt_cond
       RETURN, error_code
    ENDIF
 
    ;  Generate the string version of the MISR Path number:
    rc = path2str(misr_path, misr_path_str, DEBUG = debug, $
       EXCPT_COND = excpt_cond)
-   IF ((debug) AND (rc NE 0)) THEN BEGIN
-      error_code = 210
+   IF (debug AND (rc NE 0)) THEN BEGIN
+      error_code = 200
       excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
          ': ' + excpt_cond
       RETURN, error_code
@@ -275,10 +362,11 @@ FUNCTION mpocv2fn_l1b2, misr_mode, misr_path, misr_orbit, misr_camera, $
    status = MTK_MAKE_FILENAME(fpath[0], $
       'GRP_TERRAIN_' + misr_mode, misr_camera, misr_path, misr_orbit, $
       misr_version, l1b2_fspec)
-   IF ((debug) AND (status NE 0)) THEN BEGIN
-      error_code = 310
+   IF (debug AND (status NE 0)) THEN BEGIN
+      error_code = 600
       excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
-         ': status from MTK_MAKE_FILENAME = ' + strstr(status)
+         ': Error message from MTK_MAKE_FILENAME: ' + $
+         MTK_ERROR_MESSAGE(status)
       RETURN, error_code
    ENDIF
 

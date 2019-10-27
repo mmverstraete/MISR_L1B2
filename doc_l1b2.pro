@@ -1,22 +1,45 @@
-PRO doc_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
-   DEBUG = debug, EXCPT_COND = excpt_cond
+PRO doc_l1b2, $
+   misr_mode, $
+   misr_path, $
+   misr_orbit, $
+   misr_block, $
+   L1B2_FOLDER = l1b2_folder, $
+   L1B2_VERSION = l1b2_version, $
+   LOG_IT = log_it, $
+   LOG_FOLDER = log_folder, $
+   SAVE_IT = save_it, $
+   SAVE_FOLDER = save_folder, $
+   HIST_IT = hist_it, $
+   HIST_FOLDER = hist_folder, $
+   MAP_IT = map_it, $
+   MAP_FOLDER = map_folder, $
+   VERBOSE = verbose, $
+   DEBUG = debug, $
+   EXCPT_COND = excpt_cond
 
    ;Sec-Doc
-   ;  PURPOSE: This program generates an exhaustive characterization of
-   ;  the data contained in the MISR L1B2 Georectified Radiance Product
-   ;  (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance files
-   ;  corresponding to the specified input positional parameters , PATH,
-   ;  ORBIT and BLOCK. and BLOCK.
+   ;l1b2gm_files
    ;
-   ;  ALGORITHM: This program calls the various diagnostic, statistical
-   ;  and mapping functions within this project to provide a full
-   ;  characterization of the MISR L1B2 Georectified Radiance Product
+   ;  PURPOSE: This program generates histograms and maps of the data
+   ;  contained in the standard MISR L1B2 Georectified Radiance Product
+   ;  (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance files
+   ;  corresponding to the specified input positional parameters MODE,
+   ;  PATH, ORBIT and BLOCK.
+   ;
+   ;  ALGORITHM: This program calls the functions diag_l1b2.pro,
+   ;  map_l1b2_block.pro and map_l1b2_miss.pro to generate the histograms
+   ;  and maps of the standard MISR L1B2 Georectified Radiance Product
    ;  (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance files
    ;  corresponding to the specified input positional parameters MODE,
    ;  PATH, ORBIT and BLOCK. and BLOCK.
    ;
    ;  SYNTAX: doc_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
-   ;  DEBUG = debug, EXCPT_COND = excpt_cond
+   ;  L1B2_FOLDER = l1b2_folder, L1B2_VERSION = l1b2_version, $
+   ;  LOG_IT = log_it, LOG_FOLDER = log_folder, $
+   ;  SAVE_IT = save_it, SAVE_FOLDER = save_folder, $
+   ;  HIST_IT = hist_it, HIST_FOLDER = hist_folder, $
+   ;  MAP_IT = map_it, MAP_FOLDER = map_folder, $
+   ;  VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond
    ;
    ;  POSITIONAL PARAMETERS [INPUT/OUTPUT]:
    ;
@@ -30,6 +53,45 @@ PRO doc_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    ;
    ;  KEYWORD PARAMETERS [INPUT/OUTPUT]:
    ;
+   ;  *   LOG_IT = log_it {INT} [I] (Default value: 0): Flag to activate
+   ;      (1) or skip (0) generating a log file.
+   ;
+   ;  *   LOG_FOLDER = log_folder {STRING} [I] (Default value: Set by
+   ;      function
+   ;      set_roots_vers.pro): The directory address of the output folder
+   ;      containing the processing log.
+   ;
+   ;  *   SAVE_IT = save_it {INT} [I] (Default value: 0): Flag to activate
+   ;      (1) or skip (0) saving the results in a savefile.
+   ;
+   ;  *   SAVE_FOLDER = save_folder {STRING} [I] (Default value: Set by
+   ;      function
+   ;      set_roots_vers.pro): The directory address of the output folder
+   ;      containing the savefile.
+   ;
+   ;  *   HIST_IT = hist_it {INT} [I] (Default value: 0): Flag to activate
+   ;      (1) or skip (0) generating histograms of the numerical results.
+   ;
+   ;  *   HIST_FOLDER = hist_folder {STRING} [I] (Default value: Set by
+   ;      function
+   ;      set_roots_vers.pro): The directory address of the output folder
+   ;      containing the histograms.
+   ;
+   ;  *   MAP_IT = map_it {INT} [I] (Default value: 0): Flag to activate
+   ;      (1) or skip (0) generating maps of the numerical results.
+   ;
+   ;  *   MAP_FOLDER = map_folder {STRING} [I] (Default value: Set by
+   ;      function
+   ;      set_roots_vers.pro): The directory address of the output folder
+   ;      containing the maps.
+   ;
+   ;  *   VERBOSE = verbose {INT} [I] (Default value: 0): Flag to enable
+   ;      (> 0) or skip (0) reporting progress on the console: 1 only
+   ;      reports exiting the routine; 2 reports entering and exiting the
+   ;      routine, as well as key milestones; 3 reports entering and
+   ;      exiting the routine, and provides detailed information on the
+   ;      intermediary results.
+   ;
    ;  *   DEBUG = debug {INT} [I] (Default value: 0): Flag to activate (1)
    ;      or skip (0) debugging tests.
    ;
@@ -41,36 +103,16 @@ PRO doc_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    ;
    ;  OUTCOME:
    ;
-   ;  *   If no exception condition has been detected, this function
-   ;      returns 0, and the output keyword parameter excpt_cond is set to
-   ;      a null string, if the optional input keyword parameter DEBUG is
-   ;      set and if the optional output keyword parameter EXCPT_COND is
-   ;      provided in the call.
-   ;      If the input positional parameters specify a set of Global Mode
-   ;      files, this program generates 861 files in the folder
-   ;      root_dirs[3] + ’/Pxxx_Oyyyyyy_Bzzz/L1B2_GM/’:
-   ;
-   ;      -   54 files generated by diag_l1b2_gm.pro
-   ;
-   ;      -   698 files generated by cor_l1b2_gm.pro
-   ;
-   ;      -   72 files generated by map_l1b2_gm_block.pro
-   ;
-   ;      -   37 files generated by map_l1b2_gm_miss.pro
-   ;
-   ;      If the input positional parameters specify a set of Local Mode
-   ;      files, this program generates 861 files in the folder
-   ;      root_dirs[3] + ’/Pxxx_Oyyyyyy_Bzzz/L1B2_LM/’:
-   ;
-   ;      -   54 files generated by diag_l1b2_gm.pro
-   ;
-   ;      -   698 files generated by cor_l1b2_gm.pro
-   ;
-   ;      -   72 files generated by map_l1b2_gm_block.pro
-   ;
-   ;      -   37 files generated by map_l1b2_gm_miss.pro
-   ;
-   ;      See the documentation of these functions for further details.
+   ;  *   If no exception condition has been detected, the keyword
+   ;      parameter excpt_cond is set to a null string, if the optional
+   ;      input keyword parameter DEBUG was set and if the optional output
+   ;      keyword parameter EXCPT_COND was provided in the call. The
+   ;      number of output files generated depends on the settings of the
+   ;      optional input keyword parameters log_it, save_it, hist_it and
+   ;      map_it. Customized outputs can be generated by calling those
+   ;      functions diag_l1b2.pro, map_l1b2_block.pro and
+   ;      map_l1b2_miss.pro individually. See the documentation of these
+   ;      functions for further details.
    ;
    ;  *   If an exception condition has been detected, the optional output
    ;      keyword parameter excpt_cond contains a message about the
@@ -78,7 +120,8 @@ PRO doc_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    ;      parameter DEBUG is set and if the optional output keyword
    ;      parameter EXCPT_COND is provided. This program prints an error
    ;      message and returns control to the calling program or to the
-   ;      console; no or only partial output may be generated.
+   ;      console; the expected output files may be inexistent, incomplete
+   ;      or incorrect.
    ;
    ;  EXCEPTION CONDITIONS:
    ;
@@ -90,7 +133,17 @@ PRO doc_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    ;
    ;  *   Error 130: Input argument misr_orbit is invalid.
    ;
+   ;  *   Error 132: The input positional parameter misr_orbit is
+   ;      inconsistent with the input positional parameter misr_path.
+   ;
+   ;  *   Error 134: An exception condition occurred in is_frompath.pro.
+   ;
+   ;  *   Error 136: Unexpected return code received from is_frompath.pro.
+   ;
    ;  *   Error 140: Input argument misr_block is invalid.
+   ;
+   ;  *   Error 199: An exception condition occurred in
+   ;      set_roots_vers.pro.
    ;
    ;  *   Error 200: An exception condition occurred in function
    ;      path2str.pro.
@@ -101,12 +154,13 @@ PRO doc_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    ;  *   Error 220: An exception condition occurred in function
    ;      block2str.pro.
    ;
-   ;  *   Error 400: An exception condition occurred in function
-   ;      get_l1b2_files.
+   ;  *   Error 230: An exception condition occurred in function
+   ;      heap_l1b2_block.pro.
+   ;
+   ;  *   Error 300: An exception condition occurred in function
+   ;      heap_l1b2_block.
    ;
    ;  DEPENDENCIES:
-   ;
-   ;  *   best_fit_l1b2.pro
    ;
    ;  *   block2str.pro
    ;
@@ -118,15 +172,17 @@ PRO doc_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    ;
    ;  *   chk_misr_path.pro
    ;
-   ;  *   cor_l1b2.pro
-   ;
    ;  *   diag_l1b2.pro
    ;
-   ;  *   get_l1b2_files.pro
+   ;  *   first_char.pro
    ;
-   ;  *   map_l1b2_block.pro
+   ;  *   heap_l1b2_block.pro
    ;
-   ;  *   map_l1b2_miss.pro
+   ;  *   is_frompath.pro
+   ;
+   ;  *   is_numeric.pro
+   ;
+   ;  *   map_l1b2.pro
    ;
    ;  *   orbit2str.pro
    ;
@@ -134,30 +190,36 @@ PRO doc_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    ;
    ;  *   set_misr_specs.pro
    ;
+   ;  *   set_roots_vers.pro
+   ;
    ;  *   strstr.pro
    ;
    ;  REMARKS:
    ;
-   ;  *   NOTE 1: *** WARNING ***: The functions implementing the core of
-   ;      the work must be called in the proper order, as some of them
-   ;      depend on the results obtained by earlier ones.
+   ;  *   NOTE 1: This program calls the mapping functions with the
+   ;      default scaling options. To generate maps with other settings,
+   ;      call those functions individually.
    ;
-   ;  *   NOTE 2: *** WARNING ***: Running this program takes well over an
-   ;      hour (>3900 s) on MicMac.
-   ;
-   ;  *   NOTE 3: This program calls the diagnostic and mapping functions
-   ;      with default options. To select custom options, call those
-   ;      functions individually.
+   ;  *   NOTE 2: This program also reports on the time spent on each of
+   ;      the main routines it calls to generate the desired outcomes.
    ;
    ;  EXAMPLES:
    ;
    ;      IDL> doc_l1b2, 'GM', 168, 68050, 110, $
-   ;         /DEBUG, EXCPT_COND = excpt_cond
+   ;         /LOG_IT, /SAVE_IT, /HIST_IT, /MAP_IT, $
+   ;         VERBOSE = 0, /DEBUG, EXCPT_COND = excpt_cond
    ;
    ;      results in the creation of all output files generated by the functions
-   ;      diag_l1b2, cor_l1b2, map_l1b2_block, and map_l1b2_miss.
+   ;      diag_l1b2, map_l1b2_block and map_l1b2_miss.
    ;
-   ;  REFERENCES: None.
+   ;  REFERENCES:
+   ;
+   ;  *   Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019)
+   ;      _Improving the usability of the MISR L1B2 Georectified Radiance
+   ;      Product (2000–present) in land surface applications_,
+   ;      Earth System Science Data, Vol. xxx, p. yy–yy, available from
+   ;      https://www.earth-syst-sci-data.net/essd-2019-zz/ (DOI:
+   ;      10.5194/zzz).
    ;
    ;  VERSIONING:
    ;
@@ -176,10 +238,40 @@ PRO doc_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    ;      doc_l1b2_lm.pro and change the name to doc_l1b2_block.pro.
    ;
    ;  *   2018–05–18: Version 1.5 — Implement new coding standards.
+   ;
+   ;  *   2019–01–24: Version 1.6 — Update the code to call the new
+   ;      versions of other routines.
+   ;
+   ;  *   2019–02–17: Version 1.7 — Simplify this program to focus
+   ;      exclusively on documenting the standard MISR L1B2 data through
+   ;      histograms and maps.
+   ;
+   ;  *   2019–03–01: Version 2.00 — Systematic update of all routines to
+   ;      implement stricter coding standards and improve documentation.
+   ;
+   ;  *   2019–03–20: Version 2.10 — Update the handling of the optional
+   ;      input keyword parameter VERBOSE and generate the software
+   ;      version consistent with the published documentation.
+   ;
+   ;  *   2019–04–11: Version 2.11 — Bug fix: Corrected return statements;
+   ;      use the function map_l1b2.pro rather than the deprecated
+   ;      functions map_l1b2_block.pro and map_l1b2_miss.pro.
+   ;
+   ;  *   2019–05–02: Version 2.12 — Bug fix: Update RETURN statement
+   ;      after the call to heap_l1b2_block and update the handling of
+   ;      responses to run-time questions.
+   ;
+   ;  *   2019–06–11: Version 2.13 — Update the code to include ELSE
+   ;      options in all CASE statements and update the documentation.
+   ;
+   ;  *   2019–08–20: Version 2.1.0 — Adopt revised coding and
+   ;      documentation standards (in particular regarding the use of
+   ;      verbose and the assignment of numeric return codes), and switch
+   ;      to 3-parts version identifiers.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
-   ;  *   Copyright (C) 2017-2018 Michel M. Verstraete.
+   ;  *   Copyright (C) 2017-2019 Michel M. Verstraete.
    ;
    ;      Permission is hereby granted, free of charge, to any person
    ;      obtaining a copy of this software and associated documentation
@@ -187,16 +279,17 @@ PRO doc_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    ;      restriction, including without limitation the rights to use,
    ;      copy, modify, merge, publish, distribute, sublicense, and/or
    ;      sell copies of the Software, and to permit persons to whom the
-   ;      Software is furnished to do so, subject to the following
+   ;      Software is furnished to do so, subject to the following three
    ;      conditions:
    ;
-   ;      The above copyright notice and this permission notice shall be
-   ;      included in all copies or substantial portions of the Software.
+   ;      1. The above copyright notice and this permission notice shall
+   ;      be included in its entirety in all copies or substantial
+   ;      portions of the Software.
    ;
-   ;      THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND,
-   ;      EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-   ;      OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-   ;      NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+   ;      2. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY
+   ;      KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+   ;      WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+   ;      AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
    ;      HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
    ;      WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
    ;      FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
@@ -204,22 +297,36 @@ PRO doc_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    ;
    ;      See: https://opensource.org/licenses/MIT.
    ;
+   ;      3. The current version of this Software is freely available from
+   ;
+   ;      https://github.com/mmverstraete.
+   ;
    ;  *   Feedback
    ;
    ;      Please send comments and suggestions to the author at
-   ;      MMVerstraete@gmail.com.
+   ;      MMVerstraete@gmail.com
    ;Sec-Cod
+
+   COMPILE_OPT idl2, HIDDEN
 
    ;  Get the name of this routine:
    info = SCOPE_TRACEBACK(/STRUCTURE)
    rout_name = info[N_ELEMENTS(info) - 1].ROUTINE
 
-   ;  Initialize the default return code and the exception condition message:
-   return_code = 0
+   ;  Set the default values of essential input keyword parameters:
+   IF (KEYWORD_SET(log_it)) THEN log_it = 1 ELSE log_it = 0
+   IF (KEYWORD_SET(save_it)) THEN save_it = 1 ELSE save_it = 0
+   IF (KEYWORD_SET(hist_it)) THEN hist_it = 1 ELSE hist_it = 0
+   IF (KEYWORD_SET(map_it)) THEN map_it = 1 ELSE map_it = 0
+   IF (KEYWORD_SET(verbose)) THEN BEGIN
+      IF (is_numeric(verbose)) THEN verbose = FIX(verbose) ELSE verbose = 0
+      IF (verbose LT 0) THEN verbose = 0
+      IF (verbose GT 3) THEN verbose = 3
+   ENDIF ELSE verbose = 0
+   IF (KEYWORD_SET(debug)) THEN debug = 1 ELSE debug = 0
    excpt_cond = ''
 
-   ;  Set the default values of essential input keyword parameters:
-   IF (KEYWORD_SET(debug)) THEN debug = 1 ELSE debug = 0
+   IF (verbose GT 1) THEN PRINT, 'Entering ' + rout_name + '.'
 
    IF (debug) THEN BEGIN
 
@@ -270,6 +377,39 @@ PRO doc_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
       ENDIF
 
    ;  Return to the calling routine with an error message if the input
+   ;  positional parameter 'misr_orbit' is inconsistent with the input
+   ;  positional parameter 'misr_path':
+      res = is_frompath(misr_path, misr_orbit, $
+         DEBUG = debug, EXCPT_COND = excpt_cond)
+      IF (res NE 1) THEN BEGIN
+         CASE 1 OF
+            (res EQ 0): BEGIN
+               error_code = 132
+               excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
+                  rout_name + ': The input positional parameter ' + $
+                  'misr_orbit is inconsistent with the input positional ' + $
+                  'parameter misr_path.'
+               PRINT, error_code
+               RETURN
+            END
+            (res EQ -1): BEGIN
+               error_code = 134
+               excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
+                  rout_name + ': ' + excpt_cond
+               PRINT, error_code
+               RETURN
+            END
+            ELSE: BEGIN
+               error_code = 136
+               excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
+                  rout_name + ': Unexpected return code ' + strstr(res) + $
+                  ' from is_frompath.pro.'
+               RETURN, error_code
+            END
+         ENDCASE
+      ENDIF
+
+   ;  Return to the calling routine with an error message if the input
    ;  positional parameter 'misr_block' is invalid:
       rc = chk_misr_block(misr_block, DEBUG = debug, EXCPT_COND = excpt_cond)
       IF (rc NE 0) THEN BEGIN
@@ -288,10 +428,31 @@ PRO doc_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    n_bands = misr_specs.NBands
    bands = misr_specs.BandNames
 
-   ;  Generate the string version of the MISR Path number:
+   ;  Set the default folders and version identifiers of the MISR and
+   ;  MISR-HR files on this computer, and return to the calling routine if
+   ;  there is an internal error, but not if the computer is unrecognized, as
+   ;  root addresses can be overridden by input keyword parameters:
+   rc_roots = set_roots_vers(root_dirs, versions, $
+      DEBUG = debug, EXCPT_COND = excpt_cond)
+   IF (debug AND (rc_roots GE 100)) THEN BEGIN
+      error_code = 199
+      excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
+         ': ' + excpt_cond
+      RETURN, error_code
+   ENDIF
+
+   ;  Set the MISR and MISR-HR version numbers if they have not been specified
+   ;  explicitly:
+   IF (misr_mode EQ 'GM') THEN BEGIN
+      IF (~KEYWORD_SET(l1b2_version)) THEN l1b2_version = versions[2]
+   ENDIF ELSE BEGIN
+      IF (~KEYWORD_SET(l1b2_version)) THEN l1b2_version = versions[3]
+   ENDELSE
+
+   ;  Generate the long string version of the MISR Path number:
    rc = path2str(misr_path, misr_path_str, DEBUG = debug, $
       EXCPT_COND = excpt_cond)
-   IF ((debug) AND (rc NE 0)) THEN BEGIN
+   IF (debug AND (rc NE 0)) THEN BEGIN
       error_code = 200
       excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
          ': ' + excpt_cond
@@ -299,10 +460,10 @@ PRO doc_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
       STOP
    ENDIF
 
-   ;  Generate the string version of the MISR Orbit number:
+   ;  Generate the long string version of the MISR Orbit number:
    rc = orbit2str(misr_orbit, misr_orbit_str, DEBUG = debug, $
       EXCPT_COND = excpt_cond)
-   IF ((debug) AND (rc NE 0)) THEN BEGIN
+   IF (debug AND (rc NE 0)) THEN BEGIN
       error_code = 210
       excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
          ': ' + excpt_cond
@@ -310,10 +471,10 @@ PRO doc_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
       STOP
    ENDIF
 
-   ;  Generate the string version of the MISR Block number:
+   ;  Generate the long string version of the MISR Block number:
    rc = block2str(misr_block, misr_block_str, DEBUG = debug, $
       EXCPT_COND = excpt_cond)
-   IF ((debug) AND (rc NE 0)) THEN BEGIN
+   IF (debug AND (rc NE 0)) THEN BEGIN
       error_code = 220
       excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
          ': ' + excpt_cond
@@ -321,78 +482,74 @@ PRO doc_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
       STOP
    ENDIF
 
-   rc = get_l1b2_files(misr_mode, misr_path, misr_orbit, l1b2_files, $
+   ;  Load the 36 L1B2 data channels on the heap:
+   rc = heap_l1b2_block(misr_mode, misr_path, misr_orbit, misr_block, $
+      misr_ptr, radrd_ptr, rad_ptr, brf_ptr, rdqi_ptr, scalf_ptr, convf_ptr, $
+      L1B2GM_FOLDER = l1b2gm_folder, L1B2GM_VERSION = l1b2gm_version, $
+      L1B2LM_FOLDER = l1b2lm_folder, L1B2LM_VERSION = l1b2lm_version, $
+      MISR_SITE = misr_site, VERBOSE = verbose, $
       DEBUG = debug, EXCPT_COND = excpt_cond)
-   IF ((debug) AND (rc NE 0)) THEN BEGIN
-      error_code = 400
+   IF (debug AND (rc NE 0)) THEN BEGIN
+      error_code = 320
       excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
          ': ' + excpt_cond
       PRINT, error_code
-      STOP
+      RETURN
    ENDIF
-   n_files = N_ELEMENTS(l1b2_files)
 
-   PRINT
-   PRINT, 'Documenting the MISR L1B2 ' + misr_mode + ' data for Path ' + $
-      misr_path_str + ', Orbit ' + misr_orbit_str + ' and Block ' + misr_block_str + '.'
-   PRINT
-   TIC
+   IF (verbose GT 0) THEN BEGIN
+      PRINT
+      PRINT, 'Documenting the MISR L1B2 ' + misr_mode + ' data for Path ' + $
+         misr_path_str + ', Orbit ' + misr_orbit_str + ' and Block ' + $
+         misr_block_str + '.'
+      PRINT
+      PRINT, '1. Collecting diagnostic information (metadata):'
+      clock1 = TIC('Step 1')
+   ENDIF
 
    ;  Collect diagnostic information (metadata) on this Block:
-   PRINT, '1. Collecting diagnostic information (metadata):'
-   clock1 = TIC('Step 1')
    rc = diag_l1b2(misr_mode, misr_path, misr_orbit, misr_block, $
-      /HISTOGRAMS, DEBUG = debug, EXCPT_COND = excpt_cond)
-   TOC, clock1
+      L1B2_FOLDER = l1b2_folder, L1B2_VERSION = l1b2_version, $
+      LOG_IT = log_it, LOG_FOLDER = log_folder, $
+      SAVE_IT = save_it, SAVE_FOLDER = save_folder, $
+      HIST_IT = hist_it, HIST_FOLDER = hist_folder, $
+      VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)
    IF (rc NE 0) THEN BEGIN
       PRINT, '*** WARNING ***'
-      PRINT, 'Upon return from diag_l1b2, rc = ' + strstr(rc) + ' and'
-      PRINT, '   excpt_cond = ' + excpt_cond
+      PRINT, 'Upon return from diag_l1b2, excpt_cond = ' + excpt_cond
+      answ = ''
+      READ, answ, PROMPT = 'Do you wish to continue (Y/N): '
+      IF (STRUPCASE(first_char(strstr(answ))) NE 'Y') THEN STOP
    ENDIF
-   PRINT
 
-   ;  Identify the best predictor for each data channel:
-   PRINT, '2. Compute the best predictor for each data channel:'
-   clock2 = TIC('Step 2')
-   FOR i = 0, n_cams - 1 DO BEGIN
-      misr_camera = cams[i]
-      FOR j = 0, n_bands - 1 DO BEGIN
-         misr_band = bands[j]
-         rc = best_fit_l1b2(misr_mode, misr_path, misr_orbit, misr_block, $
-            misr_camera, misr_band, best_camera_oce, best_band_oce, $
-            best_npts_oce, best_rmsd_oce, best_cor_oce, best_a_oce, $
-            best_b_oce, best_chisq_oce, best_prob_oce, best_camera_lnd, $
-            best_band_lnd, best_npts_lnd, best_rmsd_lnd, best_cor_lnd, $
-            best_a_lnd, best_b_lnd, best_chisq_lnd, best_prob_lnd, $
-            AGP_VERSION = agp_version, /VERBOSE, /SCATTERPLOT, $
-            DEBUG = debug, EXCPT_COND = excpt_cond)
-         IF (rc NE 0) THEN BEGIN
-            PRINT, '*** WARNING ***'
-            PRINT, 'Upon return from best_fit_l1b2, rc = ' + strstr(rc) + ' and'
-            PRINT, '   excpt_cond = ' + excpt_cond
-         ENDIF
-         PRINT, 'Done best predictor for ' + misr_camera + '/' + misr_band + '.'
-      ENDFOR
-   ENDFOR
-   TOC, clock2
-   PRINT
+   IF (verbose GT 0) THEN BEGIN
+      TOC, clock1
+      PRINT
+      PRINT, '2. Mapping the L1B2 data channels:'
+      clock2 = TIC('Step 2')
+   ENDIF
 
    ;  Map the L1B2 data channels, using the default scaling factors:
-   PRINT, '3. Mapping the L1B2 data channels:'
-   clock3 = TIC('Step 3')
-   rc = map_l1b2_block(misr_mode, misr_path, misr_orbit, misr_block, $
-      /RGB_LOW, /RGB_HIGH, /PER_BAND, DEBUG = debug, EXCPT_COND = excpt_cond)
-   TOC, clock3
-   PRINT
+   rc = map_l1b2(misr_ptr, radrd_ptr, brf_ptr, rdqi_ptr, $
+      prefix, N_MASKS = n_masks, $
+      SCL_RGB_MIN = scl_rgb_min, SCL_RGB_MAX = scl_rgb_max, $
+      SCL_NIR_MIN = scl_nir_min, SCL_NIR_MAX = scl_nir_max, $
+      RGB_LOW = rgb_low, RGB_HIGH = rgb_high, PER_BAND = per_band, $
+      LOG_IT = log_it, LOG_FOLDER = log_folder, $
+      MAP_BRF = map_brf, MAP_QUAL = map_qual, MAP_FOLDER = map_folder, $
+      VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)
+   IF (excpt_cond NE '') THEN BEGIN
+      PRINT, '*** WARNING ***'
+      PRINT, 'Upon return from map_l1b2, excpt_cond = ' + excpt_cond
+      answ = ''
+      READ, answ, PROMPT = 'Do you wish to continue (Y/N): '
+      IF (STRUPCASE(first_char(strstr(answ))) NE 'Y') THEN STOP
+   ENDIF
 
-   ;  Map the spatial distribution of fill values:
-   PRINT, '4. Mapping the spatial distribution of fill values:'
-   clock4 = TIC('Step 4')
-   rc = map_l1b2_miss(misr_mode, misr_path, misr_orbit, misr_block, $
-      DEBUG = debug, EXCPT_COND = excpt_cond)
-   TOC, clock4
-   PRINT
+   IF (verbose GT 0) THEN BEGIN
+      TOC, clock2
+   ENDIF
 
-   TOC
+   IF (verbose GT 1) THEN PRINT, 'Exiting ' + rout_name + '.'
 
 END

@@ -1,18 +1,25 @@
-FUNCTION avail_l1b2_data, misr_mode, path_pattern, misr_l1b2_data, $
-   DEBUG = debug, EXCPT_COND = excpt_cond
+FUNCTION avail_l1b2_data, $
+   misr_mode, $
+   path_pattern, $
+   misr_l1b2_data, $
+   VERBOSE = verbose, $
+   DEBUG = debug, $
+   EXCPT_COND = excpt_cond
 
    ;Sec-Doc
-   ;  PURPOSE: This function reports on the availability of MISR L1B2 data
-   ;  files in the subdirectories matching the IDL regular expression
-   ;  path_pattern.
+   ;  PURPOSE: This function reports on the availability of MISR L1B2
+   ;  Global or Local Mode data files in the subdirectories matching the
+   ;  IDL regular expression path_pattern.
    ;
-   ;  ALGORITHM: This function searches the path(s) matching the pattern
-   ;  path_pattern for MISR L1B2 files. It stores information on their
-   ;  names, sizes and range of temporal coverage in the output structure
+   ;  ALGORITHM: This function searches the directory addresses matching
+   ;  the pattern path_pattern for MISR L1B2 files of the specified MODE,
+   ;  and stores information on their names, sizes and range of temporal
+   ;  coverage in the output positional parameter structure
    ;  misr_l1b2_data.
    ;
    ;  SYNTAX: rc = avail_l1b2_data(misr_mode, path_pattern, $
-   ;  misr_l1b2_data, DEBUG = debug, EXCPT_COND = excpt_cond)
+   ;  misr_l1b2_data, VERBOSE = verbose, $
+   ;  DEBUG = debug, EXCPT_COND = excpt_cond)
    ;
    ;  POSITIONAL PARAMETERS [INPUT/OUTPUT]:
    ;
@@ -30,6 +37,13 @@ FUNCTION avail_l1b2_data, misr_mode, path_pattern, misr_l1b2_data, $
    ;
    ;  KEYWORD PARAMETERS [INPUT/OUTPUT]:
    ;
+   ;  *   VERBOSE = verbose {INT} [I] (Default value: 0): Flag to enable
+   ;      (> 0) or skip (0) reporting progress on the console: 1 only
+   ;      reports exiting the routine; 2 reports entering and exiting the
+   ;      routine, as well as key milestones; 3 reports entering and
+   ;      exiting the routine, and provides detailed information on the
+   ;      intermediary results.
+   ;
    ;  *   DEBUG = debug {INT} [I] (Default value: 0): Flag to activate (1)
    ;      or skip (0) debugging tests.
    ;
@@ -37,7 +51,7 @@ FUNCTION avail_l1b2_data, misr_mode, path_pattern, misr_l1b2_data, $
    ;      Description of the exception condition if one has been
    ;      encountered, or a null string otherwise.
    ;
-   ;  RETURNED VALUE TYPE: INTEGER.
+   ;  RETURNED VALUE TYPE: INT.
    ;
    ;  OUTCOME:
    ;
@@ -67,18 +81,13 @@ FUNCTION avail_l1b2_data, misr_mode, path_pattern, misr_l1b2_data, $
    ;  *   Error 120: Positional parameter path_pattern is not of type
    ;      STRING.
    ;
-   ;  *   Error 130: Positional parameter path_pattern is not a directory
-   ;      or is not accessible.
-   ;
-   ;  *   Error 140: An exception condition occurred in function is_dir.
-   ;
-   ;  *   Error 150: An exception condition occurred in function
+   ;  *   Error 200: An exception condition occurred in function
    ;      get_dirs_sizes.
    ;
-   ;  *   Error 200: An exception condition occurred in function
+   ;  *   Error 210: An exception condition occurred in function
    ;      orbit2date when processing the first available ORBIT.
    ;
-   ;  *   Error 210: An exception condition occurred in function
+   ;  *   Error 220: An exception condition occurred in function
    ;      orbit2date when processing the last available ORBIT.
    ;
    ;  DEPENDENCIES:
@@ -86,6 +95,8 @@ FUNCTION avail_l1b2_data, misr_mode, path_pattern, misr_l1b2_data, $
    ;  *   chk_misr_mode.pro
    ;
    ;  *   get_dirs_sizes.pro
+   ;
+   ;  *   is_numeric.pro
    ;
    ;  *   is_string.pro
    ;
@@ -112,36 +123,42 @@ FUNCTION avail_l1b2_data, misr_mode, path_pattern, misr_l1b2_data, $
    ;      information in a local file, use the program avail_l1b2.pro
    ;      instead of this function.
    ;
+   ;  *   NOTE 4: No exception conditions are raised if no MISR L1B2 data
+   ;      of the specified MODE are found on this computer; a warning
+   ;      message is printed on the console only if the input keyword
+   ;      parameter VERBOSE is set to at least 1.
+   ;
    ;  EXAMPLES:
    ;
    ;      [On MicMac2:]
    ;
-   ;      IDL> root_dirs = set_root_dirs()
+   ;      IDL> rc = set_roots_vers(root_dirs, versions, $
+   ;         DEBUG = debug, EXCPT_COND = excpt_cond)
    ;      IDL> misr_mode = 'GM'
    ;      IDL> dir_patt = root_dirs[1] + 'P*/L1_' + misr_mode + '/'
    ;      IDL> rc = avail_l1b2_data(misr_mode, dir_patt, $
-   ;         misr_l1b2_data, /DEBUG, EXCPT_COND = excpt_cond)
+   ;         misr_l1b2_data, /VERBOSE, /DEBUG, EXCPT_COND = excpt_cond)
    ;      IDL> PRINT, 'rc = ', strstr(rc), ', excpt_cond = >' + excpt_cond + '<'
    ;      rc = 0, excpt_cond = ><
-   ;      IDL> help, /STRUCTURE, misr_l1b2_data
-   ;      ** Structure <3898cc08>, 7 tags, length=368, data length=360, refs=1:
-   ;         TITLE           STRING    'MISR L1B2 GM data availability'
-   ;         NUMDIRS         LONG                 5
-   ;         DIRNAMES        STRING    Array[5]
-   ;         DIRSIZES        STRING    Array[5]
-   ;         NUMFILES        LONG      Array[5]
-   ;         INIDATE         STRING    Array[5]
-   ;         FINDATE         STRING    Array[5]
    ;      IDL> PRINT, misr_l1b2_data.DIRNAMES
-   ;      /Volumes/MISR_Data3/P168/L1_GM/
-   ;      /Volumes/MISR_Data3/P169/L1_GM/
-   ;      /Volumes/MISR_Data3/P170/L1_GM/
-   ;      /Volumes/MISR_Data3/P171/L1_GM/
-   ;      /Volumes/MISR_Data3/P176/L1_GM/
+   ;      /Volumes/MISR_Data0/P167/L1_GM/
+   ;      /Volumes/MISR_Data0/P168/L1_GM/
+   ;      /Volumes/MISR_Data0/P169/L1_GM/
+   ;      /Volumes/MISR_Data0/P170/L1_GM/
+   ;      /Volumes/MISR_Data0/P171/L1_GM/
+   ;      /Volumes/MISR_Data0/P172/L1_GM/
+   ;      /Volumes/MISR_Data0/P173/L1_GM/
    ;      IDL> PRINT, misr_l1b2_data.DIRSIZES
-   ;      615G 560G 558G 546G 542G
+   ;      671G 682G 680G 677G 657G 672G 667G
    ;
-   ;  REFERENCES: None.
+   ;  REFERENCES:
+   ;
+   ;  *   Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019)
+   ;      _Improving the usability of the MISR L1B2 Georectified Radiance
+   ;      Product (2000–present) in land surface applications_,
+   ;      Earth System Science Data, Vol. xxx, p. yy–yy, available from
+   ;      https://www.earth-syst-sci-data.net/essd-2019-zz/ (DOI:
+   ;      10.5194/zzz).
    ;
    ;  VERSIONING:
    ;
@@ -154,10 +171,28 @@ FUNCTION avail_l1b2_data, misr_mode, path_pattern, misr_l1b2_data, $
    ;      avail_l1b2_lm_data.pro and change the name to avail_l1b2.pro.
    ;
    ;  *   2018–05–18: Version 1.5 — Implement new coding standards.
+   ;
+   ;  *   2018–-12–24: Version 1.6 — Update this routine to rely on the
+   ;      new function
+   ;      set_roots_vers.pro.
+   ;
+   ;  *   2019–03–01: Version 2.00 — Systematic update of all routines to
+   ;      implement stricter coding standards and improve documentation.
+   ;
+   ;  *   2019–03–20: Version 2.01 — Update the handling of the optional
+   ;      input keyword parameter VERBOSE and generate the software
+   ;      version consistent with the published documentation.
+   ;
+   ;  *   2019–06–11: Version 2.02 — Update the documentation.
+   ;
+   ;  *   2019–08–20: Version 2.1.0 — Adopt revised coding and
+   ;      documentation standards (in particular regarding the use of
+   ;      verbose and the assignment of numeric return codes), and switch
+   ;      to 3-parts version identifiers.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
-   ;  *   Copyright (C) 2017-2018 Michel M. Verstraete.
+   ;  *   Copyright (C) 2017-2019 Michel M. Verstraete.
    ;
    ;      Permission is hereby granted, free of charge, to any person
    ;      obtaining a copy of this software and associated documentation
@@ -165,16 +200,17 @@ FUNCTION avail_l1b2_data, misr_mode, path_pattern, misr_l1b2_data, $
    ;      restriction, including without limitation the rights to use,
    ;      copy, modify, merge, publish, distribute, sublicense, and/or
    ;      sell copies of the Software, and to permit persons to whom the
-   ;      Software is furnished to do so, subject to the following
+   ;      Software is furnished to do so, subject to the following three
    ;      conditions:
    ;
-   ;      The above copyright notice and this permission notice shall be
-   ;      included in all copies or substantial portions of the Software.
+   ;      1. The above copyright notice and this permission notice shall
+   ;      be included in its entirety in all copies or substantial
+   ;      portions of the Software.
    ;
-   ;      THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND,
-   ;      EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-   ;      OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-   ;      NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+   ;      2. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY
+   ;      KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+   ;      WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+   ;      AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
    ;      HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
    ;      WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
    ;      FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
@@ -182,22 +218,35 @@ FUNCTION avail_l1b2_data, misr_mode, path_pattern, misr_l1b2_data, $
    ;
    ;      See: https://opensource.org/licenses/MIT.
    ;
+   ;      3. The current version of this Software is freely available from
+   ;
+   ;      https://github.com/mmverstraete.
+   ;
    ;  *   Feedback
    ;
    ;      Please send comments and suggestions to the author at
-   ;      MMVerstraete@gmail.com.
+   ;      MMVerstraete@gmail.com
    ;Sec-Cod
+
+   COMPILE_OPT idl2, HIDDEN
 
    ;  Get the name of this routine:
    info = SCOPE_TRACEBACK(/STRUCTURE)
    rout_name = info[N_ELEMENTS(info) - 1].ROUTINE
 
-   ;  Initialize the default return code and the exception condition message:
+   ;  Initialize the default return code:
    return_code = 0
+
+   ;  Set the default values of flags and essential output keyword parameters:
+   IF (KEYWORD_SET(verbose)) THEN BEGIN
+      IF (is_numeric(verbose)) THEN verbose = FIX(verbose) ELSE verbose = 0
+      IF (verbose LT 0) THEN verbose = 0
+      IF (verbose GT 3) THEN verbose = 3
+   ENDIF ELSE verbose = 0
+   IF (KEYWORD_SET(debug)) THEN debug = 1 ELSE debug = 0
    excpt_cond = ''
 
-   ;  Set the default values of essential input keyword parameters:
-   IF (KEYWORD_SET(debug)) THEN debug = 1 ELSE debug = 0
+   IF (verbose GT 1) THEN PRINT, 'Entering ' + rout_name + '.'
 
    ;  Initialize the output positional parameter(s):
    misr_l1b2_data = {}
@@ -235,34 +284,24 @@ FUNCTION avail_l1b2_data, misr_mode, path_pattern, misr_l1b2_data, $
             ': Argument path_pattern is not of type STRING.'
          RETURN, error_code
       ENDIF
-
-   ;  Return to the calling routine with an error message if the argument
-   ;  'path_pattern' is not a directory (which can contain wildcard characters
-   ;  but not be an array of directories):
-      rc = is_dir(path_pattern, DEBUG = debug, EXCPT_COND = excpt_cond)
-      IF (rc EQ 0) THEN BEGIN
-         error_code = 130
-         excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
-            ': Directory ' + path_pattern + ' is not a directory or is ' + $
-            'not accessible.'
-         RETURN, error_code
-      ENDIF
-      IF (rc EQ -1) THEN BEGIN
-         error_code = 140
-         excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
-            ': ' + excpt_cond
-         RETURN, error_code
-      ENDIF
    ENDIF
 
    ;  Get the list of directories containing MISR data and their sizes:
    rc = get_dirs_sizes(path_pattern, n_dirs, dirs_names, dirs_sizes, $
       DEBUG = debug, EXCPT_COND = excpt_cond)
-   IF ((debug) AND (rc NE 0)) THEN BEGIN
-      error_code = 150
+   IF (debug AND (rc NE 0)) THEN BEGIN
+      error_code = 200
       excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
          ': ' + excpt_cond
       RETURN, error_code
+   ENDIF
+
+   ;  Return to the calling routine if no directories are found:
+   IF (n_dirs EQ 0) THEN BEGIN
+      misr_l1b2_data = {}
+      IF (verbose GT 0) THEN PRINT, 'No MISR L1B2 ' + misr_mode + $
+         ' data found on this computer.'
+      RETURN, return_code
    ENDIF
 
    ;  Define the arrays that will contain some of the results:
@@ -285,7 +324,7 @@ FUNCTION avail_l1b2_data, misr_mode, path_pattern, misr_l1b2_data, $
       date_1[j] = orbit2date(misr_orbit_1, $
          DEBUG = debug, EXCPT_COND = excpt_cond)
       IF ((debug) AND ((date_1[j] EQ '') OR (excpt_cond NE ''))) THEN BEGIN
-         error_code = 200
+         error_code = 210
          excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
             ': ' + excpt_cond
          RETURN, error_code
@@ -298,7 +337,7 @@ FUNCTION avail_l1b2_data, misr_mode, path_pattern, misr_l1b2_data, $
       date_2[j] = orbit2date(misr_orbit_2, $
          DEBUG = debug, EXCPT_COND = excpt_cond)
       IF ((debug) AND ((date_2[j] EQ '') OR (excpt_cond NE ''))) THEN BEGIN
-         error_code = 210
+         error_code = 220
          excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
             ': ' + excpt_cond
          RETURN, error_code
@@ -314,6 +353,8 @@ FUNCTION avail_l1b2_data, misr_mode, path_pattern, misr_l1b2_data, $
    misr_l1b2_data = CREATE_STRUCT(misr_l1b2_data, 'NumFiles', n_files)
    misr_l1b2_data = CREATE_STRUCT(misr_l1b2_data, 'IniDate', date_1)
    misr_l1b2_data = CREATE_STRUCT(misr_l1b2_data, 'FinDate', date_2)
+
+   IF (verbose GT 1) THEN PRINT, 'Exiting ' + rout_name + '.'
 
    RETURN, return_code
 

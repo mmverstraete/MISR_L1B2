@@ -1,29 +1,39 @@
-FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
-   misr_orbit, misr_block, stats_lr, stats_hr, $
-   DEBUG = debug, EXCPT_COND = excpt_cond
+FUNCTION cor_l1b2_block, $
+   l1b2_files, $
+   misr_mode, $
+   misr_path, $
+   misr_orbit, $
+   misr_block, $
+   stats_lr, $
+   stats_hr, $
+   VERBOSE = verbose, $
+   DEBUG = debug, $
+   EXCPT_COND = excpt_cond
 
    ;Sec-Doc
    ;  PURPOSE: This function computes the cross-correlation statistics
    ;  between the 36 data channels contained in the 9 MISR L1B2
    ;  Georectified Radiance Product (GRP) Terrain-Projected Top of
    ;  Atmosphere (ToA) files for the given MODE, PATH, ORBIT and BLOCK
-   ;  combination. item ALGORITHM: This function computes the 630
-   ;  (36 × 35/2) cross-correlations between the input data channels at
-   ;  the lowest available spatial resolution (1100 m for GM and 275 m for
-   ;  LM) and the results are saved in the output structure stats_lr. If
-   ;  the input arguments are for GM data, this function (1) relies on the
-   ;  IDL function hr2lr.pro to downsize the 12 high spatial resolution
-   ;  data channels of the specified input files to match the lower
-   ;  spatial resolution of the remaining 24 data channels and (2) also
-   ;  computes the 66 (12 × 11/2) cross-correlations between the high
-   ;  spatial resolution data channels and those resuts are saved in the
-   ;  output structure stats_hr. If the input arguments are for LM data,
-   ;  this latter structure is empty. All statistical results are carried
-   ;  out by the IDL function cor_arrays.pro.
+   ;  combination.
+   ;
+   ;  ALGORITHM: This function computes the 630 (36 × 35/2)
+   ;  cross-correlations between the input data channels at the lowest
+   ;  available spatial resolution (1100 m for GM and 275 m for LM) and
+   ;  the results are saved in the output structure stats_lr. If the input
+   ;  arguments are for GM data, this function (1) relies on the IDL
+   ;  function hr2lr.pro to downsize the 12 high spatial resolution data
+   ;  channels of the specified input files to match the lower spatial
+   ;  resolution of the remaining 24 data channels and (2) also computes
+   ;  the 66 (12 × 11/2) cross-correlations between the high spatial
+   ;  resolution data channels and those resuts are saved in the output
+   ;  structure stats_hr. If the input arguments are for LM data, this
+   ;  latter structure is empty. All statistical results are carried out
+   ;  by the IDL function cor_arrays.pro.
    ;
    ;  SYNTAX: rc = cor_l1b2_block(l1b2_files, misr_mode, misr_path, $
    ;  misr_orbit, misr_block, stats_lr, stats_hr, $
-   ;  DEBUG = debug, EXCPT_COND = excpt_cond)
+   ;  VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)
    ;
    ;  POSITIONAL PARAMETERS [INPUT/OUTPUT]:
    ;
@@ -46,6 +56,13 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
    ;
    ;  KEYWORD PARAMETERS [INPUT/OUTPUT]:
    ;
+   ;  *   VERBOSE = verbose {INT} [I] (Default value: 0): Flag to enable
+   ;      (> 0) or skip (0) reporting progress on the console: 1 only
+   ;      reports exiting the routine; 2 reports entering and exiting the
+   ;      routine, as well as key milestones; 3 reports entering and
+   ;      exiting the routine, and provides detailed information on the
+   ;      intermediary results.
+   ;
    ;  *   DEBUG = debug {INT} [I] (Default value: 0): Flag to activate (1)
    ;      or skip (0) debugging tests.
    ;
@@ -53,7 +70,7 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
    ;      Description of the exception condition if one has been
    ;      encountered, or a null string otherwise.
    ;
-   ;  RETURNED VALUE TYPE: INTEGER.
+   ;  RETURNED VALUE TYPE: INT.
    ;
    ;  OUTCOME:
    ;
@@ -81,55 +98,63 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
    ;
    ;  *   Error 100: One or more positional parameter(s) are missing.
    ;
-   ;  *   Error 110: Input argument misr_path is invalid.
+   ;  *   Error 110: Input argument misr_mode is invalid.
    ;
-   ;  *   Error 120: Input argument misr_orbit is invalid.
+   ;  *   Error 120: Input argument misr_path is invalid.
    ;
-   ;  *   Error 130: Input argument misr_block is invalid.
+   ;  *   Error 130: Input argument misr_orbit is invalid.
    ;
-   ;  *   Error 210: An exception condition occurred in function
-   ;      path2str.pro.
+   ;  *   Error 132: The input positional parameter misr_orbit is
+   ;      inconsistent with the input positional parameter misr_path.
    ;
-   ;  *   Error 220: An exception condition occurred in function
-   ;      orbit2str.pro.
+   ;  *   Error 134: An exception condition occurred in is_frompath.pro.
    ;
-   ;  *   Error 230: An exception condition occurred in function
-   ;      block2str.pro.
+   ;  *   Error 136: Unexpected return code received from is_frompath.pro.
    ;
-   ;  *   Error 240: An exception condition occurred in function
-   ;      acquis_date.pro.
+   ;  *   Error 140: Input argument misr_block is invalid.
    ;
-   ;  *   Error 300: No or more than 1 file(s) found for the first low
-   ;      resolution data channel.
+   ;  *   Error 200: An exception condition occurred in function
+   ;      orbit2date.pro.
    ;
-   ;  *   Error 310: An exception condition occurred in function
-   ;      MTK_READDATA while reading l1b2_file_1 low resolution.
+   ;  *   Error 500: No or more than 1 file(s) found for first low
+   ;      resolution data channel (from 0 to 35).
    ;
-   ;  *   Error 320: No or more than 1 file(s) found for the second low
-   ;      resolution data channel.
+   ;  *   Error 510: No or more than 1 file(s) found for second low
+   ;      resolution data channel (from i + 1 to 35).
    ;
-   ;  *   Error 330: An exception condition occurred in function
-   ;      MTK_READDATA while reading l1b2_file_2 low resolution.
-   ;
-   ;  *   Error 340: An exception condition occurred in function
+   ;  *   Error 520: An exception condition occurred in function
    ;      cor_arrays.pro while computing correlations between the low
    ;      resolution channels.
    ;
-   ;  *   Error 350: No or more than 1 file(s) found for the first high
-   ;      resolution data channel.
+   ;  *   Error 530: No or more than 1 file(s) found for first high
+   ;      resolution data channel (from 0 to 12).
    ;
-   ;  *   Error 360: An exception condition occurred in function
-   ;      MTK_READDATA while reading l1b2_file_1 high resolution.
+   ;  *   Error 540: No or more than 1 file(s) found for second high
+   ;      resolution data channel (from i+1 to 35).
    ;
-   ;  *   Error 370: No or more than 1 file(s) found for the second high
-   ;      resolution data channel.
-   ;
-   ;  *   Error 380: An exception condition occurred in function
-   ;      MTK_READDATA while reading l1b2_file_2 high resolution.
-   ;
-   ;  *   Error 390: An exception condition occurred in function
+   ;  *   Error 550: An exception condition occurred in function
    ;      cor_arrays.pro while computing correlations between the high
    ;      resolution channels.
+   ;
+   ;  *   Error 600: An exception condition occurred in the MISR TOOLKIT
+   ;      routine
+   ;      MTK_SETREGION_BY_PATH_BLOCKRANGE.
+   ;
+   ;  *   Error 610: An exception condition occurred in the MISR TOOLKIT
+   ;      routine
+   ;      MTK_READDATA while reading l1b2_file_1 low resolution.
+   ;
+   ;  *   Error 620: An exception condition occurred in the MISR TOOLKIT
+   ;      routine
+   ;      MTK_READDATA while reading l1b2_file_2 low resolution.
+   ;
+   ;  *   Error 630: An exception condition occurred in the MISR TOOLKIT
+   ;      routine
+   ;      MTK_READDATA while reading l1b2_file_1 high resolution.
+   ;
+   ;  *   Error 640: An exception condition occurred in the MISR TOOLKIT
+   ;      routine
+   ;      MTK_READDATA while reading l1b2_file_2 high resolution.
    ;
    ;  DEPENDENCIES:
    ;
@@ -147,26 +172,54 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
    ;
    ;  *   hr2lr.pro
    ;
-   ;  *   set_misr_specs.pro
+   ;  *   is_frompath.pro
    ;
-   ;  *   round_dec.pro
+   ;  *   is_numeric.pro
+   ;
+   ;  *   orbit2date.pro
+   ;
+   ;  *   set_misr_specs.pro
    ;
    ;  *   strstr.pro
    ;
+   ;  *   today.pro
+   ;
    ;  REMARKS:
    ;
-   ;  *   NOTE 1: *** WARNING ***: Execution of this function can take a
-   ;      significant amount of time (e.g., over an hour on MicMac).
+   ;  *   NOTE 1: If the input positional parameter misr_mode is set to
+   ;      GM, the correlation results are stored in two separate output
+   ;      structures: one (stats_lr) for the 36 low spatial resolution and
+   ;      one (stats_hr) for the 12 high spatial resolution data channels.
+   ;      If the input positional parameter misr_mode is set to LM, the
+   ;      correlation results are stored in the output structure stats_hr
+   ;      and the variable stats_lr is set to a null structure.
+   ;
+   ;  *   NOTE 2: *** WARNING ***: Execution of this function can take a
+   ;      few minutes.
    ;
    ;  EXAMPLES:
    ;
-   ;      rc = cor_l1b2_block(l1b2_files, 'GM', 168, 68050, 110, stats_lr, $
-   ;         stats_hr, /DEBUG, EXCPT_COND = excpt_cond)
+   ;      IDL> rc = cor_l1b2_block(l1b2_files, 'GM', 168, 68050, 110, stats_lr, $
+   ;         stats_hr, VERBOSE = 0, /DEBUG, EXCPT_COND = excpt_cond)
    ;
    ;      returns the statistical results in ouput arguments stats_lr and
-   ;      stats_hr, in the folder root_dirs[3] + 'P168_O068050_B110/L1B2_GM/'.
+   ;      stats_hr. Similarly
    ;
-   ;  REFERENCES: None.
+   ;      IDL> rc = cor_l1b2_block(l1b2_files, 'LM', 168, 68050, 110, stats_lr, $
+   ;         stats_hr, VERBOSE = 0, /DEBUG, EXCPT_COND = excpt_cond)
+   ;
+   ;      returns the statistical results in ouput arguments stats_hr, while
+   ;      stats_lr is an empty structure as there are no low spatial
+   ;      resolution data in LM.
+   ;
+   ;  REFERENCES:
+   ;
+   ;  *   Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019)
+   ;      _Improving the usability of the MISR L1B2 Georectified Radiance
+   ;      Product (2000–present) in land surface applications_,
+   ;      Earth System Science Data, Vol. xxx, p. yy–yy, available from
+   ;      https://www.earth-syst-sci-data.net/essd-2019-zz/ (DOI:
+   ;      10.5194/zzz).
    ;
    ;  VERSIONING:
    ;
@@ -190,10 +243,34 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
    ;      cor_l1b2_lm_block.pro and change the name to cor_l1b2_block.pro.
    ;
    ;  *   2018–05–18: Version 1.5 — Implement new coding standards.
+   ;
+   ;  *   2019–01–24: Version 1.6 — Add the input keyword parameter
+   ;      VERBOSE.
+   ;
+   ;  *   2019–03–01: Version 2.00 — Systematic update of all routines to
+   ;      implement stricter coding standards and improve documentation.
+   ;
+   ;  *   2019–03–20: Version 2.10 — Update the handling of the optional
+   ;      input keyword parameter VERBOSE and generate the software
+   ;      version consistent with the published documentation.
+   ;
+   ;  *   2019–05–04: Version 2.11 — Update the code to report the
+   ;      specific error message of MTK routines.
+   ;
+   ;  *   2019–06–11: Version 2.12 — Update the code to include ELSE
+   ;      options in all CASE statements and update the documentation.
+   ;
+   ;  *   2019–08–20: Version 2.1.0 — Adopt revised coding and
+   ;      documentation standards (in particular regarding the use of
+   ;      verbose and the assignment of numeric return codes), and switch
+   ;      to 3-parts version identifiers.
+   ;
+   ;  *   2019–09–28: Version 2.1.1 — Update the code to use the current
+   ;      version of the function hr2lr.pro.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
-   ;  *   Copyright (C) 2017-2018 Michel M. Verstraete.
+   ;  *   Copyright (C) 2017-2019 Michel M. Verstraete.
    ;
    ;      Permission is hereby granted, free of charge, to any person
    ;      obtaining a copy of this software and associated documentation
@@ -201,16 +278,17 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
    ;      restriction, including without limitation the rights to use,
    ;      copy, modify, merge, publish, distribute, sublicense, and/or
    ;      sell copies of the Software, and to permit persons to whom the
-   ;      Software is furnished to do so, subject to the following
+   ;      Software is furnished to do so, subject to the following three
    ;      conditions:
    ;
-   ;      The above copyright notice and this permission notice shall be
-   ;      included in all copies or substantial portions of the Software.
+   ;      1. The above copyright notice and this permission notice shall
+   ;      be included in its entirety in all copies or substantial
+   ;      portions of the Software.
    ;
-   ;      THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND,
-   ;      EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-   ;      OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-   ;      NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+   ;      2. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY
+   ;      KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+   ;      WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+   ;      AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
    ;      HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
    ;      WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
    ;      FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
@@ -218,22 +296,35 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
    ;
    ;      See: https://opensource.org/licenses/MIT.
    ;
+   ;      3. The current version of this Software is freely available from
+   ;
+   ;      https://github.com/mmverstraete.
+   ;
    ;  *   Feedback
    ;
    ;      Please send comments and suggestions to the author at
-   ;      MMVerstraete@gmail.com.
+   ;      MMVerstraete@gmail.com
    ;Sec-Cod
+
+   COMPILE_OPT idl2, HIDDEN
 
    ;  Get the name of this routine:
    info = SCOPE_TRACEBACK(/STRUCTURE)
    rout_name = info[N_ELEMENTS(info) - 1].ROUTINE
 
-   ;  Initialize the default return code and the exception condition message:
+   ;  Initialize the default return code:
    return_code = 0
+
+   ;  Set the default values of flags and essential output keyword parameters:
+   IF (KEYWORD_SET(verbose)) THEN BEGIN
+      IF (is_numeric(verbose)) THEN verbose = FIX(verbose) ELSE verbose = 0
+      IF (verbose LT 0) THEN verbose = 0
+      IF (verbose GT 3) THEN verbose = 3
+   ENDIF ELSE verbose = 0
+   IF (KEYWORD_SET(debug)) THEN debug = 1 ELSE debug = 0
    excpt_cond = ''
 
-   ;  Set the default values of essential input keyword parameters:
-   IF (KEYWORD_SET(debug)) THEN debug = 1 ELSE debug = 0
+   IF (verbose GT 1) THEN PRINT, 'Entering ' + rout_name + '.'
 
    IF (debug) THEN BEGIN
 
@@ -280,6 +371,37 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
       ENDIF
 
    ;  Return to the calling routine with an error message if the input
+   ;  positional parameter 'misr_orbit' is inconsistent with the input
+   ;  positional parameter 'misr_path':
+      res = is_frompath(misr_path, misr_orbit, $
+         DEBUG = debug, EXCPT_COND = excpt_cond)
+      IF (res NE 1) THEN BEGIN
+         CASE 1 OF
+            (res EQ 0): BEGIN
+               error_code = 132
+               excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
+                  rout_name + ': The input positional parameter ' + $
+                  'misr_orbit is inconsistent with the input positional ' + $
+                  'parameter misr_path.'
+               RETURN, error_code
+            END
+            (res EQ -1): BEGIN
+               error_code = 134
+               excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
+                  rout_name + ': ' + excpt_cond
+               RETURN, error_code
+            END
+            ELSE: BEGIN
+               error_code = 136
+               excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
+                  rout_name + ': Unexpected return code ' + strstr(res) + $
+                  ' from is_frompath.pro.'
+               RETURN, error_code
+            END
+         ENDCASE
+      ENDIF
+
+   ;  Return to the calling routine with an error message if the input
    ;  positional parameter 'misr_block' is invalid:
       rc = chk_misr_block(misr_block, DEBUG = debug, EXCPT_COND = excpt_cond)
       IF (rc NE 0) THEN BEGIN
@@ -301,7 +423,7 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
    ;  Get the date of acquisition of this MISR Orbit:
    acquis_date = orbit2date(LONG(misr_orbit), DEBUG = debug, $
       EXCPT_COND = excpt_cond)
-   IF ((debug) AND (excpt_cond NE '')) THEN BEGIN
+   IF (debug AND (excpt_cond NE '')) THEN BEGIN
       error_code = 200
       excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
          ': ' + excpt_cond
@@ -311,14 +433,14 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
    ;  Management of status codes from calls to MISR Toolkit routines:
    status = MTK_SETREGION_BY_PATH_BLOCKRANGE(misr_path, $
       misr_block, misr_block, region)
-   IF ((debug) AND (status NE 0)) THEN BEGIN
-      info = SCOPE_TRACEBACK(/STRUCTURE)
-      rout_name = info[N_ELEMENTS(info) - 1].ROUTINE
-      error_code = 300
+   IF (debug AND (status NE 0)) THEN BEGIN
+      error_code = 600
       excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
-         ': Status from MTK_SETREGION_BY_PATH_BLOCKRANGE = ' + strstr(status)
+         ': Error message from MTK_SETREGION_BY_PATH_BLOCKRANGE: ' + $
+         MTK_ERROR_MESSAGE(status)
       RETURN, error_code
    ENDIF
+
    ;  Create a named structure to contain all results computed with the
    ;  2 low resolution fields ((36 x 35) / 2 = 1260 / 2 = 630):
    stats = CREATE_STRUCT(NAME = 'Bivariate', $
@@ -348,11 +470,21 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
       'Linfit_b_2', 0.0, $
       'Linfit_CHISQR_2', 0.0, $
       'Linfit_PROB_2', 0.0)
-   stats_lr = REPLICATE(stats, 630)
 
-   PRINT, 'Computing the correlation statistics for the 36 data ' + $
-      'channels at the lowest spatial resolution (1100 m for GM, ' + $
-      '275 m for LM):'
+   IF (misr_mode EQ 'GM') THEN BEGIN
+      stats_lr = REPLICATE(stats, 630)
+      stats_hr = REPLICATE(stats, 66)
+      IF (verbose GT 0) THEN $
+         PRINT, 'Computing the correlation statistics for the 36 data ' + $
+            'channels of GM files at low spatial resolution, and 12 data ' + $
+            'channels of GM files at high spatial resolution:'
+   ENDIF ELSE BEGIN
+      stats_hr = REPLICATE(stats, 630)
+      stats_lr = {}
+      IF (verbose GT 0) THEN $
+         PRINT, 'Computing the correlation statistics for the 36 data ' + $
+            'channels of LM files at high spatial resolution:'
+   ENDELSE
 
    ;  Iterate over the channels for the first field:
    n_iter = 0
@@ -364,8 +496,8 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
 
    ;  Identify the file containing this data channel:
       idx = WHERE(STRPOS(l1b2_files, cam_1) GT 1, count)
-      IF ((debug) AND (count NE 1)) THEN BEGIN
-         error_code = 300
+      IF (debug AND (count NE 1)) THEN BEGIN
+         error_code = 500
          excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
             ': No or more than 1 file(s) found for first low ' + $
             'resolution data channel ' + strstr(i) + ' (from 0 to 35).'
@@ -380,11 +512,11 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
    ;  Read the data for this first channel:
       status = MTK_READDATA(l1b2_file_1, grid_1, field_1, region, buf_1, $
          mapinfo)
-      IF ((debug) AND (status NE 0)) THEN BEGIN
-         error_code = 310
+      IF (debug AND (status NE 0)) THEN BEGIN
+         error_code = 610
          excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
-            ': Error encountered in MTK_READDATA while reading ' + $
-            l1b2_file_1
+            ': Error message from MTK_READDATA: ' + $
+            MTK_ERROR_MESSAGE(status)
          RETURN, error_code
       ENDIF
 
@@ -393,7 +525,7 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
    ;  of the data:
       IF ((misr_mode EQ 'GM') AND ((ban_1 EQ 'Red') OR (cam_1 EQ 'AN'))) $
          THEN BEGIN
-         buf_1 = hr2lr(buf_1)
+         buf_1 = hr2lr(buf_1, 'Brf')
       ENDIF
 
    ;  Iterate over the channels for the second field:
@@ -405,8 +537,8 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
 
    ;  Identify the file containing this data channel:
          jdx = WHERE(STRPOS(l1b2_files, cam_2) GT 1, count)
-         IF ((debug) AND (count NE 1)) THEN BEGIN
-            error_code = 320
+         IF (debug AND (count NE 1)) THEN BEGIN
+            error_code = 510
             excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
                ': No or more than 1 file(s) found for second low ' + $
                'resolution data channel ' + strstr(i) + ' (from i+1 to 35).'
@@ -421,19 +553,19 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
    ;  Read the data for this second channel:
          status = MTK_READDATA(l1b2_file_2, grid_2, field_2, region, buf_2, $
             mapinfo)
-         IF ((debug) AND (status NE 0)) THEN BEGIN
-            error_code = 330
+         IF (debug AND (status NE 0)) THEN BEGIN
+            error_code = 620
             excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
-               ': Error encountered in MTK_READDATA while reading ' + $
-               l1b2_file_2
+               ': Error message from MTK_READDATA: ' + $
+               MTK_ERROR_MESSAGE(status)
             RETURN, error_code
          ENDIF
 
-   ;  If the data are for Global Mode and this is is a red channel, or a
+   ;  If the data are for Global Mode and this is a red channel, or a
    ;  channel of the AN camera, generate a low spatial resolution version
    ;  of the data:
          IF ((misr_mode EQ 'GM') AND ((ban_2 EQ 'Red') OR (cam_2 EQ 'AN'))) THEN BEGIN
-            buf_2 = hr2lr(buf_2)
+            buf_2 = hr2lr(buf_2, 'Brf')
          ENDIF
 
    ;  Locate the pixels with valid (> 0) values in both fields:
@@ -442,44 +574,71 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
          f_2 = buf_2[kdx]
 
    ;  Set the experiment metadata in the output structure:
-         stats_lr[n_iter].experiment = n_iter
-         stats_lr[n_iter].array_1_id = misr_chns[i]
-         stats_lr[n_iter].array_2_id = misr_chns[j]
+         IF (misr_mode EQ 'GM') THEN BEGIN
+            stats_lr[n_iter].experiment = n_iter
+            stats_lr[n_iter].array_1_id = misr_chns[i]
+            stats_lr[n_iter].array_2_id = misr_chns[j]
+         ENDIF ELSE BEGIN
+            stats_hr[n_iter].experiment = n_iter
+            stats_hr[n_iter].array_1_id = misr_chns[i]
+            stats_hr[n_iter].array_2_id = misr_chns[j]
+         ENDELSE
 
    ;  Compute the correlation statistics:
          rc = cor_arrays(f_1, f_2, stats, $
             DEBUG = debug, EXCPT_COND = excpt_cond)
-         IF ((debug) AND (excpt_cond NE '')) THEN BEGIN
-            error_code = 340
+         IF (debug AND (excpt_cond NE '')) THEN BEGIN
+            error_code = 520
             excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
                rout_name + ': ' + excpt_cond
             RETURN, error_code
          ENDIF
 
    ;  Save the results in the array of structures:
-         stats_lr[n_iter].N_points = stats.N_points
-         stats_lr[n_iter].RMSD = stats.RMSD
-         stats_lr[n_iter].Pearson_cc = stats.Pearson_cc
-         stats_lr[n_iter].Spearman_cc = stats.Spearman_cc
-         stats_lr[n_iter].Spearman_sig = stats.Spearman_sig
-         stats_lr[n_iter].Spearman_D = stats.Spearman_D
-         stats_lr[n_iter].Spearman_PROBD = stats.Spearman_PROBD
-         stats_lr[n_iter].Spearman_ZD = stats.Spearman_ZD
-         stats_lr[n_iter].Linear_fit_1 = stats.Linear_fit_1
-         stats_lr[n_iter].Linfit_a_1 = stats.Linfit_a_1
-         stats_lr[n_iter].Linfit_b_1 = stats.Linfit_b_1
-         stats_lr[n_iter].Linfit_CHISQR_1 = stats.Linfit_CHISQR_1
-         stats_lr[n_iter].Linfit_PROB_1 = stats.Linfit_PROB_1
-         stats_lr[n_iter].Linear_fit_2 = stats.Linear_fit_2
-         stats_lr[n_iter].Linfit_a_2 = stats.Linfit_a_2
-         stats_lr[n_iter].Linfit_b_2 = stats.Linfit_b_2
-         stats_lr[n_iter].Linfit_CHISQR_2 = stats.Linfit_CHISQR_2
-         stats_lr[n_iter].Linfit_PROB_2 = stats.Linfit_PROB_2
+         IF (misr_mode EQ 'GM') THEN BEGIN
+            stats_lr[n_iter].N_points = stats.N_points
+            stats_lr[n_iter].RMSD = stats.RMSD
+            stats_lr[n_iter].Pearson_cc = stats.Pearson_cc
+            stats_lr[n_iter].Spearman_cc = stats.Spearman_cc
+            stats_lr[n_iter].Spearman_sig = stats.Spearman_sig
+            stats_lr[n_iter].Spearman_D = stats.Spearman_D
+            stats_lr[n_iter].Spearman_PROBD = stats.Spearman_PROBD
+            stats_lr[n_iter].Spearman_ZD = stats.Spearman_ZD
+            stats_lr[n_iter].Linear_fit_1 = stats.Linear_fit_1
+            stats_lr[n_iter].Linfit_a_1 = stats.Linfit_a_1
+            stats_lr[n_iter].Linfit_b_1 = stats.Linfit_b_1
+            stats_lr[n_iter].Linfit_CHISQR_1 = stats.Linfit_CHISQR_1
+            stats_lr[n_iter].Linfit_PROB_1 = stats.Linfit_PROB_1
+            stats_lr[n_iter].Linear_fit_2 = stats.Linear_fit_2
+            stats_lr[n_iter].Linfit_a_2 = stats.Linfit_a_2
+            stats_lr[n_iter].Linfit_b_2 = stats.Linfit_b_2
+            stats_lr[n_iter].Linfit_CHISQR_2 = stats.Linfit_CHISQR_2
+            stats_lr[n_iter].Linfit_PROB_2 = stats.Linfit_PROB_2
+         ENDIF ELSE BEGIN
+            stats_hr[n_iter].N_points = stats.N_points
+            stats_hr[n_iter].RMSD = stats.RMSD
+            stats_hr[n_iter].Pearson_cc = stats.Pearson_cc
+            stats_hr[n_iter].Spearman_cc = stats.Spearman_cc
+            stats_hr[n_iter].Spearman_sig = stats.Spearman_sig
+            stats_hr[n_iter].Spearman_D = stats.Spearman_D
+            stats_hr[n_iter].Spearman_PROBD = stats.Spearman_PROBD
+            stats_hr[n_iter].Spearman_ZD = stats.Spearman_ZD
+            stats_hr[n_iter].Linear_fit_1 = stats.Linear_fit_1
+            stats_hr[n_iter].Linfit_a_1 = stats.Linfit_a_1
+            stats_hr[n_iter].Linfit_b_1 = stats.Linfit_b_1
+            stats_hr[n_iter].Linfit_CHISQR_1 = stats.Linfit_CHISQR_1
+            stats_hr[n_iter].Linfit_PROB_1 = stats.Linfit_PROB_1
+            stats_hr[n_iter].Linear_fit_2 = stats.Linear_fit_2
+            stats_hr[n_iter].Linfit_a_2 = stats.Linfit_a_2
+            stats_hr[n_iter].Linfit_b_2 = stats.Linfit_b_2
+            stats_hr[n_iter].Linfit_CHISQR_2 = stats.Linfit_CHISQR_2
+            stats_hr[n_iter].Linfit_PROB_2 = stats.Linfit_PROB_2
+         ENDELSE
 
          n_iter = n_iter + 1
       ENDFOR
 
-      PRINT, 'Done with data channel ' + misr_chns[i]
+      IF (verbose GT 0) THEN PRINT, 'Done with data channel ' + misr_chns[i]
    ENDFOR
 
    ;  If processing Global Mode data, reset the list of data channels to the
@@ -492,9 +651,9 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
 
    ;  Create a named structure to contain all results computed with the
    ;  2 high resolution fields ((12 x 11) / 2 = 132 / 2 = 66):
-      stats_hr = REPLICATE(stats, 66)
 
-      PRINT, 'Computing the correlation statistics for the 12 data ' + $
+      IF (verbose GT 0) THEN $
+         PRINT, 'Computing the correlation statistics for the 12 data ' + $
          'channels at the high spatial resolution for GM data:'
 
    ;  Iterate over the channels for the first field:
@@ -508,7 +667,7 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
    ;  Identify the file containing this channel:
          idx = WHERE(STRPOS(l1b2_files, cam_1) GT 1, count)
          IF (count NE 1) THEN BEGIN
-            error_code = 350
+            error_code = 530
             excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
                ': No or more than 1 file(s) found for first high ' + $
                'resolution data channel ' + strstr(i) + ' (from 0 to 12).'
@@ -523,11 +682,11 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
    ;  Read the data for this first channel:
          status = MTK_READDATA(l1b2_file_1, grid_1, field_1, region, buf_1, $
             mapinfo)
-         IF ((debug) AND (status NE 0)) THEN BEGIN
-            error_code = 360
+         IF (debug AND (status NE 0)) THEN BEGIN
+            error_code = 630
             excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
-               ': Error encountered in MTK_READDATA while reading ' + $
-               l1b2_file_1
+               ': Error message from MTK_READDATA: ' + $
+               MTK_ERROR_MESSAGE(status)
             RETURN, error_code
          ENDIF
 
@@ -541,7 +700,7 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
    ;  Identify the file containing this channel:
             jdx = WHERE(STRPOS(l1b2_files, cam_2) GT 1, count)
             IF (count NE 1) THEN BEGIN
-               error_code = 370
+               error_code = 540
                excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
                   rout_name + ': No or more than 1 file(s) found for ' + $
                   ' second high resolution data channel ' + strstr(i) + $
@@ -557,11 +716,11 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
    ;  Read the data for this second channel:
             status = MTK_READDATA(l1b2_file_2, grid_2, field_2, region, $
                buf_2, mapinfo)
-            IF ((debug) AND (status NE 0)) THEN BEGIN
-               error_code = 380
+            IF (debug AND (status NE 0)) THEN BEGIN
+               error_code = 640
                excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
-                  rout_name + ': Error encountered in MTK_READDATA ' + $
-                  'while reading ' + l1b2_file_2
+                  rout_name + ': Error message from MTK_READDATA: ' + $
+                  MTK_ERROR_MESSAGE(status)
                RETURN, error_code
             ENDIF
 
@@ -578,8 +737,8 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
    ;  Compute the correlation statistics:
             rc = cor_arrays(f_1, f_2, stats, $
                DEBUG = debug, EXCPT_COND = excpt_cond)
-            IF ((debug) AND (excpt_cond NE '')) THEN BEGIN
-               error_code = 390
+            IF (debug AND (excpt_cond NE '')) THEN BEGIN
+               error_code = 550
                excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
                   rout_name + ': ' + excpt_cond
                RETURN, error_code
@@ -608,11 +767,13 @@ FUNCTION cor_l1b2_block, l1b2_files, misr_mode, misr_path, $
             n_iter = n_iter + 1
          ENDFOR
 
-         PRINT, 'Done with data channel ' + misr_chns[i]
+         IF (verbose GT 0) THEN PRINT, 'Done with data channel ' + misr_chns[i]
       ENDFOR
    ENDIF ELSE BEGIN
       stats_hr = {}
    ENDELSE
+
+   IF (verbose GT 1) THEN PRINT, 'Exiting ' + rout_name + '.'
 
    RETURN, return_code
 
