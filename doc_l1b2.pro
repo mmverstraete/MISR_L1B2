@@ -268,6 +268,11 @@ PRO doc_l1b2, $
    ;      documentation standards (in particular regarding the use of
    ;      verbose and the assignment of numeric return codes), and switch
    ;      to 3-parts version identifiers.
+   ;
+   ;  *   2019–12–19: Version 2.1.1 — Bug fix (replace RETURN by STOP
+   ;      statements) and code update to call the current versions of
+   ;      diag_l1b2gm.pro and diag_l1b2lm.pro, and to set the value of
+   ;      prefix before calling map_l1b2.pro.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
@@ -390,21 +395,22 @@ PRO doc_l1b2, $
                   'misr_orbit is inconsistent with the input positional ' + $
                   'parameter misr_path.'
                PRINT, error_code
-               RETURN
+               STOP
             END
             (res EQ -1): BEGIN
                error_code = 134
                excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
                   rout_name + ': ' + excpt_cond
                PRINT, error_code
-               RETURN
+               STOP
             END
             ELSE: BEGIN
                error_code = 136
                excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
                   rout_name + ': Unexpected return code ' + strstr(res) + $
                   ' from is_frompath.pro.'
-               RETURN, error_code
+               PRINT, error_code
+               STOP
             END
          ENDCASE
       ENDIF
@@ -438,7 +444,8 @@ PRO doc_l1b2, $
       error_code = 199
       excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
          ': ' + excpt_cond
-      RETURN, error_code
+      PRINT, error_code
+      STOP
    ENDIF
 
    ;  Set the MISR and MISR-HR version numbers if they have not been specified
@@ -494,7 +501,7 @@ PRO doc_l1b2, $
       excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
          ': ' + excpt_cond
       PRINT, error_code
-      RETURN
+      STOP
    ENDIF
 
    IF (verbose GT 0) THEN BEGIN
@@ -508,19 +515,38 @@ PRO doc_l1b2, $
    ENDIF
 
    ;  Collect diagnostic information (metadata) on this Block:
-   rc = diag_l1b2(misr_mode, misr_path, misr_orbit, misr_block, $
-      L1B2_FOLDER = l1b2_folder, L1B2_VERSION = l1b2_version, $
-      LOG_IT = log_it, LOG_FOLDER = log_folder, $
-      SAVE_IT = save_it, SAVE_FOLDER = save_folder, $
-      HIST_IT = hist_it, HIST_FOLDER = hist_folder, $
-      VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)
-   IF (rc NE 0) THEN BEGIN
-      PRINT, '*** WARNING ***'
-      PRINT, 'Upon return from diag_l1b2, excpt_cond = ' + excpt_cond
-      answ = ''
-      READ, answ, PROMPT = 'Do you wish to continue (Y/N): '
-      IF (STRUPCASE(first_char(strstr(answ))) NE 'Y') THEN STOP
-   ENDIF
+   CASE misr_mode OF
+      'GM': BEGIN
+         rc = diag_l1b2gm(misr_path, misr_orbit, misr_block, $
+            L1B2GM_FOLDER = l1b2gm_folder, L1B2GM_VERSION = l1b2gm_version, $
+            LOG_IT = log_it, LOG_FOLDER = log_folder, $
+            SAVE_IT = save_it, SAVE_FOLDER = save_folder, $
+            HIST_IT = hist_it, HIST_FOLDER = hist_folder, $
+            VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)
+         IF (rc NE 0) THEN BEGIN
+            PRINT, '*** WARNING ***'
+            PRINT, 'Upon return from diag_l1b2gm, excpt_cond = ' + excpt_cond
+            answ = ''
+            READ, answ, PROMPT = 'Do you wish to continue (Y/N): '
+            IF (STRUPCASE(first_char(strstr(answ))) NE 'Y') THEN STOP
+         ENDIF
+      END
+      'LM': BEGIN
+         rc = diag_l1b2lm(misr_site, misr_path, misr_orbit, misr_block, $
+            L1B2LM_FOLDER = l1b2lm_folder, L1B2LM_VERSION = l1b2lm_version, $
+            LOG_IT = log_it, LOG_FOLDER = log_folder, $
+            SAVE_IT = save_it, SAVE_FOLDER = save_folder, $
+            HIST_IT = hist_it, HIST_FOLDER = hist_folder, $
+            VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)
+         IF (rc NE 0) THEN BEGIN
+            PRINT, '*** WARNING ***'
+            PRINT, 'Upon return from diag_l1b2lm, excpt_cond = ' + excpt_cond
+            answ = ''
+            READ, answ, PROMPT = 'Do you wish to continue (Y/N): '
+            IF (STRUPCASE(first_char(strstr(answ))) NE 'Y') THEN STOP
+         ENDIF
+      END
+   ENDCASE
 
    IF (verbose GT 0) THEN BEGIN
       TOC, clock1
@@ -530,6 +556,7 @@ PRO doc_l1b2, $
    ENDIF
 
    ;  Map the L1B2 data channels, using the default scaling factors:
+   prefix = 'doc'
    rc = map_l1b2(misr_ptr, radrd_ptr, brf_ptr, rdqi_ptr, $
       prefix, N_MASKS = n_masks, $
       SCL_RGB_MIN = scl_rgb_min, SCL_RGB_MAX = scl_rgb_max, $

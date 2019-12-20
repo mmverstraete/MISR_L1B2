@@ -338,9 +338,9 @@ FUNCTION pre_fix_l1b2, $
    ;
    ;  *   2019–08–10: Version 2.17 — Update the code to externalize the
    ;      acquisition of L1B2 data (the function heap_l1b2_block.pro must
-   ;      be called only once prior to processing , L1B2 or L1B3 data) and
-   ;      to allow the processing of Local Mode data (which does require
-   ;      an extra call to heap_l1b2_block.pro, as noted above).
+   ;      be called only once prior to processing RCCM, L1B2 or L1B3 data)
+   ;      and to allow the processing of Local Mode data (which does
+   ;      require an extra call to heap_l1b2_block.pro, as noted above).
    ;
    ;  *   2019–08–20: Version 2.1.0 — Adopt revised coding and
    ;      documentation standards (in particular regarding the use of

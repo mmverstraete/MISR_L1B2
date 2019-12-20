@@ -413,9 +413,9 @@ FUNCTION fix_poor_l1b2, $
    ;
    ;  *   2019–08–10: Version 2.17 — Update the code to externalize the
    ;      acquisition of L1B2 data (the function heap_l1b2_block.pro must
-   ;      be called only once prior to processing , L1B2 or L1B3 data) and
-   ;      to allow the processing of Local Mode data (which does require
-   ;      an extra call to heap_l1b2_block.pro, as noted above).
+   ;      be called only once prior to processing RCCM, L1B2 or L1B3 data)
+   ;      and to allow the processing of Local Mode data (which does
+   ;      require an extra call to heap_l1b2_block.pro, as noted above).
    ;
    ;  *   2019–08–20: Version 2.1.0 — Adopt revised coding and
    ;      documentation standards (in particular regarding the use of
@@ -435,7 +435,7 @@ FUNCTION fix_poor_l1b2, $
    ;      fix_l1b2.pro, breaking it up into smaller routines, including
    ;      this one, and optionally replacing poor values before processing
    ;      missing values; this version also includes the possibility of
-   ;      generating scatterplots of the updated versus the original
+   ;      generating scatterplots of the updated versus the original RDQI
    ;      values, for each of the affected data channels.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS

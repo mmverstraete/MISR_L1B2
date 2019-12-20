@@ -276,6 +276,8 @@ FUNCTION cor_l1b2, $
    ;      documentation standards (in particular regarding the use of
    ;      verbose and the assignment of numeric return codes), and switch
    ;      to 3-parts version identifiers.
+   ;
+   ;  *   2019–12–19: Version 2.1.1 — Bug fix (missing ENDIF statement).
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
@@ -573,6 +575,7 @@ FUNCTION cor_l1b2, $
             rout_name + ': The directory log_fpath is unwritable.'
          RETURN, error_code
       ENDIF
+   ENDIF
 
    IF (save_it) THEN BEGIN
 

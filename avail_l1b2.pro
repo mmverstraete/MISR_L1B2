@@ -232,6 +232,9 @@ PRO avail_l1b2, $
    ;      documentation standards (in particular regarding the use of
    ;      verbose and the assignment of numeric return codes), and switch
    ;      to 3-parts version identifiers.
+   ;
+   ;  *   2019–12–19: Version 2.1.1 — Bug fix (replace RETURN by STOP
+   ;      statements).
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
@@ -276,9 +279,6 @@ PRO avail_l1b2, $
    ;  Get the name of this routine:
    info = SCOPE_TRACEBACK(/STRUCTURE)
    rout_name = info[N_ELEMENTS(info) - 1].ROUTINE
-
-   ;  Initialize the default return code:
-   return_code = 0
 
    ;  Set the default values of flags and essential output keyword parameters:
    IF (KEYWORD_SET(verbose)) THEN BEGIN
@@ -429,7 +429,8 @@ PRO avail_l1b2, $
       error_code = 400
       excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
          rout_name + ': The directory out_fpath is unwritable.'
-      RETURN, error_code
+      PRINT, excpt_cond
+      RETURN
    ENDIF
 
    ;  Set the name of the output file:
