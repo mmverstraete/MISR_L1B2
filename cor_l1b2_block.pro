@@ -18,7 +18,7 @@ FUNCTION cor_l1b2_block, $
    ;  combination.
    ;
    ;  ALGORITHM: This function computes the 630 (36 × 35/2)
-   ;  cross-correlations between the input data channels at the lowest
+   ;  cross-correlations between the input data channels at the coarser
    ;  available spatial resolution (1100 m for GM and 275 m for LM) and
    ;  the results are saved in the output structure stats_lr. If the input
    ;  arguments are for GM data, this function (1) relies on the IDL
@@ -38,7 +38,8 @@ FUNCTION cor_l1b2_block, $
    ;  POSITIONAL PARAMETERS [INPUT/OUTPUT]:
    ;
    ;  *   l1b2_files {STRING array} [I]: The file specifications (path and
-   ;      filename) of the 9 MISR L1B2 GRP ToA GM radiance files.
+   ;      filename) of the 9 MISR L1B2 GRP ToA GM radiance files to
+   ;      process (either GM or LM).
    ;
    ;  *   misr_mode {STRING} [I]: The selected MISR MODE.
    ;
@@ -49,10 +50,12 @@ FUNCTION cor_l1b2_block, $
    ;  *   misr_block {INTEGER} [I]: The selected MISR BLOCK number.
    ;
    ;  *   stats_lr {STRUCTURE} [O]: The cross-correlation statistics
-   ;      between all 36 MISR BRF fields at low spatial resolution.
+   ;      between all 36 MISR BRF fields at the coarser spatial resolution
+   ;      (GM and LM data).
    ;
    ;  *   stats_hr {STRUCTURE} [O]: The cross-correlation statistics
-   ;      between all 12 MISR BRF fields at high spatial resolution.
+   ;      between all 12 MISR BRF fields at high spatial resolution, only
+   ;      for GM data.
    ;
    ;  KEYWORD PARAMETERS [INPUT/OUTPUT]:
    ;
@@ -80,11 +83,11 @@ FUNCTION cor_l1b2_block, $
    ;      set and if the optional output keyword parameter EXCPT_COND is
    ;      provided in the call. The output positional parameter stats_lr
    ;      contains the correlation statistics for the 36 data channels at
-   ;      the lowest spatial resolution (1100 m for GM, 275 m for LM). For
-   ;      GM input data, the output positional parameter stats_hr contains
-   ;      the correlation statistics for the 12 data channels available at
-   ;      the higher spatial resolution (275 m). In the case of LM data,
-   ;      this second output structure is void.
+   ;      the coarser spatial resolution (1100 m for GM, 275 m for LM).
+   ;      For GM input data, the output positional parameter stats_hr
+   ;      contains the correlation statistics for the 12 data channels
+   ;      available at the higher spatial resolution (275 m). In the case
+   ;      of LM data, this second output structure is void.
    ;
    ;  *   If an exception condition has been detected, this function
    ;      returns a non-zero error code, and the output keyword parameter
@@ -203,23 +206,23 @@ FUNCTION cor_l1b2_block, $
    ;         stats_hr, VERBOSE = 0, /DEBUG, EXCPT_COND = excpt_cond)
    ;
    ;      returns the statistical results in ouput arguments stats_lr and
-   ;      stats_hr. Similarly
+   ;      stats_hr.
    ;
    ;      IDL> rc = cor_l1b2_block(l1b2_files, 'LM', 168, 68050, 110, stats_lr, $
    ;         stats_hr, VERBOSE = 0, /DEBUG, EXCPT_COND = excpt_cond)
    ;
    ;      returns the statistical results in ouput arguments stats_hr, while
-   ;      stats_lr is an empty structure as there are no low spatial
-   ;      resolution data in LM.
+   ;      stats_lr is an empty structure.
    ;
    ;  REFERENCES:
    ;
-   ;  *   Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019)
-   ;      _Improving the usability of the MISR L1B2 Georectified Radiance
-   ;      Product (2000–present) in land surface applications_,
-   ;      Earth System Science Data, Vol. xxx, p. yy–yy, available from
-   ;      https://www.earth-syst-sci-data.net/essd-2019-zz/ (DOI:
-   ;      10.5194/zzz).
+   ;  *   Michel M. Verstraete, Linda A. Hunt and Veljko M.
+   ;      Jovanovic (2019) Improving the usability of the MISR L1B2
+   ;      Georectified Radiance Product (2000–present) in land surface
+   ;      applications, _Earth System Science Data Discussions (ESSDD)_,
+   ;      Vol. 2019, p. 1–31, available from
+   ;      https://www.earth-syst-sci-data-discuss.net/essd-2019-210/ (DOI:
+   ;      10.5194/essd-2019-210).
    ;
    ;  VERSIONING:
    ;
@@ -267,10 +270,16 @@ FUNCTION cor_l1b2_block, $
    ;
    ;  *   2019–09–28: Version 2.1.1 — Update the code to use the current
    ;      version of the function hr2lr.pro.
+   ;
+   ;  *   2020–03–25: Version 2.1.2 — Correct the code to properly compute
+   ;      statistics for LM data and update the documentation.
+   ;
+   ;  *   2020–03–30: Version 2.1.5 — Software version described in the
+   ;      preprint published in _ESSDD_ referenced above.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
-   ;  *   Copyright (C) 2017-2019 Michel M. Verstraete.
+   ;  *   Copyright (C) 2017-2020 Michel M. Verstraete.
    ;
    ;      Permission is hereby granted, free of charge, to any person
    ;      obtaining a copy of this software and associated documentation
@@ -282,7 +291,7 @@ FUNCTION cor_l1b2_block, $
    ;      conditions:
    ;
    ;      1. The above copyright notice and this permission notice shall
-   ;      be included in its entirety in all copies or substantial
+   ;      be included in their entirety in all copies or substantial
    ;      portions of the Software.
    ;
    ;      2. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY
@@ -479,8 +488,8 @@ FUNCTION cor_l1b2_block, $
             'channels of GM files at low spatial resolution, and 12 data ' + $
             'channels of GM files at high spatial resolution:'
    ENDIF ELSE BEGIN
-      stats_hr = REPLICATE(stats, 630)
-      stats_lr = {}
+      stats_lr = REPLICATE(stats, 630)
+      stats_hr = {}
       IF (verbose GT 0) THEN $
          PRINT, 'Computing the correlation statistics for the 36 data ' + $
             'channels of LM files at high spatial resolution:'
@@ -520,7 +529,7 @@ FUNCTION cor_l1b2_block, $
          RETURN, error_code
       ENDIF
 
-   ;  If the data are for Global Mode and this is is a red channel, or a
+   ;  If the data are for Global Mode and this is a red channel, or a
    ;  channel of the AN camera, generate a low spatial resolution version
    ;  of the data:
       IF ((misr_mode EQ 'GM') AND ((ban_1 EQ 'Red') OR (cam_1 EQ 'AN'))) $
@@ -574,15 +583,9 @@ FUNCTION cor_l1b2_block, $
          f_2 = buf_2[kdx]
 
    ;  Set the experiment metadata in the output structure:
-         IF (misr_mode EQ 'GM') THEN BEGIN
             stats_lr[n_iter].experiment = n_iter
             stats_lr[n_iter].array_1_id = misr_chns[i]
             stats_lr[n_iter].array_2_id = misr_chns[j]
-         ENDIF ELSE BEGIN
-            stats_hr[n_iter].experiment = n_iter
-            stats_hr[n_iter].array_1_id = misr_chns[i]
-            stats_hr[n_iter].array_2_id = misr_chns[j]
-         ENDELSE
 
    ;  Compute the correlation statistics:
          rc = cor_arrays(f_1, f_2, stats, $
@@ -595,7 +598,6 @@ FUNCTION cor_l1b2_block, $
          ENDIF
 
    ;  Save the results in the array of structures:
-         IF (misr_mode EQ 'GM') THEN BEGIN
             stats_lr[n_iter].N_points = stats.N_points
             stats_lr[n_iter].RMSD = stats.RMSD
             stats_lr[n_iter].Pearson_cc = stats.Pearson_cc
@@ -614,26 +616,6 @@ FUNCTION cor_l1b2_block, $
             stats_lr[n_iter].Linfit_b_2 = stats.Linfit_b_2
             stats_lr[n_iter].Linfit_CHISQR_2 = stats.Linfit_CHISQR_2
             stats_lr[n_iter].Linfit_PROB_2 = stats.Linfit_PROB_2
-         ENDIF ELSE BEGIN
-            stats_hr[n_iter].N_points = stats.N_points
-            stats_hr[n_iter].RMSD = stats.RMSD
-            stats_hr[n_iter].Pearson_cc = stats.Pearson_cc
-            stats_hr[n_iter].Spearman_cc = stats.Spearman_cc
-            stats_hr[n_iter].Spearman_sig = stats.Spearman_sig
-            stats_hr[n_iter].Spearman_D = stats.Spearman_D
-            stats_hr[n_iter].Spearman_PROBD = stats.Spearman_PROBD
-            stats_hr[n_iter].Spearman_ZD = stats.Spearman_ZD
-            stats_hr[n_iter].Linear_fit_1 = stats.Linear_fit_1
-            stats_hr[n_iter].Linfit_a_1 = stats.Linfit_a_1
-            stats_hr[n_iter].Linfit_b_1 = stats.Linfit_b_1
-            stats_hr[n_iter].Linfit_CHISQR_1 = stats.Linfit_CHISQR_1
-            stats_hr[n_iter].Linfit_PROB_1 = stats.Linfit_PROB_1
-            stats_hr[n_iter].Linear_fit_2 = stats.Linear_fit_2
-            stats_hr[n_iter].Linfit_a_2 = stats.Linfit_a_2
-            stats_hr[n_iter].Linfit_b_2 = stats.Linfit_b_2
-            stats_hr[n_iter].Linfit_CHISQR_2 = stats.Linfit_CHISQR_2
-            stats_hr[n_iter].Linfit_PROB_2 = stats.Linfit_PROB_2
-         ENDELSE
 
          n_iter = n_iter + 1
       ENDFOR

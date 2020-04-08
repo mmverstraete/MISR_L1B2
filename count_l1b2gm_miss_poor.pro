@@ -102,9 +102,14 @@ FUNCTION count_l1b2gm_miss_poor, $
    ;      the optional input keyword parameters l1b2gm_folder, out_folder
    ;      is not specified.
    ;
-   ;  *   Error 300: The input folder l1b2_fpath is unreadable.
+   ;  *   Error 300: The input folder l1b2_fpath does not exist.
    ;
-   ;  *   Error 310: The number of files in the folder containing MISR
+   ;  *   Error 310: The input folder l1b2_fpath points to multiple
+   ;      directories.
+   ;
+   ;  *   Error 320: The input folder l1b2_fpath is unreadable.
+   ;
+   ;  *   Error 330: The number of files in the folder containing MISR
    ;      L1B2 files is not a multiple of 9.
    ;
    ;  *   Error 400: The output folder out_fpath (output file for bad
@@ -185,12 +190,13 @@ FUNCTION count_l1b2gm_miss_poor, $
    ;
    ;  REFERENCES:
    ;
-   ;  *   Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019)
-   ;      _Improving the usability of the MISR L1B2 Georectified Radiance
-   ;      Product (2000–present) in land surface applications_,
-   ;      Earth System Science Data, Vol. xxx, p. yy–yy, available from
-   ;      https://www.earth-syst-sci-data.net/essd-2019-zz/ (DOI:
-   ;      10.5194/zzz).
+   ;  *   Michel M. Verstraete, Linda A. Hunt and Veljko M.
+   ;      Jovanovic (2019) Improving the usability of the MISR L1B2
+   ;      Georectified Radiance Product (2000–present) in land surface
+   ;      applications, _Earth System Science Data Discussions (ESSDD)_,
+   ;      Vol. 2019, p. 1–31, available from
+   ;      https://www.earth-syst-sci-data-discuss.net/essd-2019-210/ (DOI:
+   ;      10.5194/essd-2019-210).
    ;
    ;  VERSIONING:
    ;
@@ -220,10 +226,16 @@ FUNCTION count_l1b2gm_miss_poor, $
    ;      documentation standards (in particular regarding the use of
    ;      verbose and the assignment of numeric return codes), and switch
    ;      to 3-parts version identifiers.
+   ;
+   ;  *   2020–03–06: Version 2.1.1 — Update the code to handle input path
+   ;      names with wildcard characters.
+   ;
+   ;  *   2020–03–30: Version 2.1.5 — Software version described in the
+   ;      preprint published in _ESSDD_ referenced above.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
-   ;  *   Copyright (C) 2017-2019 Michel M. Verstraete.
+   ;  *   Copyright (C) 2017-2020 Michel M. Verstraete.
    ;
    ;      Permission is hereby granted, free of charge, to any person
    ;      obtaining a copy of this software and associated documentation
@@ -235,7 +247,7 @@ FUNCTION count_l1b2gm_miss_poor, $
    ;      conditions:
    ;
    ;      1. The above copyright notice and this permission notice shall
-   ;      be included in its entirety in all copies or substantial
+   ;      be included in their entirety in all copies or substantial
    ;      portions of the Software.
    ;
    ;      2. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY
@@ -384,12 +396,39 @@ FUNCTION count_l1b2gm_miss_poor, $
          'L1_GM' + PATH_SEP()
    ENDELSE
 
+   ;  Convert wildcard characters if any are present:
+   tst1 = STRPOS(l1b2_fpath, '*')
+   tst2 = STRPOS(l1b2_fpath, '?')
+   IF ((tst1 GE 0) OR (tst2 GE 0)) THEN BEGIN
+      fp = FILE_SEARCH(l1b2_fpath, COUNT = n_fp)
+      IF (debug AND (n_fp NE 1)) THEN BEGIN
+         CASE n_fp OF
+            0: BEGIN
+               error_code = 300
+               excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
+                  rout_name + ': The input folder ' + l1b2_fpath + $
+                  ' does not exist.'
+               RETURN, error_code
+            END
+            ELSE: BEGIN
+               error_code = 310
+               excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
+                  rout_name + ': The input folder ' + l1b2_fpath + $
+                  ' points to multiple directories.'
+               RETURN, error_code
+            END
+         ENDCASE
+      ENDIF
+      l1b2_fpath = fp[0]
+      rc = force_path_sep(l1b2_fpath)
+   ENDIF
+
    ;  Return to the calling routine with an error message if the input
    ;  folder 'l1b2_fpath' is unreadable:
    IF (debug) THEN BEGIN
       res = is_readable_dir(l1b2_fpath)
       IF (res EQ 0) THEN BEGIN
-         error_code = 300
+         error_code = 320
          excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
             rout_name + ': The input folder ' + l1b2_fpath + $
             ' is not found, not a directory or not readable.'
@@ -404,7 +443,7 @@ FUNCTION count_l1b2gm_miss_poor, $
    IF (debug) THEN BEGIN
       tst = n_gm_files MOD 9
       IF (tst NE 0) THEN BEGIN
-         error_code = 310
+         error_code = 330
          excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
             ': The number of files in the folder containing MISR L1B2 ' + $
             'files is not a multiple of 9.'
@@ -419,7 +458,8 @@ FUNCTION count_l1b2gm_miss_poor, $
    gm_orbits = gm_orbits[UNIQ(gm_orbits)]
 
    IF (verbose GT 0) THEN BEGIN
-      PRINT, 'Processing  Orbits: ', gm_orbits
+      PRINT, 'Processing ' + strstr(N_ELEMENTS(gm_orbits)) + ' Orbits: '
+      PRINT, gm_orbits
    ENDIF
 
    ;  Set the directory address of the folder containing the outputs

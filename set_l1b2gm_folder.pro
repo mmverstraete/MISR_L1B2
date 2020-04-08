@@ -18,7 +18,7 @@ FUNCTION set_l1b2gm_folder, $
    ;  l1b2gm_folder overrides this setting. The function also checks that
    ;  this folder is available for reading.
    ;
-   ;  SYNTAX: rc = set_l1b2gm_folder(misr_mode, misr_path, $
+   ;  SYNTAX: rc = set_l1b2gm_folder(misr_path, $
    ;  l1b2gm_fpath, n_l1b2gm_files, $
    ;  L1B2GM_FOLDER = l1b2gm_folder, L1B2GM_VERSION = l1b2gm_version, $
    ;  VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)
@@ -99,10 +99,15 @@ FUNCTION set_l1b2gm_folder, $
    ;  *   Error 299: The computer is not recognized and the optional input
    ;      keyword parameter l1b2gm_folder is not specified.
    ;
-   ;  *   Error 300: The folder l1b2gm_fpath is not found, is not a
+   ;  *   Error 300: The input folder l1b2gm_fpath does not exist.
+   ;
+   ;  *   Error 310: The input folder l1b2gm_fpath points to multiple
+   ;      directories.
+   ;
+   ;  *   Error 320: The folder l1b2gm_fpath is not found, is not a
    ;      directory or is not readable.
    ;
-   ;  *   Error 310: The folder l1b2_path does not contain any L1B2 files.
+   ;  *   Error 330: The folder l1b2_path does not contain any L1B2 files.
    ;
    ;  DEPENDENCIES:
    ;
@@ -151,12 +156,13 @@ FUNCTION set_l1b2gm_folder, $
    ;
    ;  REFERENCES:
    ;
-   ;  *   Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019)
-   ;      _Improving the usability of the MISR L1B2 Georectified Radiance
-   ;      Product (2000–present) in land surface applications_,
-   ;      Earth System Science Data, Vol. xxx, p. yy–yy, available from
-   ;      https://www.earth-syst-sci-data.net/essd-2019-zz/ (DOI:
-   ;      10.5194/zzz).
+   ;  *   Michel M. Verstraete, Linda A. Hunt and Veljko M.
+   ;      Jovanovic (2019) Improving the usability of the MISR L1B2
+   ;      Georectified Radiance Product (2000–present) in land surface
+   ;      applications, _Earth System Science Data Discussions (ESSDD)_,
+   ;      Vol. 2019, p. 1–31, available from
+   ;      https://www.earth-syst-sci-data-discuss.net/essd-2019-210/ (DOI:
+   ;      10.5194/essd-2019-210).
    ;
    ;  VERSIONING:
    ;
@@ -176,10 +182,16 @@ FUNCTION set_l1b2gm_folder, $
    ;  *   2019–10–27: Version 2.1.1 — Delete input positional parameter
    ;      misr_mode since this function applies only to Global Mode files,
    ;      and update the documentation.
+   ;
+   ;  *   2020–03–06: Version 2.1.2 — Update the code to handle input path
+   ;      names with wildcard characters.
+   ;
+   ;  *   2020–03–30: Version 2.1.5 — Software version described in the
+   ;      preprint published in _ESSDD_ referenced above.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
-   ;  *   Copyright (C) 2017-2019 Michel M. Verstraete.
+   ;  *   Copyright (C) 2017-2020 Michel M. Verstraete.
    ;
    ;      Permission is hereby granted, free of charge, to any person
    ;      obtaining a copy of this software and associated documentation
@@ -191,7 +203,7 @@ FUNCTION set_l1b2gm_folder, $
    ;      conditions:
    ;
    ;      1. The above copyright notice and this permission notice shall
-   ;      be included in its entirety in all copies or substantial
+   ;      be included in their entirety in all copies or substantial
    ;      portions of the Software.
    ;
    ;      2. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY
@@ -322,16 +334,39 @@ FUNCTION set_l1b2gm_folder, $
          'L1_' + misr_mode + PATH_SEP()
    ENDELSE
 
-   ;  Eliminate metacharacters of regular expressions, if any:
-   tst = FILE_SEARCH(l1b2gm_fpath, COUNT = cnt, /MARK_DIRECTORY)
-   l1b2gm_fpath = tst[0]
+   ;  Convert wildcard characters if any are present:
+   tst1 = STRPOS(l1b2gm_fpath, '*')
+   tst2 = STRPOS(l1b2gm_fpath, '?')
+   IF ((tst1 GE 0) OR (tst2 GE 0)) THEN BEGIN
+      fp = FILE_SEARCH(l1b2gm_fpath, COUNT = n_fp)
+      IF (debug AND (n_fp NE 1)) THEN BEGIN
+         CASE n_fp OF
+            0: BEGIN
+               error_code = 300
+               excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
+                  rout_name + ': The input folder ' + l1b2gm_fpath + $
+                  ' does not exist.'
+               RETURN, error_code
+            END
+            ELSE: BEGIN
+               error_code = 310
+               excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
+                  rout_name + ': The input folder ' + l1b2gm_fpath + $
+                  ' points to multiple directories.'
+               RETURN, error_code
+            END
+         ENDCASE
+      ENDIF
+      l1b2gm_fpath = fp[0]
+      rc = force_path_sep(l1b2gm_fpath)
+   ENDIF
 
    ;  Return to the calling routine with an error message if the input
    ;  file 'l1b2gm_fpath' does not exist or is unreadable:
    IF (debug) THEN BEGIN
       res = is_readable_dir(l1b2gm_fpath)
       IF (res EQ 0) THEN BEGIN
-         error_code = 300
+         error_code = 320
          excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
             rout_name + ': The input folder ' + l1b2gm_fpath + $
             ' is not found, is not a directory or is not readable.'
@@ -345,7 +380,7 @@ FUNCTION set_l1b2gm_folder, $
    pattern = l1b2gm_fpath + 'MISR*GRP_TERRAIN_GM*' + l1b2gm_version + '.hdf'
    l1b2_files = FILE_SEARCH(pattern, COUNT = n_l1b2gm_files)
    IF (n_l1b2gm_files EQ 0) THEN BEGIN
-      error_code = 310
+      error_code = 330
       excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
          ': The folder ' + l1b2gm_fpath + ' does not contain any L1B2 ' + $
          'files for Version ' + l1b2gm_version + '.'

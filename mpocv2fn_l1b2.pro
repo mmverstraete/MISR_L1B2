@@ -5,6 +5,7 @@ FUNCTION mpocv2fn_l1b2, $
    misr_camera, $
    misr_version, $
    l1b2_fspec, $
+   VERBOSE = verbose, $
    DEBUG = debug, $
    EXCPT_COND = excpt_cond
 
@@ -41,6 +42,19 @@ FUNCTION mpocv2fn_l1b2, $
    ;      GRP ToA radiance file.
    ;
    ;  KEYWORD PARAMETERS [INPUT/OUTPUT]:
+   ;
+   ;  *   VERBOSE = verbose {INT} [I] (Default value: 0): Flag to enable
+   ;      (> 0) or skip (0) outputting messages on the console:
+   ;
+   ;      -   If verbose > 0, messages inform the user about progress in
+   ;          the execution of time-consuming routines, or the location of
+   ;          output files (e.g., log, map, plot, etc.);
+   ;
+   ;      -   If verbose > 1, messages record entering and exiting the
+   ;          routine; and
+   ;
+   ;      -   If verbose > 2, messages provide additional information
+   ;          about intermediary results.
    ;
    ;  *   DEBUG = debug {INT} [I] (Default value: 0): Flag to activate (1)
    ;      or skip (0) debugging tests.
@@ -146,12 +160,13 @@ FUNCTION mpocv2fn_l1b2, $
    ;
    ;  REFERENCES:
    ;
-   ;  *   Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019)
-   ;      _Improving the usability of the MISR L1B2 Georectified Radiance
-   ;      Product (2000–present) in land surface applications_,
-   ;      Earth System Science Data, Vol. xxx, p. yy–yy, available from
-   ;      https://www.earth-syst-sci-data.net/essd-2019-zz/ (DOI:
-   ;      10.5194/zzz).
+   ;  *   Michel M. Verstraete, Linda A. Hunt and Veljko M.
+   ;      Jovanovic (2019) Improving the usability of the MISR L1B2
+   ;      Georectified Radiance Product (2000–present) in land surface
+   ;      applications, _Earth System Science Data Discussions (ESSDD)_,
+   ;      Vol. 2019, p. 1–31, available from
+   ;      https://www.earth-syst-sci-data-discuss.net/essd-2019-210/ (DOI:
+   ;      10.5194/essd-2019-210).
    ;
    ;  VERSIONING:
    ;
@@ -191,10 +206,16 @@ FUNCTION mpocv2fn_l1b2, $
    ;      documentation standards (in particular regarding the use of
    ;      verbose and the assignment of numeric return codes), and switch
    ;      to 3-parts version identifiers.
+   ;
+   ;  *   2020–03–26: Version 2.1.1 — Update the code to add the optional
+   ;      keyword parameter VERBOSE and update the documentation.
+   ;
+   ;  *   2020–03–30: Version 2.1.5 — Software version described in the
+   ;      preprint published in _ESSDD_ referenced above.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
-   ;  *   Copyright (C) 2017-2019 Michel M. Verstraete.
+   ;  *   Copyright (C) 2017-2020 Michel M. Verstraete.
    ;
    ;      Permission is hereby granted, free of charge, to any person
    ;      obtaining a copy of this software and associated documentation
@@ -206,7 +227,7 @@ FUNCTION mpocv2fn_l1b2, $
    ;      conditions:
    ;
    ;      1. The above copyright notice and this permission notice shall
-   ;      be included in its entirety in all copies or substantial
+   ;      be included in their entirety in all copies or substantial
    ;      portions of the Software.
    ;
    ;      2. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY
@@ -239,9 +260,16 @@ FUNCTION mpocv2fn_l1b2, $
    ;  Initialize the default return code:
    return_code = 0
 
-   ;  Set the default values of flags and essential output keyword parameters:
+   ;  Set the default values of flags and essential keyword parameters:
+   IF (KEYWORD_SET(verbose)) THEN BEGIN
+      IF (is_numeric(verbose)) THEN verbose = FIX(verbose) ELSE verbose = 0
+      IF (verbose LT 0) THEN verbose = 0
+      IF (verbose GT 3) THEN verbose = 3
+   ENDIF ELSE verbose = 0
    IF (KEYWORD_SET(debug)) THEN debug = 1 ELSE debug = 0
    excpt_cond = ''
+
+   IF (verbose GT 1) THEN PRINT, 'Entering ' + rout_name + '.'
 
    ;  Initialize the output positional parameter(s):
    l1b2_fspec = ''
@@ -369,6 +397,8 @@ FUNCTION mpocv2fn_l1b2, $
          MTK_ERROR_MESSAGE(status)
       RETURN, error_code
    ENDIF
+
+   IF (verbose GT 1) THEN PRINT, 'Exiting ' + rout_name + '.'
 
    RETURN, return_code
 

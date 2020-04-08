@@ -5,6 +5,7 @@ FUNCTION cor_l1b2, $
    misr_block, $
    L1B2_FOLDER = l1b2_folder, $
    L1B2_VERSION = l1b2_version, $
+   MISR_SITE = misr_site, $
    LOG_IT = log_it, $
    LOG_FOLDER = log_folder, $
    SAVE_IT = save_it, $
@@ -30,7 +31,7 @@ FUNCTION cor_l1b2, $
    ;  SYNTAX:
    ;  rc = cor_l1b2(misr_mode, misr_path, misr_orbit, misr_block, $
    ;  L1B2_FOLDER = l1b2_folder, L1B2_VERSION = l1b2_version, $
-   ;  LOG_IT = log_it, LOG_FOLDER = log_folder, $
+   ;  MISR_SITE = misr_site, LOG_IT = log_it, LOG_FOLDER = log_folder, $
    ;  SAVE_IT = save_it, SAVE_FOLDER = save_folder, $
    ;  VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)
    ;
@@ -56,6 +57,9 @@ FUNCTION cor_l1b2, $
    ;      function
    ;      set_roots_vers.pro): The L1B2 version identifier to use instead
    ;      of the default value.
+   ;
+   ;  *   MISR_SITE = misr_site {STRING} [I] (Default value: None: The
+   ;      official name of the Local Mode site.
    ;
    ;  *   LOG_IT = log_it {INT} [I] (Default value: 0): Flag to activate
    ;      (1) or skip (0) generating a log file.
@@ -138,6 +142,12 @@ FUNCTION cor_l1b2, $
    ;  *   Error 136: Unexpected return code received from is_frompath.pro.
    ;
    ;  *   Error 140: Input argument misr_block is invalid.
+   ;
+   ;  *   Error 150: Attempt to process Local Mode data while misr_site is
+   ;      an empty string.
+   ;
+   ;  *   Error 160: Attempt to process Local Mode data while misr_site is
+   ;      undefined.
    ;
    ;  *   Error 199: An exception condition occurred in
    ;      set_roots_vers.pro.
@@ -224,12 +234,13 @@ FUNCTION cor_l1b2, $
    ;
    ;  REFERENCES:
    ;
-   ;  *   Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019)
-   ;      _Improving the usability of the MISR L1B2 Georectified Radiance
-   ;      Product (2000–present) in land surface applications_,
-   ;      Earth System Science Data, Vol. xxx, p. yy–yy, available from
-   ;      https://www.earth-syst-sci-data.net/essd-2019-zz/ (DOI:
-   ;      10.5194/zzz).
+   ;  *   Michel M. Verstraete, Linda A. Hunt and Veljko M.
+   ;      Jovanovic (2019) Improving the usability of the MISR L1B2
+   ;      Georectified Radiance Product (2000–present) in land surface
+   ;      applications, _Earth System Science Data Discussions (ESSDD)_,
+   ;      Vol. 2019, p. 1–31, available from
+   ;      https://www.earth-syst-sci-data-discuss.net/essd-2019-210/ (DOI:
+   ;      10.5194/essd-2019-210).
    ;
    ;  VERSIONING:
    ;
@@ -278,10 +289,22 @@ FUNCTION cor_l1b2, $
    ;      to 3-parts version identifiers.
    ;
    ;  *   2019–12–19: Version 2.1.1 — Bug fix (missing ENDIF statement).
+   ;
+   ;  *   2020–03–24: Version 2.1.2 — Edit the code to (1) add the
+   ;      optional keyword parameter MISR_SITE to allow processing of
+   ;      Local Mode data and update the code to save the appropriate
+   ;      statistics in that case, (2) implement exception conditions 150
+   ;      and 160 to check the existence of that new keyword, (3) enable
+   ;      all keywords in the call to find_l1b2gm_files, (4) save all
+   ;      output files in a more appropriate default folder, and (5)
+   ;      update the documentation.
+   ;
+   ;  *   2020–03–30: Version 2.1.5 — Software version described in the
+   ;      preprint published in _ESSDD_ referenced above.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
-   ;  *   Copyright (C) 2017-2019 Michel M. Verstraete.
+   ;  *   Copyright (C) 2017-2020 Michel M. Verstraete.
    ;
    ;      Permission is hereby granted, free of charge, to any person
    ;      obtaining a copy of this software and associated documentation
@@ -293,7 +316,7 @@ FUNCTION cor_l1b2, $
    ;      conditions:
    ;
    ;      1. The above copyright notice and this permission notice shall
-   ;      be included in its entirety in all copies or substantial
+   ;      be included in their entirety in all copies or substantial
    ;      portions of the Software.
    ;
    ;      2. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY
@@ -421,6 +444,27 @@ FUNCTION cor_l1b2, $
             ': ' + excpt_cond
          RETURN, error_code
       ENDIF
+
+   ;  Return to the calling routine with an error message if the optional
+   ;  keyword parameter MISR_SITE is empty or undefined while processing
+   ;  Local Mode data:
+      IF (misr_mode EQ 'LM') THEN BEGIN
+         IF (is_defined(misr_site)) THEN BEGIN
+            IF (misr_site EQ '') THEN BEGIN
+               error_code = 150
+               excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
+                  rout_name + ': Attempt to process Local Mode data ' + $
+                  "while misr_site = ''."
+               RETURN, error_code
+            ENDIF
+         ENDIF ELSE BEGIN
+            error_code = 160
+            excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
+               rout_name + ': Attempt to process Local Mode data ' + $
+               'while misr_site is undefined.'
+            RETURN, error_code
+         ENDELSE
+      ENDIF
    ENDIF
 
    ;  Identify the current operating system and computer name:
@@ -526,11 +570,11 @@ FUNCTION cor_l1b2, $
       ENDIF
    ENDIF
 
-   ;  Locate the 9 MISR L1B2 input files corresponding to the specified Path
-   ;  and Orbit numbers:
+   ;  Locate the 9 MISR L1B2 input files corresponding to the specified Mode, ;  Path and Orbit numbers:
    IF (misr_mode EQ 'GM') THEN BEGIN
       rc = find_l1b2gm_files(misr_path, misr_orbit, l1b2_files, $
-         DEBUG = debug, EXCPT_COND = excpt_cond)
+         L1B2GM_FOLDER = l1b2gm_folder, L1B2GM_VERSION = l1b2gm_version, $
+         VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)
       IF (debug AND (rc NE 0)) THEN BEGIN
          info = SCOPE_TRACEBACK(/STRUCTURE)
          rout_name = info[N_ELEMENTS(info) - 1].ROUTINE
@@ -540,7 +584,7 @@ FUNCTION cor_l1b2, $
          RETURN, error_code
       ENDIF
    ENDIF ELSE BEGIN
-      rc = find_l1b2lm_files(misr_site, misr_path, misr_orbit, l1b2lm_files, $
+      rc = find_l1b2lm_files(misr_site, misr_path, misr_orbit, l1b2_files, $
          L1B2LM_FOLDER = l1b2lm_folder, L1B2LM_VERSION = l1b2lm_version, $
          VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)
       IF (debug AND (rc NE 0)) THEN BEGIN
@@ -563,7 +607,7 @@ FUNCTION cor_l1b2, $
          log_fpath = log_folder
       ENDIF ELSE BEGIN
          log_fpath = root_dirs[3] + pob_str + PATH_SEP() + misr_mode + $
-            PATH_SEP() + 'Correlations' + PATH_SEP()
+            PATH_SEP() + 'L1B2' + PATH_SEP() + 'Correlations' + PATH_SEP()
       ENDELSE
 
    ;  Check that the output directory 'log_fpath' exists and is writable, and
@@ -587,7 +631,7 @@ FUNCTION cor_l1b2, $
          save_fpath = save_folder
       ENDIF ELSE BEGIN
          save_fpath = root_dirs[3] + pob_str + PATH_SEP() + misr_mode + $
-            PATH_SEP() + 'Correlations' + PATH_SEP()
+            PATH_SEP() + 'L1B2' + PATH_SEP() + 'Correlations' + PATH_SEP()
       ENDELSE
 
    ;  Check that the output directory 'save_fpath' exists and is writable, and
@@ -614,20 +658,25 @@ FUNCTION cor_l1b2, $
       RETURN, error_code
    ENDIF
 
-   ;  Save the results in an IDL save file, if requested:
+   ;  Save the results in an IDL save file, if requested. For GM input data,
+   ;  statistics are generated separately for low and high resolution channels;
+   ;  for LM data, all data channels are available at the full spatial
+   ;  resolution but the results from 'cor_l1b2_block.pro' are still reported
+   ;  in 'stats_lr':
    IF (save_it) THEN BEGIN
       save_fname = 'Save_L1B2_corr_' + mpob_str + '_' + $
          acquis_date + '_' + date + '.sav'
       save_fspec = save_fpath + save_fname
 
-      descr = 'Cross-correlations between the 36 data channels ' + $
-         'of MISR L1B2 (low and high res).'
-      SAVE, stats_lr, stats_hr, DESCRIPTION = descr, FILENAME = save_fspec
-
-      IF (verbose GT 0) THEN BEGIN
-         PRINT, 'The results have been saved in the IDL SAVE file'
-         PRINT, save_fspec
-      ENDIF
+      IF (misr_mode EQ 'GM') THEN BEGIN
+         descr = 'Cross-correlations between the 36 data channels ' + $
+            'of MISR L1B2 Global Mode (low and high res).'
+         SAVE, stats_lr, stats_hr, DESCRIPTION = descr, FILENAME = save_fspec
+      ENDIF ELSE BEGIN
+         descr = 'Cross-correlations between the 36 data channels ' + $
+            'of MISR L1B2 Local Mode (high res).'
+         SAVE, stats_lr, DESCRIPTION = descr, FILENAME = save_fspec
+      ENDELSE
    ENDIF
 
    ;  Save the log file, if requested:
@@ -637,7 +686,7 @@ FUNCTION cor_l1b2, $
       log_fspec = log_fpath + log_fname
 
       fmt1 = '(A30, A)'
-      fmt2 = '(A32, A)'
+      fmt2 = '(A30, A)'
 
    ;  Open the log file and save the statistical information:
       OPENW, log_unit, log_fspec, /GET_LUN
@@ -649,16 +698,22 @@ FUNCTION cor_l1b2, $
       PRINTF, log_unit, 'Saved on: ', date, FORMAT = fmt1
       PRINTF, log_unit
 
-      PRINTF, log_unit, 'Date of MISR acquisition: ' + acquis_date
+      PRINTF, log_unit, 'Date of MISR acquisition: ', acquis_date, $
+         FORMAT = fmt1
       PRINTF, log_unit
 
-      PRINTF, log_unit, 'Content: Statistical results on'
-      PRINTF, log_unit, '- the 630 (36x35/2) cross-correlations between'
-      PRINTF, log_unit, '  the 36 low spatial resolution data channels'
-      PRINTF, log_unit, '- the 66 (12x11/2) cross-correlations between'
-      PRINTF, log_unit, '  the 12 high spatial resolution data channels'
-      PRINTF, log_unit, '  of MISR L1B2 GRP Terrain-Projected ToA GM BRF for'
-      PRINTF, log_unit, '  ' + mpob_str
+      PRINTF, log_unit, 'Content: ', 'Statistical results on', FORMAT = fmt1
+      PRINTF, log_unit, '', '- the 630 (36x35/2) cross-correlations between', $
+         FORMAT = fmt1
+      PRINTF, log_unit, '', '  the 36 low spatial resolution data channels', $
+         FORMAT = fmt1
+      PRINTF, log_unit, '', '- the 66 (12x11/2) cross-correlations between', $
+         FORMAT = fmt1
+      PRINTF, log_unit, '', '  the 12 high spatial resolution data channels', $
+         FORMAT = fmt1
+      PRINTF, log_unit, '', '  of MISR L1B2 GRP Terrain-Projected ToA GM ' + $
+         'BRF for', FORMAT = fmt1
+      PRINTF, log_unit, '', '  ' + mpob_str, FORMAT = fmt1
       PRINTF, log_unit
 
    ;  For GM files, save the correlation statistics for the low spatial
@@ -825,16 +880,16 @@ FUNCTION cor_l1b2, $
 
       IF (log_it AND verbose GT 0) THEN BEGIN
          PRINT, 'The log file'
-         PRINT, log_fname
+         PRINT, '   ' + log_fname
          PRINT, 'has been written in the folder'
-         PRINT, log_fpath
+         PRINT, '   ' + log_fpath
       ENDIF
 
       IF (save_it AND verbose GT 0) THEN BEGIN
-         PRINT, 'The results have been written in the file'
-         PRINT, save_fname
+         PRINT, 'The numerical results have been written in the file'
+         PRINT, '   ' + save_fname
          PRINT, 'located in folder'
-         PRINT, save_fpath
+         PRINT, '   ' + save_fpath
       ENDIF
    ENDIF
 

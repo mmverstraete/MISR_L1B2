@@ -356,12 +356,13 @@ FUNCTION fix_poor_l1b2, $
    ;
    ;  REFERENCES:
    ;
-   ;  *   Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019)
-   ;      _Improving the usability of the MISR L1B2 Georectified Radiance
-   ;      Product (2000–present) in land surface applications_,
-   ;      Earth System Science Data, Vol. xxx, p. yy–yy, available from
-   ;      https://www.earth-syst-sci-data.net/essd-2019-zz/ (DOI:
-   ;      10.5194/zzz).
+   ;  *   Michel M. Verstraete, Linda A. Hunt and Veljko M.
+   ;      Jovanovic (2019) Improving the usability of the MISR L1B2
+   ;      Georectified Radiance Product (2000–present) in land surface
+   ;      applications, _Earth System Science Data Discussions (ESSDD)_,
+   ;      Vol. 2019, p. 1–31, available from
+   ;      https://www.earth-syst-sci-data-discuss.net/essd-2019-210/ (DOI:
+   ;      10.5194/essd-2019-210).
    ;
    ;  VERSIONING:
    ;
@@ -431,16 +432,23 @@ FUNCTION fix_poor_l1b2, $
    ;      default log, map and savefile output directories, and use the
    ;      current version of the function hr2lr.pro.
    ;
-   ;  *   2019–10–23: Version 2.2.0 — Major rewrite of the function
+   ;  *   2019–10–23: Version 2.1.3 — Major rewrite of the function
    ;      fix_l1b2.pro, breaking it up into smaller routines, including
    ;      this one, and optionally replacing poor values before processing
    ;      missing values; this version also includes the possibility of
    ;      generating scatterplots of the updated versus the original RDQI
    ;      values, for each of the affected data channels.
+   ;
+   ;  *   2020–03–05: Version 2.1.4 — Update the code to prevent computing
+   ;      statistics and plotting scatterplots when fewer than 5 data
+   ;      points are involved.
+   ;
+   ;  *   2020–03–30: Version 2.1.5 — Software version described in the
+   ;      preprint published in _ESSDD_ referenced above.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
-   ;  *   Copyright (C) 2017-2019 Michel M. Verstraete.
+   ;  *   Copyright (C) 2017-2020 Michel M. Verstraete.
    ;
    ;      Permission is hereby granted, free of charge, to any person
    ;      obtaining a copy of this software and associated documentation
@@ -452,7 +460,7 @@ FUNCTION fix_poor_l1b2, $
    ;      conditions:
    ;
    ;      1. The above copyright notice and this permission notice shall
-   ;      be included in its entirety in all copies or substantial
+   ;      be included in their entirety in all copies or substantial
    ;      portions of the Software.
    ;
    ;      2. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY
@@ -1663,7 +1671,7 @@ FUNCTION fix_poor_l1b2, $
             rdqi_ori = *rdqi_ptr[cam, bnd]
             rdqi_upd = *fixed_rdqi_ptr[cam, bnd]
             idx_scat = WHERE((rdqi_ori EQ 2B) AND (rdqi_upd EQ 1B), n_scat)
-            IF (n_scat GT 0) THEN BEGIN
+            IF (n_scat GT 4) THEN BEGIN
                brf_ori = *brf_ptr[cam, bnd]
                brf_upd = *fixed_brf_ptr[cam, bnd]
                array_1 = brf_ori[idx_scat]
@@ -1718,7 +1726,10 @@ FUNCTION fix_poor_l1b2, $
                   SET_MAX_SCATT = set_max_scatt, SCATT_PATH = scatt_path, $
                   PREFIX = prefix, VERBOSE = verbose, $
                   DEBUG = debug, EXCPT_COND = excpt_cond)
-            ENDIF
+            ENDIF ELSE BEGIN
+               PRINTF, main_log_unit, 'Fewer than 5 RDQI values 2B were ' + $
+                  'updated to 1B: No scatterplot generated.'
+            ENDELSE
          ENDIF   ;  End of IF block to generate scatterplots
       ENDFOR   ;  End of loop on spectral bands
    ENDFOR   ;  End of loop on cameras

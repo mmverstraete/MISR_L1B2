@@ -128,6 +128,8 @@ FUNCTION diag_l1b2_block_cam, $
    ;
    ;  *   Error 400: The output folder hist_fpath is unwritable.
    ;
+   ;  *   Error 500: The array
+   ;
    ;  *   Error 600: An exception condition occurred in the MISR TOOLKIT
    ;      routine
    ;      MTK_SETREGION_BY_PATH_BLOCKRANGE.
@@ -153,6 +155,8 @@ FUNCTION diag_l1b2_block_cam, $
    ;  *   chk_misr_block.pro
    ;
    ;  *   force_path_sep.pro
+   ;
+   ;  *   hr2lr.pro
    ;
    ;  *   is_numeric.pro
    ;
@@ -180,6 +184,11 @@ FUNCTION diag_l1b2_block_cam, $
    ;      this function generates 4 histograms, 1 for each spectral data
    ;      channel of the L1B2 GRP ToA radiance input file.
    ;
+   ;  *   NOTE 2: All data channels available at the full native spatial
+   ;      resolution of the MISR instrument are downscaled to 512 × 128
+   ;      for the purpose of plotting the histograms to limit the number
+   ;      of points in the graph.
+   ;
    ;  EXAMPLES:
    ;
    ;      See the documentation for the functions
@@ -187,12 +196,13 @@ FUNCTION diag_l1b2_block_cam, $
    ;
    ;  REFERENCES:
    ;
-   ;  *   Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019)
-   ;      _Improving the usability of the MISR L1B2 Georectified Radiance
-   ;      Product (2000–present) in land surface applications_,
-   ;      Earth System Science Data, Vol. xxx, p. yy–yy, available from
-   ;      https://www.earth-syst-sci-data.net/essd-2019-zz/ (DOI:
-   ;      10.5194/zzz).
+   ;  *   Michel M. Verstraete, Linda A. Hunt and Veljko M.
+   ;      Jovanovic (2019) Improving the usability of the MISR L1B2
+   ;      Georectified Radiance Product (2000–present) in land surface
+   ;      applications, _Earth System Science Data Discussions (ESSDD)_,
+   ;      Vol. 2019, p. 1–31, available from
+   ;      https://www.earth-syst-sci-data-discuss.net/essd-2019-210/ (DOI:
+   ;      10.5194/essd-2019-210).
    ;
    ;  VERSIONING:
    ;
@@ -240,10 +250,19 @@ FUNCTION diag_l1b2_block_cam, $
    ;  *   2019–10–24: Version 2.1.1 — Update the code to save the
    ;      histograms in a folder consistent with the rest of the L1B2
    ;      processing routines.
+   ;
+   ;  *   2020–03–25: Version 2.1.2 — Update the code to reduce the
+   ;      dimension of the data set to plot as a histogram when handling
+   ;      LM or high spatial resolution data channels; delete code
+   ;      fragments to record the locations of missing and poor values
+   ;      (due to excessive time required); update the documentation.
+   ;
+   ;  *   2020–03–30: Version 2.1.5 — Software version described in the
+   ;      preprint published in _ESSDD_ referenced above.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
-   ;  *   Copyright (C) 2017-2019 Michel M. Verstraete.
+   ;  *   Copyright (C) 2017-2020 Michel M. Verstraete.
    ;
    ;      Permission is hereby granted, free of charge, to any person
    ;      obtaining a copy of this software and associated documentation
@@ -255,7 +274,7 @@ FUNCTION diag_l1b2_block_cam, $
    ;      conditions:
    ;
    ;      1. The above copyright notice and this permission notice shall
-   ;      be included in its entirety in all copies or substantial
+   ;      be included in their entirety in all copies or substantial
    ;      portions of the Software.
    ;
    ;      2. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY
@@ -381,7 +400,7 @@ FUNCTION diag_l1b2_block_cam, $
    ;  of misr_path, misr_orbit and misr_block (used in the plots' titles and
    ;  file names:
    IF (hist_it) THEN BEGIN
-      IF (verbose GT 0) THEN PRINT, 'Readying for histograms.'
+      IF (verbose GT 2) THEN PRINT, 'Readying for histograms.'
 
       rc = path2str(misr_path, misr_path_str, DEBUG = debug, $
          EXCPT_COND = excpt_cond)
@@ -432,7 +451,7 @@ FUNCTION diag_l1b2_block_cam, $
          hist_fpath = hist_folder
       ENDIF ELSE BEGIN
          hist_fpath = root_dirs[3] + pob_str + PATH_SEP() + misr_mode + $
-            PATH_SEP() + 'L1B2' + PATH_SEP() + 'Histograms'
+            PATH_SEP() + 'L1B2' + PATH_SEP() + 'Histograms' + PATH_SEP()
       ENDELSE
       rc = force_path_sep(hist_fpath)
 
@@ -489,6 +508,7 @@ FUNCTION diag_l1b2_block_cam, $
       tagg = 'Grid_' + strstr(i)
       valg = grids[i]
       meta_data = CREATE_STRUCT(meta_data, tagg, valg)
+      IF (verbose GT 2) THEN PRINT, 'Start processing grid ' + grids[i]
 
    ;  Retrieve the names of the fields in this grid:
       status = MTK_FILE_GRID_TO_FIELDLIST(l1b2_file, grids[i], $
@@ -510,6 +530,7 @@ FUNCTION diag_l1b2_block_cam, $
          tagfn = tagg + '_Field_' + strstr(j)
          valfn = fields[j]
          meta_data = CREATE_STRUCT(meta_data, tagfn, valfn)
+         IF (verbose GT 2) THEN PRINT, 'Start processing field ' + fields[j]
 
    ;  Read the data for that grid and field:
          status = MTK_READDATA(l1b2_file, grids[i], fields[j], region, $
@@ -566,32 +587,6 @@ FUNCTION diag_l1b2_block_cam, $
             tagnbad = tagfn + '_Nbad'
             valnbad = nbad
             meta_data = CREATE_STRUCT(meta_data, tagnbad, valnbad)
-
-   ;  If there are bad pixels, record their locations:
-            IF ((verbose GT 1) AND (nbad GT 5000)) THEN $
-               PRINT, 'File ' + l1b2_file + ' contains ' + strstr(nbad) + $
-               ' bad pixels in ' + grids[i] + ' and ' + fields[j]
-            IF (nbad GT 0) THEN BEGIN
-               IF ((misr_mode EQ 'GM') AND $
-                  ((misr_camera NE 'AN') AND (misr_band NE 'Red'))) THEN BEGIN
-                  line_length = 512
-               ENDIF ELSE BEGIN
-                  line_length = 2048
-               ENDELSE
-               line_num = INTARR(nbad)
-               sample_num = INTARR(nbad)
-               FOR k = 0, nbad - 1 DO BEGIN
-                  line_num[k] = idx_bad[k] / line_length
-                  sample_num[k] = idx_bad[k] MOD line_length
-                  meta_data = CREATE_STRUCT(meta_data, 'Bad_pix_' + $
-                     misr_mode + '_' + misr_camera + '_' + misr_band + '_' + $
-                     strstr(k), 'L' + strstr(line_num[k]) + $
-                     ', S' + strstr(sample_num[k]))
-                  IF ((verbose GT 1) AND ((k MOD 5000) EQ 0)) THEN $
-                     PRINT, 'Recorded ' + strstr(k) + $
-                     ' bad pixels in the output structure.'
-               ENDFOR
-            ENDIF
 
    ;  Count the number of 'good' pixels:
             idx_gud = WHERE(databuf LT 65511, ngud)
@@ -670,32 +665,6 @@ FUNCTION diag_l1b2_block_cam, $
             tag2 = tagfn + '_RDQI2'
             val2 = nrdqi2
             meta_data = CREATE_STRUCT(meta_data, tag2, val2)
-
-   ;  If there are poor pixels, record their locations:
-            IF ((verbose GT 1) AND (nrdqi2 GT 5000)) THEN $
-               PRINT, 'File ' + l1b2_file + ' contains ' + strstr(nrdqi2) + $
-               ' poor pixels in ' + grids[i] + ' and ' + fields[j]
-            IF (nrdqi2 GT 0) THEN BEGIN
-               IF ((misr_mode EQ 'GM') AND $
-                  ((misr_camera NE 'AN') AND (misr_band NE 'Red'))) THEN BEGIN
-                  line_length = 512
-               ENDIF ELSE BEGIN
-                  line_length = 2048
-               ENDELSE
-               line_num = INTARR(nrdqi2)
-               sample_num = INTARR(nrdqi2)
-               FOR k = 0, nrdqi2 - 1 DO BEGIN
-                  line_num[k] = idx_rd2[k] / line_length
-                  sample_num[k] = idx_rd2[k] MOD line_length
-                  meta_data = CREATE_STRUCT(meta_data, 'Poor_pix_' + $
-                     misr_mode + '_' + misr_camera + '_' + misr_band + '_' + $
-                     strstr(k), 'L' + strstr(line_num[k]) + $
-                     ', S' + strstr(sample_num[k]))
-                  IF ((verbose GT 1) AND ((k MOD 5000) EQ 0)) THEN $
-                     PRINT, 'Recorded ' + strstr(k) + $
-                     ' poor pixels in the output structure.'
-               ENDFOR
-            ENDIF
 
    ;  Count the number of pixels with (RDQI = 3) in that field:
             idx_rd3 = WHERE(databuf EQ 3, nrdqi3)

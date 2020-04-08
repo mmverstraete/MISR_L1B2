@@ -82,29 +82,18 @@ FUNCTION map_l1b2, $
    ;  *   If the optional keyword parameter PER_BAND is set, black and
    ;      white maps of all 36 data Brf channels are generated.
    ;
-   ;  *   In addition, all the content of all these maps can be stretched
-   ;      to meet specific needs using one ot more of the following
-   ;      keywords:
+   ;  *   In addition, the contents of these maps can be adjusted to meet
+   ;      specific needs using one or more of the following keywords:
    ;
-   ;      -   If the optional keyword parameter SCL_RGB_MIN is set, its
-   ;          value defines the smallest Brf value recognized by the
-   ;          mapping program for the purpose of representing the blue,
-   ;          green and red data channels.
+   ;      -   The optional keyword parameters SCL_RGB_MIN and SCL_RGB_MAX
+   ;          control the stretching of the blue, green and red data
+   ;          channels onto black and white values for the purpose of
+   ;          mapping the Brf, as described below.
    ;
-   ;      -   If the optional keyword parameter SCL_RGB_MAX is set, its
-   ;          value defines the largest Brf value recognized by the
-   ;          mapping program for the purpose of representing the blue,
-   ;          green and red data channels.
-   ;
-   ;      -   If the optional keyword parameter SCL_NIR_MIN is set, its
-   ;          value defines the smallest Brf value recognized by the
-   ;          mapping program for the purpose of representing the NIR data
-   ;          channels.
-   ;
-   ;      -   If the optional keyword parameter SCL_NIR_MAX is set, its
-   ;          value defines the largest Brf value recognized by the
-   ;          mapping program for the purpose of representing the NIR data
-   ;          channels.
+   ;      -   The optional keyword parameters SCL_NIR_MIN and SCL_NIR_MAX
+   ;          control the stretching of the Near-Infrared (NIR) data
+   ;          channel onto black and white values for the purpose of
+   ;          mapping the Brf, as described below.
    ;
    ;  *   If the optional keyword parameter MAP_QUAL is set, maps of the
    ;      quality indicators of the 36 L1B2 data channels are generated.
@@ -487,12 +476,13 @@ FUNCTION map_l1b2, $
    ;
    ;  REFERENCES:
    ;
-   ;  *   Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019)
-   ;      _Improving the usability of the MISR L1B2 Georectified Radiance
-   ;      Product (2000–present) in land surface applications_,
-   ;      Earth System Science Data, Vol. xxx, p. yy–yy, available from
-   ;      https://www.earth-syst-sci-data.net/essd-2019-zz/ (DOI:
-   ;      10.5194/zzz).
+   ;  *   Michel M. Verstraete, Linda A. Hunt and Veljko M.
+   ;      Jovanovic (2019) Improving the usability of the MISR L1B2
+   ;      Georectified Radiance Product (2000–present) in land surface
+   ;      applications, _Earth System Science Data Discussions (ESSDD)_,
+   ;      Vol. 2019, p. 1–31, available from
+   ;      https://www.earth-syst-sci-data-discuss.net/essd-2019-210/ (DOI:
+   ;      10.5194/essd-2019-210).
    ;
    ;  VERSIONING:
    ;
@@ -535,10 +525,18 @@ FUNCTION map_l1b2, $
    ;  *   2019–09–28: Version 2.1.2 — Update the code to modify the
    ;      default log and map output directories, and use the current
    ;      version of the function hr2lr.pro.
+   ;
+   ;  *   2020–03–28: Version 2.1.3 — Update the code to output diagnostic
+   ;      information on the number of good, fair, poor, bad, obscured,
+   ;      edge and bad pixels in the log file, and update the
+   ;      documentation.
+   ;
+   ;  *   2020–03–30: Version 2.1.5 — Software version described in the
+   ;      preprint published in _ESSDD_ referenced above.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
-   ;  *   Copyright (C) 2017-2019 Michel M. Verstraete.
+   ;  *   Copyright (C) 2017-2020 Michel M. Verstraete.
    ;
    ;      Permission is hereby granted, free of charge, to any person
    ;      obtaining a copy of this software and associated documentation
@@ -550,7 +548,7 @@ FUNCTION map_l1b2, $
    ;      conditions:
    ;
    ;      1. The above copyright notice and this permission notice shall
-   ;      be included in its entirety in all copies or substantial
+   ;      be included in their entirety in all copies or substantial
    ;      portions of the Software.
    ;
    ;      2. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY
@@ -837,8 +835,9 @@ FUNCTION map_l1b2, $
       ENDELSE
 
       PRINTF, log_unit, 'Content: ', 'Log file created in conjunction ' + $
-         'with the generation of some or all of the following ' + $
-         strstr(nf_tot) + ' files:', FORMAT = fmt1
+         'with the generation of'
+      PRINTF, log_unit, 'some or all of the following ' + strstr(nf_tot) + $
+         ' files:', FORMAT = fmt1
       PRINTF, log_unit
 
       PRINTF, log_unit, 'Color RDQI maps: ', $
@@ -1749,11 +1748,14 @@ FUNCTION map_l1b2, $
       FOR cam = 0, n_cams - 1 DO BEGIN
 
          IF (log_it) THEN BEGIN
-            tit = 'Mapping RDQI fields of Camera ' + misr_cams[cam]
-            PRINTF, log_unit, tit
-            PRINTF, log_unit, strrepeat('-', STRLEN(tit), $
-               DEBUG = debug, EXCPT_COND = excpt_cond)
             PRINTF, log_unit
+            tit1 = 'Mapping the RDQI fields of Camera ' + misr_cams[cam]
+            tit2 = '(# of pixels in the output maps, not necessarily in ' + $
+               'the input files)'
+            PRINTF, log_unit, tit1
+            PRINTF, log_unit, tit2
+            PRINTF, log_unit, strrepeat('-', STRLEN(tit2), $
+               DEBUG = debug, EXCPT_COND = excpt_cond)
          ENDIF
 
    ;  Iterate over the 4 spectral bands:
@@ -1779,6 +1781,19 @@ FUNCTION map_l1b2, $
             IF (nedge GT 0) THEN byte_array[edge] = 4B
             bad = WHERE(radrd_array EQ 65523, nbad)
             IF (nbad GT 0) THEN byte_array[bad] = 5B
+
+   ;  Report in the log file the number of pixels in each category:
+         IF (log_it) THEN BEGIN
+            PRINTF, log_unit, 'Spectral band = ', misr_bnds[bnd], FORMAT = fmt2
+            PRINTF, log_unit, '   # good = ', strstr(ngood), FORMAT = fmt2
+            PRINTF, log_unit, '   # fair = ', strstr(nfair), FORMAT = fmt2
+            PRINTF, log_unit, '   # poor = ', strstr(npoor), FORMAT = fmt2
+            PRINTF, log_unit, '   # obsc = ', strstr(nobsc), FORMAT = fmt2
+            PRINTF, log_unit, '   # edge = ', strstr(nedge), FORMAT = fmt2
+            PRINTF, log_unit, '   # bad = ', strstr(nbad), FORMAT = fmt2
+            tot_pix = ngood + nfair + npoor + nobsc + nedge + nbad
+            PRINTF, log_unit, '   Total = ', strstr(tot_pix), FORMAT = fmt2
+         ENDIF
 
    ;  Set the name of the quality map:
             rdqi_fname = map_fname1 + $

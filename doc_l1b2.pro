@@ -5,6 +5,7 @@ PRO doc_l1b2, $
    misr_block, $
    L1B2_FOLDER = l1b2_folder, $
    L1B2_VERSION = l1b2_version, $
+   MISR_SITE = misr_site, $
    LOG_IT = log_it, $
    LOG_FOLDER = log_folder, $
    SAVE_IT = save_it, $
@@ -20,21 +21,20 @@ PRO doc_l1b2, $
    ;Sec-Doc
    ;l1b2gm_files
    ;
-   ;  PURPOSE: This program generates histograms and maps of the data
+   ;  PURPOSE: This procedure generates histograms and maps of the data
    ;  contained in the standard MISR L1B2 Georectified Radiance Product
    ;  (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance files
    ;  corresponding to the specified input positional parameters MODE,
    ;  PATH, ORBIT and BLOCK.
    ;
-   ;  ALGORITHM: This program calls the functions diag_l1b2.pro,
-   ;  map_l1b2_block.pro and map_l1b2_miss.pro to generate the histograms
-   ;  and maps of the standard MISR L1B2 Georectified Radiance Product
-   ;  (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance files
+   ;  ALGORITHM: This procedure calls the functions diag_l1b2.proand
+   ;  map_l1b2.pro to generate the required histograms and maps
    ;  corresponding to the specified input positional parameters MODE,
    ;  PATH, ORBIT and BLOCK. and BLOCK.
    ;
    ;  SYNTAX: doc_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $
    ;  L1B2_FOLDER = l1b2_folder, L1B2_VERSION = l1b2_version, $
+   ;  MISR_SITE = misr_site, $
    ;  LOG_IT = log_it, LOG_FOLDER = log_folder, $
    ;  SAVE_IT = save_it, SAVE_FOLDER = save_folder, $
    ;  HIST_IT = hist_it, HIST_FOLDER = hist_folder, $
@@ -52,6 +52,20 @@ PRO doc_l1b2, $
    ;  *   misr_block {INTEGER} [I]: The selected MISR BLOCK number.
    ;
    ;  KEYWORD PARAMETERS [INPUT/OUTPUT]:
+   ;
+   ;  *   L1B2_FOLDER = l1b2_folder {STRING} [I] (Default value: Set by
+   ;      function
+   ;      set_roots_vers.pro): The directory address of the folder
+   ;      containing the MISR L1B2 files, if they are not located in the
+   ;      default location.
+   ;
+   ;  *   L1B2_VERSION = l1b2_version {STRING} [I] (Default value: Set by
+   ;      function
+   ;      set_roots_vers.pro): The L1B2 version identifier to use instead
+   ;      of the default value.
+   ;
+   ;  *   MISR_SITE = misr_site {STRING} [I] (Default value: None: The
+   ;      official name of the Local Mode site.
    ;
    ;  *   LOG_IT = log_it {INT} [I] (Default value: 0): Flag to activate
    ;      (1) or skip (0) generating a log file.
@@ -142,6 +156,12 @@ PRO doc_l1b2, $
    ;
    ;  *   Error 140: Input argument misr_block is invalid.
    ;
+   ;  *   Error 150: Attempt to process Local Mode data while misr_site is
+   ;      an empty string.
+   ;
+   ;  *   Error 160: Attempt to process Local Mode data while misr_site is
+   ;      undefined.
+   ;
    ;  *   Error 199: An exception condition occurred in
    ;      set_roots_vers.pro.
    ;
@@ -177,6 +197,8 @@ PRO doc_l1b2, $
    ;  *   first_char.pro
    ;
    ;  *   heap_l1b2_block.pro
+   ;
+   ;  *   is_defined.pro
    ;
    ;  *   is_frompath.pro
    ;
@@ -214,12 +236,13 @@ PRO doc_l1b2, $
    ;
    ;  REFERENCES:
    ;
-   ;  *   Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019)
-   ;      _Improving the usability of the MISR L1B2 Georectified Radiance
-   ;      Product (2000–present) in land surface applications_,
-   ;      Earth System Science Data, Vol. xxx, p. yy–yy, available from
-   ;      https://www.earth-syst-sci-data.net/essd-2019-zz/ (DOI:
-   ;      10.5194/zzz).
+   ;  *   Michel M. Verstraete, Linda A. Hunt and Veljko M.
+   ;      Jovanovic (2019) Improving the usability of the MISR L1B2
+   ;      Georectified Radiance Product (2000–present) in land surface
+   ;      applications, _Earth System Science Data Discussions (ESSDD)_,
+   ;      Vol. 2019, p. 1–31, available from
+   ;      https://www.earth-syst-sci-data-discuss.net/essd-2019-210/ (DOI:
+   ;      10.5194/essd-2019-210).
    ;
    ;  VERSIONING:
    ;
@@ -273,10 +296,17 @@ PRO doc_l1b2, $
    ;      statements) and code update to call the current versions of
    ;      diag_l1b2gm.pro and diag_l1b2lm.pro, and to set the value of
    ;      prefix before calling map_l1b2.pro.
+   ;
+   ;  *   2020–03–28: Version 2.1.2 — Add the optional keyword parameter
+   ;      MISR_SITE to allow processing Local Mode data, and update the
+   ;      documentation.
+   ;
+   ;  *   2020–03–30: Version 2.1.5 — Software version described in the
+   ;      preprint published in _ESSDD_ referenced above.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
-   ;  *   Copyright (C) 2017-2019 Michel M. Verstraete.
+   ;  *   Copyright (C) 2017-2020 Michel M. Verstraete.
    ;
    ;      Permission is hereby granted, free of charge, to any person
    ;      obtaining a copy of this software and associated documentation
@@ -288,7 +318,7 @@ PRO doc_l1b2, $
    ;      conditions:
    ;
    ;      1. The above copyright notice and this permission notice shall
-   ;      be included in its entirety in all copies or substantial
+   ;      be included in their entirety in all copies or substantial
    ;      portions of the Software.
    ;
    ;      2. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY
@@ -425,6 +455,29 @@ PRO doc_l1b2, $
          PRINT, error_code
          STOP
       ENDIF
+
+   ;  Return to the calling routine with an error message if the optional
+   ;  keyword parameter MISR_SITE is empty or undefined while processing
+   ;  Local Mode data:
+      IF (misr_mode EQ 'LM') THEN BEGIN
+         IF (is_defined(misr_site)) THEN BEGIN
+            IF (misr_site EQ '') THEN BEGIN
+               error_code = 150
+               excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
+                  rout_name + ': Attempt to process Local Mode data ' + $
+                  "while misr_site = ''."
+               PRINT, error_code
+               STOP
+            ENDIF
+         ENDIF ELSE BEGIN
+            error_code = 160
+            excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $
+               rout_name + ': Attempt to process Local Mode data ' + $
+               'while misr_site is undefined.'
+            PRINT, error_code
+            STOP
+         ENDELSE
+      ENDIF
    ENDIF
 
    ;  Set the MISR specifications:
@@ -557,6 +610,16 @@ PRO doc_l1b2, $
 
    ;  Map the L1B2 data channels, using the default scaling factors:
    prefix = 'doc'
+   scl_rgb_min = 0.0
+   scl_rgb_max = 0.0
+   scl_nir_min = 0.0
+   scl_nir_max = 0.0
+   rgb_low = 1
+   rgb_high = 1
+   per_band = 1
+   map_brf = 1
+   map_qual = 1
+   per_band = 1
    rc = map_l1b2(misr_ptr, radrd_ptr, brf_ptr, rdqi_ptr, $
       prefix, N_MASKS = n_masks, $
       SCL_RGB_MIN = scl_rgb_min, SCL_RGB_MAX = scl_rgb_max, $

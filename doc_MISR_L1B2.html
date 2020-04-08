@@ -7,6 +7,21 @@
    </head>
 <body>
 <h1>Documentation for the IDL routines in project MISR_L1B2</h1>
+<ul>
+<li><p><strong>Intellectual property rights</strong></p>
+<ul>
+<li><p>Copyright (C) 2017-2020 Michel M. Verstraete.</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following three conditions:</p>
+<p>1. The above copyright notice and this permission notice shall be included in their entirety in all copies or substantial portions of the Software.</p>
+<p>2. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+<p>See: <a href="https://opensource.org/licenses/MIT" class="uri">https://opensource.org/licenses/MIT</a>.</p>
+<p>3. The current version of this Software is freely available from</p>
+<p><a href="https://github.com/mmverstraete" class="uri">https://github.com/mmverstraete</a>.</p></li>
+<li><p>Feedback</p>
+<p>Please send comments and suggestions to the author at<br />
+<a href="mailto:MMVerstraete@gmail.com">MMVerstraete@gmail.com</a></p></li>
+</ul></li>
+</ul>
 <h2>avail_l1b2</h2>
 <ul>
 <li><p><strong>Purpose:</strong> This program saves information on the availability of <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance files in either Global or Local Mode on the current computer at the time of execution.</p></li>
@@ -93,7 +108,7 @@ Generated on: MicMac2
 /Volumes/MISR_Data3/P176/L1_GM/  542G  3150  2000-02-29  2015-11-21</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -112,6 +127,7 @@ Generated on: MicMac2
 <li><p>2019&#8211;06-11: Version 2.02 &#8212; Update the code to include <code>ELSE</code> options in all <code>CASE</code> statements, add the version identifier to the output file and update the documentation.</p></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
 <li><p>2019&#8211;12&#8211;19: Version 2.1.1 &#8212; Bug fix (replace <code>RETURN</code> by <code>STOP</code> statements).</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>avail_l1b2_data</h2>
@@ -187,7 +203,7 @@ IDL&gt; PRINT, misr_l1b2_data.DIRSIZES
 671G 682G 680G 677G 657G 672G 667G</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -202,6 +218,7 @@ IDL&gt; PRINT, misr_l1b2_data.DIRSIZES
 <li><p>2019&#8211;03&#8211;20: Version 2.01 &#8212; Update the handling of the optional input keyword parameter <code>VERBOSE</code> and generate the software version consistent with the published documentation.</p></li>
 <li><p>2019&#8211;06&#8211;11: Version 2.02 &#8212; Update the documentation.</p></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>best_fits_l1b2</h2>
@@ -337,7 +354,7 @@ The log file has been saved in ~/MISR_HR/Outcomes/
    GM-P168-O001412-B111_AF_Blue.txt</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -351,6 +368,7 @@ The log file has been saved in ~/MISR_HR/Outcomes/
 <li><p>2019&#8211;06-11: Version 2.13 &#8212; Update the code to include <code>ELSE</code> options in all <code>CASE</code> statements and update the documentation.</p></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
 <li><p>2019&#8211;09&#8211;30: Version 2.1.1 &#8212; Add the optional keyword parameter <code>test_id</code> to facilitate saving the log file and the scatterplots in separate folders for testing purposes, change the definition of <code>best_land_chisqs</code>, <code>best_water_chisqs</code> and <code>best_cloud_chisqs</code> from <code>FLTARR</code> to <code>DBLARR</code> and update the code to use the current version of the function <code>hr2lr.pro</code>.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>cor_l1b2</h2>
@@ -359,7 +377,7 @@ The log file has been saved in ~/MISR_HR/Outcomes/
 <li><p><strong>Algorithm:</strong> This function relies on the <code>IDL</code> function <code>cor_l1b2_block.pro</code> to carry out the computations, and saves the numerical results in an <code>IDL</code> <code>SAVE</code> file as well as in a plain text file. If the input data are from <span class="smallcaps">Global</span> <span class="smallcaps">Mode</span> files, this function also separately computes the correlations between the 12 high spatial resolution BRF fields.</p></li>
 <li><p><strong>Syntax:</strong> <code>rc = cor_l1b2(misr_mode, misr_path, misr_orbit, misr_block, $</code><br />
 <code>L1B2_FOLDER = l1b2_folder, L1B2_VERSION = l1b2_version, $</code><br />
-<code>LOG_IT = log_it, LOG_FOLDER = log_folder, $</code><br />
+<code>MISR_SITE = misr_site, LOG_IT = log_it, LOG_FOLDER = log_folder, $</code><br />
 <code>SAVE_IT = save_it, SAVE_FOLDER = save_folder, $</code><br />
 <code>VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
 <li><p><strong>Positional parameters [Input/Output]:</strong></p>
@@ -375,6 +393,7 @@ The log file has been saved in ~/MISR_HR/Outcomes/
 <code>set_roots_vers.pro):</code> The directory address of the folder containing the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> files, if they are not located in the default location.</p></li>
 <li><p><code>L1B2_VERSION = l1b2_version {STRING} [I] (Default value:</code> Set by function<br />
 <code>set_roots_vers.pro):</code> The <span class="smallcaps">L1B2</span> version identifier to use instead of the default value.</p></li>
+<li><p><code>MISR_SITE = misr_site {STRING} [I] (Default value: None</code>: The official name of the Local Mode site.</p></li>
 <li><p><code>LOG_IT = log_it {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) generating a log file.</p></li>
 <li><p><code>LOG_FOLDER = log_folder {STRING} [I] (Default value:</code> Set by function<br />
 <code>set_roots_vers.pro):</code> The directory address of the output folder containing the processing log.</p></li>
@@ -413,6 +432,8 @@ The log file has been saved in ~/MISR_HR/Outcomes/
 <li><p>Error 134: An exception condition occurred in <code>is_frompath.pro</code>.</p></li>
 <li><p>Error 136: Unexpected return code received from <code>is_frompath.pro</code>.</p></li>
 <li><p>Error 140: Input argument <code>misr_block</code> is invalid.</p></li>
+<li><p>Error 150: Attempt to process Local Mode data while <code>misr_site</code> is an empty string.</p></li>
+<li><p>Error 160: Attempt to process Local Mode data while <code>misr_site</code> is undefined.</p></li>
 <li><p>Error 199: An exception condition occurred in <code>set_roots_vers.pro</code>.</p></li>
 <li><p>Error 200: Unrecognized <code>misr_mode</code> in a <code>CASE</code> statement.</p></li>
 <li><p>Error 210: An exception condition occurred in function <code>path2str.pro</code>.</p></li>
@@ -456,7 +477,7 @@ The log file has been saved in ~/MISR_HR/Outcomes/
 generates a log file and a save file in the default folder.</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -476,24 +497,26 @@ generates a log file and a save file in the default folder.</code></pre></li>
 <li><p>2019&#8211;06&#8211;11: Version 2.12 &#8212; Update the code to include <code>ELSE</code> options in all <code>CASE</code> statements and update the documentation.</p></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
 <li><p>2019&#8211;12&#8211;19: Version 2.1.1 &#8212; Bug fix (missing <code>ENDIF</code> statement).</p></li>
+<li><p>2020&#8211;03&#8211;24: Version 2.1.2 &#8212; Edit the code to (1) add the optional keyword parameter <code>MISR_SITE</code> to allow processing of Local Mode data and update the code to save the appropriate statistics in that case, (2) implement exception conditions 150 and 160 to check the existence of that new keyword, (3) enable all keywords in the call to <code>find_l1b2gm_files</code>, (4) save all output files in a more appropriate default folder, and (5) update the documentation.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>cor_l1b2_block</h2>
 <ul>
 <li><p><strong>Purpose:</strong> This function computes the cross-correlation statistics between the 36 data channels contained in the 9 <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) files for the given <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span> combination.</p></li>
-<li><p><strong>Algorithm:</strong> This function computes the 630 <span class="math inline">(36&#8197;&#215;&#8197;35/2)</span> cross-correlations between the input data channels at the lowest available spatial resolution (1100 m for <span class="smallcaps">GM</span> and 275 m for <span class="smallcaps">LM</span>) and the results are saved in the output structure <code>stats_lr</code>. If the input arguments are for <span class="smallcaps">GM</span> data, this function (1) relies on the <code>IDL</code> function <code>hr2lr.pro</code> to downsize the 12 high spatial resolution data channels of the specified input files to match the lower spatial resolution of the remaining 24 data channels and (2) also computes the 66 <span class="math inline">(12&#8197;&#215;&#8197;11/2)</span> cross-correlations between the high spatial resolution data channels and those resuts are saved in the output structure <code>stats_hr</code>. If the input arguments are for <span class="smallcaps">LM</span> data, this latter structure is empty. All statistical results are carried out by the <code>IDL</code> function <code>cor_arrays.pro</code>.</p></li>
+<li><p><strong>Algorithm:</strong> This function computes the 630 <span class="math inline">(36&#8197;&#215;&#8197;35/2)</span> cross-correlations between the input data channels at the coarser available spatial resolution (1100 m for <span class="smallcaps">GM</span> and 275 m for <span class="smallcaps">LM</span>) and the results are saved in the output structure <code>stats_lr</code>. If the input arguments are for <span class="smallcaps">GM</span> data, this function (1) relies on the <code>IDL</code> function <code>hr2lr.pro</code> to downsize the 12 high spatial resolution data channels of the specified input files to match the lower spatial resolution of the remaining 24 data channels and (2) also computes the 66 <span class="math inline">(12&#8197;&#215;&#8197;11/2)</span> cross-correlations between the high spatial resolution data channels and those resuts are saved in the output structure <code>stats_hr</code>. If the input arguments are for <span class="smallcaps">LM</span> data, this latter structure is empty. All statistical results are carried out by the <code>IDL</code> function <code>cor_arrays.pro</code>.</p></li>
 <li><p><strong>Syntax:</strong> <code>rc = cor_l1b2_block(l1b2_files, misr_mode, misr_path, $</code><br />
 <code>misr_orbit, misr_block, stats_lr, stats_hr, $</code><br />
 <code>VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
 <li><p><strong>Positional parameters [Input/Output]:</strong></p>
 <ul>
-<li><p><code>l1b2_files {STRING array} [I]:</code> The file specifications (path and filename) of the 9 <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GRP ToA GM radiance files.</p></li>
+<li><p><code>l1b2_files {STRING array} [I]:</code> The file specifications (path and filename) of the 9 <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GRP ToA GM radiance files to process (either GM or LM).</p></li>
 <li><p><code>misr_mode {STRING} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Mode</span>.</p></li>
 <li><p><code>misr_path {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> number.</p></li>
 <li><p><code>misr_orbit {LONG} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Orbit</span> number.</p></li>
 <li><p><code>misr_block {INTEGER} [I]:</code> The selected <span class="smallcaps">MISR</span> <span class="smallcaps">Block</span> number.</p></li>
-<li><p><code>stats_lr {STRUCTURE} [O]:</code> The cross-correlation statistics between all 36 <span class="smallcaps">MISR</span> BRF fields at low spatial resolution.</p></li>
-<li><p><code>stats_hr {STRUCTURE} [O]:</code> The cross-correlation statistics between all 12 <span class="smallcaps">MISR</span> BRF fields at high spatial resolution.</p></li>
+<li><p><code>stats_lr {STRUCTURE} [O]:</code> The cross-correlation statistics between all 36 <span class="smallcaps">MISR</span> BRF fields at the coarser spatial resolution (GM and LM data).</p></li>
+<li><p><code>stats_hr {STRUCTURE} [O]:</code> The cross-correlation statistics between all 12 <span class="smallcaps">MISR</span> BRF fields at high spatial resolution, only for GM data.</p></li>
 </ul></li>
 <li><p><strong>Keyword parameters [Input/Output]:</strong></p>
 <ul>
@@ -504,7 +527,7 @@ generates a log file and a save file in the default folder.</code></pre></li>
 <li><p><strong>Returned value type:</strong> <code>INT</code>.</p></li>
 <li><p><strong>Outcome:</strong></p>
 <ul>
-<li><p>If no exception condition has been detected, this function returns <code>0</code>, and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided in the call. The output positional parameter <code>stats_lr</code> contains the correlation statistics for the 36 data channels at the lowest spatial resolution (1100 m for <span class="smallcaps">GM</span>, 275 m for <span class="smallcaps">LM</span>). For <span class="smallcaps">GM</span> input data, the output positional parameter <code>stats_hr</code> contains the correlation statistics for the 12 data channels available at the higher spatial resolution (275 m). In the case of <span class="smallcaps">LM</span> data, this second output structure is void.</p></li>
+<li><p>If no exception condition has been detected, this function returns <code>0</code>, and the output keyword parameter <code>excpt_cond</code> is set to a null string, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided in the call. The output positional parameter <code>stats_lr</code> contains the correlation statistics for the 36 data channels at the coarser spatial resolution (1100 m for <span class="smallcaps">GM</span>, 275 m for <span class="smallcaps">LM</span>). For <span class="smallcaps">GM</span> input data, the output positional parameter <code>stats_hr</code> contains the correlation statistics for the 12 data channels available at the higher spatial resolution (275 m). In the case of <span class="smallcaps">LM</span> data, this second output structure is void.</p></li>
 <li><p>If an exception condition has been detected, this function returns a non-zero error code, and the output keyword parameter <code>excpt_cond</code> contains a message about the exception condition encountered, if the optional input keyword parameter <code>DEBUG</code> is set and if the optional output keyword parameter <code>EXCPT_COND</code> is provided. The output positional parameters <code>stats_lr</code> and <code>stats_hr</code> may be empty, incomplete or useless.</p></li>
 </ul></li>
 <li><p><strong>Exception conditions:</strong></p>
@@ -561,17 +584,16 @@ generates a log file and a save file in the default folder.</code></pre></li>
    stats_hr, VERBOSE = 0, /DEBUG, EXCPT_COND = excpt_cond)
 
 returns the statistical results in ouput arguments stats_lr and
-stats_hr. Similarly
+stats_hr.
 
 IDL&gt; rc = cor_l1b2_block(l1b2_files, &#39;LM&#39;, 168, 68050, 110, stats_lr, $
    stats_hr, VERBOSE = 0, /DEBUG, EXCPT_COND = excpt_cond)
 
 returns the statistical results in ouput arguments stats_hr, while
-stats_lr is an empty structure as there are no low spatial
-resolution data in LM.</code></pre></li>
+stats_lr is an empty structure.</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -590,6 +612,8 @@ resolution data in LM.</code></pre></li>
 <li><p>2019&#8211;06&#8211;11: Version 2.12 &#8212; Update the code to include <code>ELSE</code> options in all <code>CASE</code> statements and update the documentation.</p></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
 <li><p>2019&#8211;09&#8211;28: Version 2.1.1 &#8212; Update the code to use the current version of the function <code>hr2lr.pro</code>.</p></li>
+<li><p>2020&#8211;03&#8211;25: Version 2.1.2 &#8212; Correct the code to properly compute statistics for LM data and update the documentation.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>count_l1b2gm_miss_poor</h2>
@@ -632,8 +656,10 @@ resolution data in LM.</code></pre></li>
 <li><p>Error 200: An exception condition occurred in function <code>path2str.pro</code>.</p></li>
 <li><p>Error 210: An exception condition occurred in function <code>block2str.pro</code>.</p></li>
 <li><p>Error 299: The computer is not recognized and at least one of the optional input keyword parameters <code>l1b2gm_folder</code>, <code>out_folder</code> is not specified.</p></li>
-<li><p>Error 300: The input folder <code>l1b2_fpath</code> is unreadable.</p></li>
-<li><p>Error 310: The number of files in the folder containing <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> files is not a multiple of 9.</p></li>
+<li><p>Error 300: The input folder <code>l1b2_fpath</code> does not exist.</p></li>
+<li><p>Error 310: The input folder <code>l1b2_fpath</code> points to multiple directories.</p></li>
+<li><p>Error 320: The input folder <code>l1b2_fpath</code> is unreadable.</p></li>
+<li><p>Error 330: The number of files in the folder containing <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> files is not a multiple of 9.</p></li>
 <li><p>Error 400: The output folder <code>out_fpath</code> (output file for bad values) is unwritable.</p></li>
 <li><p>Error 410: The output folder <code>out_fpath</code> (output file for poor values) is unwritable.</p></li>
 <li><p>Error 600: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
@@ -683,7 +709,7 @@ IDL&gt; PRINT, &#39;rc = &#39; + strstr(rc)
 rc = 0</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -695,6 +721,8 @@ rc = 0</code></pre></li>
 <li><p>2019&#8211;06&#8211;11: Version 2.04 &#8212; Update the code to include <code>ELSE</code> options in all <code>CASE</code> statements and update the documentation.</p></li>
 <li><p>2019&#8211;08&#8211;10: Version 2.05 &#8212; Rename this function <code>count_l1b2gm_miss_poor.pro</code>.</p></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
+<li><p>2020&#8211;03&#8211;06: Version 2.1.1 &#8212; Update the code to handle input path names with wildcard characters.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>diag_l1b2_block_cam</h2>
@@ -746,6 +774,7 @@ rc = 0</code></pre></li>
 <li><p>Error 230: An exception condition occurred in <code>block2str.pro</code>.</p></li>
 <li><p>Error 299: The computer is not recognized and the optional input keyword parameter <code>hist_folder</code> is not specified.</p></li>
 <li><p>Error 400: The output folder <code>hist_fpath</code> is unwritable.</p></li>
+<li><p>Error 500: The array</p></li>
 <li><p>Error 600: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
 <code>MTK_SETREGION_BY_PATH_BLOCKRANGE</code>.</p></li>
 <li><p>Error 610: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
@@ -761,6 +790,7 @@ rc = 0</code></pre></li>
 <li><p><code>block2str.pro</code></p></li>
 <li><p><code>chk_misr_block.pro</code></p></li>
 <li><p><code>force_path_sep.pro</code></p></li>
+<li><p><code>hr2lr.pro</code></p></li>
 <li><p><code>is_numeric.pro</code></p></li>
 <li><p><code>is_readable_file.pro</code></p></li>
 <li><p><code>is_writable_dir.pro</code></p></li>
@@ -775,13 +805,14 @@ rc = 0</code></pre></li>
 <li><p><strong>Remarks:</strong></p>
 <ul>
 <li><p><strong>Note 1:</strong> If the optional input keyword parameter <code>hist_it</code> is set, this function generates 4 histograms, 1 for each spectral data channel of the <span class="smallcaps">L1B2</span> <span class="smallcaps">GRP</span> ToA radiance input file.</p></li>
+<li><p><strong>Note 2:</strong> All data channels available at the full native spatial resolution of the <span class="smallcaps">MISR</span> instrument are downscaled to <span class="math inline">512&#8197;&#215;&#8197;128</span> for the purpose of plotting the histograms to limit the number of points in the graph.</p></li>
 </ul></li>
 <li><p><strong>Examples:</strong></p>
 <pre><code>See the documentation for the functions
    diag_l1b2gm.pro and diag_l1b2lm.pro.</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -802,6 +833,8 @@ rc = 0</code></pre></li>
 <li><p>2019&#8211;05&#8211;04: Version 2.13 &#8212; Update the code to report the specific error message of MTK routines.</p></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
 <li><p>2019&#8211;10&#8211;24: Version 2.1.1 &#8212; Update the code to save the histograms in a folder consistent with the rest of the <span class="smallcaps">L1B2</span> processing routines.</p></li>
+<li><p>2020&#8211;03&#8211;25: Version 2.1.2 &#8212; Update the code to reduce the dimension of the data set to plot as a histogram when handling LM or high spatial resolution data channels; delete code fragments to record the locations of missing and poor values (due to excessive time required); update the documentation.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>diag_l1b2gm</h2>
@@ -917,7 +950,7 @@ results in the creation of 9 plain text files, 9 .sav files and
 36 histograms in the folder root_dirs[3] + &#39;P168-O068050-B110/GM/&#39;.</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -939,6 +972,8 @@ results in the creation of 9 plain text files, 9 .sav files and
 <li><p>2019&#8211;06&#8211;11: Version 2.14 &#8212; Update the code to include <code>ELSE</code> options in all <code>CASE</code> statements and update the documentation.</p></li>
 <li><p>2019&#8211;08&#8211;10: Version 2.15 &#8212; Make this function specific to <span class="smallcaps">GM</span> input files.</p></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
+<li><p>2020&#8211;03&#8211;25: Version 2.1.1 &#8212; Edit the code to (1) pass the optional keyword parameter <code>VERBOSE</code> to the function <code>diag_l1b2_block_cam.pro</code>, (2) save all output files in a more appropriate default folder, and (3) update the documentation.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>diag_l1b2lm</h2>
@@ -1054,7 +1089,7 @@ results in the creation of 9 plain text files, 9 .sav files and
 36 histograms in the folder root_dirs[3] + &#39;P168-O068050-B110/LM/&#39;.</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -1076,15 +1111,18 @@ results in the creation of 9 plain text files, 9 .sav files and
 <li><p>2019&#8211;06&#8211;11: Version 2.14 &#8212; Update the code to include <code>ELSE</code> options in all <code>CASE</code> statements and update the documentation.</p></li>
 <li><p>2019&#8211;08&#8211;10: Version 2.15 &#8212; Create this function using the most current version of <code>diag_l1b2.pro</code> as a template, add the <code>misr_site</code> input argument.</p></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
+<li><p>2020&#8211;03&#8211;25: Version 2.1.1 &#8212; Edit the code to (1) pass the optional keyword parameter <code>VERBOSE</code> to the function <code>diag_l1b2_block_cam.pro</code>, (2) save all output files in a more appropriate default folder, and (3) update the documentation.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>doc_l1b2</h2>
 <p>l1b2gm_files</p>
 <ul>
-<li><p><strong>Purpose:</strong> This program generates histograms and maps of the data contained in the standard <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance files corresponding to the specified input positional parameters <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span>.</p></li>
-<li><p><strong>Algorithm:</strong> This program calls the functions <code>diag_l1b2.pro</code>, <code>map_l1b2_block.pro</code> and <code>map_l1b2_miss.pro</code> to generate the histograms and maps of the standard <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance files corresponding to the specified input positional parameters <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span>. and <span class="smallcaps">Block</span>.</p></li>
+<li><p><strong>Purpose:</strong> This procedure generates histograms and maps of the data contained in the standard <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Radiance files corresponding to the specified input positional parameters <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span>.</p></li>
+<li><p><strong>Algorithm:</strong> This procedure calls the functions <code>diag_l1b2.pro</code>and <code>map_l1b2.pro</code> to generate the required histograms and maps corresponding to the specified input positional parameters <span class="smallcaps">Mode</span>, <span class="smallcaps">Path</span>, <span class="smallcaps">Orbit</span> and <span class="smallcaps">Block</span>. and <span class="smallcaps">Block</span>.</p></li>
 <li><p><strong>Syntax:</strong> <code>doc_l1b2, misr_mode, misr_path, misr_orbit, misr_block, $</code><br />
 <code>L1B2_FOLDER = l1b2_folder, L1B2_VERSION = l1b2_version, $</code><br />
+<code>MISR_SITE = misr_site, $</code><br />
 <code>LOG_IT = log_it, LOG_FOLDER = log_folder, $</code><br />
 <code>SAVE_IT = save_it, SAVE_FOLDER = save_folder, $</code><br />
 <code>HIST_IT = hist_it, HIST_FOLDER = hist_folder, $</code><br />
@@ -1099,6 +1137,11 @@ results in the creation of 9 plain text files, 9 .sav files and
 </ul></li>
 <li><p><strong>Keyword parameters [Input/Output]:</strong></p>
 <ul>
+<li><p><code>L1B2_FOLDER = l1b2_folder {STRING} [I] (Default value:</code> Set by function<br />
+<code>set_roots_vers.pro):</code> The directory address of the folder containing the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> files, if they are not located in the default location.</p></li>
+<li><p><code>L1B2_VERSION = l1b2_version {STRING} [I] (Default value:</code> Set by function<br />
+<code>set_roots_vers.pro):</code> The <span class="smallcaps">L1B2</span> version identifier to use instead of the default value.</p></li>
+<li><p><code>MISR_SITE = misr_site {STRING} [I] (Default value: None</code>: The official name of the Local Mode site.</p></li>
 <li><p><code>LOG_IT = log_it {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) generating a log file.</p></li>
 <li><p><code>LOG_FOLDER = log_folder {STRING} [I] (Default value:</code> Set by function<br />
 <code>set_roots_vers.pro):</code> The directory address of the output folder containing the processing log.</p></li>
@@ -1131,6 +1174,8 @@ results in the creation of 9 plain text files, 9 .sav files and
 <li><p>Error 134: An exception condition occurred in <code>is_frompath.pro</code>.</p></li>
 <li><p>Error 136: Unexpected return code received from <code>is_frompath.pro</code>.</p></li>
 <li><p>Error 140: Input argument <code>misr_block</code> is invalid.</p></li>
+<li><p>Error 150: Attempt to process Local Mode data while <code>misr_site</code> is an empty string.</p></li>
+<li><p>Error 160: Attempt to process Local Mode data while <code>misr_site</code> is undefined.</p></li>
 <li><p>Error 199: An exception condition occurred in <code>set_roots_vers.pro</code>.</p></li>
 <li><p>Error 200: An exception condition occurred in function <code>path2str.pro</code>.</p></li>
 <li><p>Error 210: An exception condition occurred in function <code>orbit2str.pro</code>.</p></li>
@@ -1148,6 +1193,7 @@ results in the creation of 9 plain text files, 9 .sav files and
 <li><p><code>diag_l1b2.pro</code></p></li>
 <li><p><code>first_char.pro</code></p></li>
 <li><p><code>heap_l1b2_block.pro</code></p></li>
+<li><p><code>is_defined.pro</code></p></li>
 <li><p><code>is_frompath.pro</code></p></li>
 <li><p><code>is_numeric.pro</code></p></li>
 <li><p><code>map_l1b2.pro</code></p></li>
@@ -1171,7 +1217,7 @@ results in the creation of all output files generated by the functions
 diag_l1b2, map_l1b2_block and map_l1b2_miss.</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -1191,6 +1237,8 @@ diag_l1b2, map_l1b2_block and map_l1b2_miss.</code></pre></li>
 <li><p>2019&#8211;06&#8211;11: Version 2.13 &#8212; Update the code to include <code>ELSE</code> options in all <code>CASE</code> statements and update the documentation.</p></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
 <li><p>2019&#8211;12&#8211;19: Version 2.1.1 &#8212; Bug fix (replace <code>RETURN</code> by <code>STOP</code> statements) and code update to call the current versions of <code>diag_l1b2gm.pro</code> and <code>diag_l1b2lm.pro</code>, and to set the value of <code>prefix</code> before calling <code>map_l1b2.pro</code>.</p></li>
+<li><p>2020&#8211;03&#8211;28: Version 2.1.2 &#8212; Add the optional keyword parameter <code>MISR_SITE</code> to allow processing Local Mode data, and update the documentation.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>find_l1b2gm_files</h2>
@@ -1237,10 +1285,12 @@ diag_l1b2, map_l1b2_block and map_l1b2_miss.</code></pre></li>
 <li><p>Error 210: An exception condition occurred in function <code>orbit2str.pro</code>.</p></li>
 <li><p>Error 212: An exception condition occurred in function <code>orbit2str.pro</code>.</p></li>
 <li><p>Error 299: The computer is not recognized and the optional input keyword parameter <code>l1b2gm_folder</code> is not specified.</p></li>
-<li><p>Error 300: The input folder <code>l1b2gm_fpath</code> is not a directory or not readable.</p></li>
-<li><p>Error 310: The input folder <code>l1b2gm_fpath</code> does not contain any <span class="smallcaps">L1B2</span> <span class="smallcaps">GM</span> files for selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> and <span class="smallcaps">Orbit</span>.</p></li>
-<li><p>Error 320: The input folder <code>l1b2gm_fpath</code> contains multiple <span class="smallcaps">L1B2</span> <span class="smallcaps">GM</span> files for selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> and <span class="smallcaps">Orbit</span>.</p></li>
-<li><p>Error 330: At least one of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GRP GM ToA radiance files <code>l1b2gm_files[cam]</code> in the input folder <code>l1b2gm_fpath</code> is not readable.</p></li>
+<li><p>Error 300: The input folder <code>l1b2gm_fpath</code> does not exist.</p></li>
+<li><p>Error 310: The input folder <code>l1b2gm_fpath</code> points to multiple directories.</p></li>
+<li><p>Error 320: The input folder <code>l1b2gm_fpath</code> is not a directory or not readable.</p></li>
+<li><p>Error 330: The input folder <code>l1b2gm_fpath</code> does not contain any <span class="smallcaps">L1B2</span> <span class="smallcaps">GM</span> files for selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> and <span class="smallcaps">Orbit</span>.</p></li>
+<li><p>Error 340: The input folder <code>l1b2gm_fpath</code> contains multiple <span class="smallcaps">L1B2</span> <span class="smallcaps">GM</span> files for selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> and <span class="smallcaps">Orbit</span>.</p></li>
+<li><p>Error 350: At least one of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GRP GM ToA radiance files <code>l1b2gm_files[cam]</code> in the input folder <code>l1b2gm_fpath</code> is not readable.</p></li>
 <li><p>Error 600: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
 <code>MTK_MAKE_FILENAME</code>.</p></li>
 </ul></li>
@@ -1289,7 +1339,7 @@ MISR_AM1_GRP_TERRAIN_GM_P168_O068050_DA_F03_0024.hdf
 MISR_AM1_GRP_TERRAIN_GM_P168_O068050_DF_F03_0024.hdf</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -1308,12 +1358,14 @@ MISR_AM1_GRP_TERRAIN_GM_P168_O068050_DF_F03_0024.hdf</code></pre></li>
 <li><p>2019&#8211;05&#8211;04: Version 2.11 &#8212; Update the code to report the specific error message of MTK routines.</p></li>
 <li><p>2019&#8211;06&#8211;11: Version 2.12 &#8212; Update the code to include <code>ELSE</code> options in all <code>CASE</code> statements and update the documentation.</p></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
+<li><p>2020&#8211;03&#8211;06: Version 2.1.1 &#8212; Update the code to handle input path names with wildcard characters.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>find_l1b2lm_files</h2>
 <ul>
 <li><p><strong>Purpose:</strong> This function provides the file specifications of the 9 <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Local Mode radiance files corresponding to the specified <span class="smallcaps">Path</span> and <span class="smallcaps">Orbit</span>, if they are available in the expected folder. These file specifications are provided in their native order: <code>DF</code>, <code>CF</code>, &#8230;, <code>AN</code>, &#8230;, <code>CA</code>, <code>DA</code>.</p></li>
-<li><p><strong>Algorithm:</strong> This function reports the file specifications (path + names) of the 9 <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Global Mode Radiance files for the specified <span class="smallcaps">Path</span> and <span class="smallcaps">Orbit</span> in the default or specified folder, for the default or specified version, and verifies that they are readable.</p></li>
+<li><p><strong>Algorithm:</strong> This function reports the file specifications (path + names) of the 9 <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (GRP) Terrain-Projected Top of Atmosphere (ToA) Local Mode Radiance files for the specified <span class="smallcaps">Path</span> and <span class="smallcaps">Orbit</span> in the default or specified folder, for the default or specified version, and verifies that they are readable.</p></li>
 <li><p><strong>Syntax:</strong> <code>rc = find_l1b2lm_files(misr_site, misr_path, misr_orbit, $</code><br />
 <code>l1b2lm_files, L1B2LM_FOLDER = l1b2lm_folder, $</code><br />
 <code>L1B2LM_VERSION = l1b2lm_version, $</code><br />
@@ -1355,10 +1407,12 @@ MISR_AM1_GRP_TERRAIN_GM_P168_O068050_DF_F03_0024.hdf</code></pre></li>
 <li><p>Error 210: An exception condition occurred in function <code>orbit2str.pro</code>.</p></li>
 <li><p>Error 212: An exception condition occurred in function <code>orbit2str.pro</code>.</p></li>
 <li><p>Error 299: The computer is not recognized and the optional input keyword parameter <code>l1b2lm_folder</code> is not specified.</p></li>
-<li><p>Error 300: The input folder <code>l1b2lm_fpath</code> is not a directory or not readable.</p></li>
-<li><p>Error 310: The input folder <code>l1b2lm_fpath</code> does not contain any <span class="smallcaps">L1B2</span> <span class="smallcaps">LM</span> files for selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> and <span class="smallcaps">Orbit</span>.</p></li>
-<li><p>Error 320: The input folder <code>l1b2lm_fpath</code> contains multiple <span class="smallcaps">L1B2</span> <span class="smallcaps">LM</span> files for selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> and <span class="smallcaps">Orbit</span>.</p></li>
-<li><p>Error 330: At least one of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GRP LM ToA radiance files <code>l1b2lm_files[cam]</code> in the input folder <code>l1b2lm_fpath</code> is not readable.</p></li>
+<li><p>Error 300: The input folder <code>l1b2lm_fpath</code> does not exist.</p></li>
+<li><p>Error 310: The input folder <code>l1b2lm_fpath</code> points to multiple directories.</p></li>
+<li><p>Error 320: The input folder <code>l1b2lm_fpath</code> is not a directory or not readable.</p></li>
+<li><p>Error 330: The input folder <code>l1b2lm_fpath</code> does not contain any <span class="smallcaps">L1B2</span> <span class="smallcaps">LM</span> files for selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> and <span class="smallcaps">Orbit</span>.</p></li>
+<li><p>Error 340: The input folder <code>l1b2lm_fpath</code> contains multiple <span class="smallcaps">L1B2</span> <span class="smallcaps">LM</span> files for selected <span class="smallcaps">MISR</span> <span class="smallcaps">Path</span> and <span class="smallcaps">Orbit</span>.</p></li>
+<li><p>Error 350: At least one of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GRP LM ToA radiance files <code>l1b2lm_files[cam]</code> in the input folder <code>l1b2lm_fpath</code> is not readable.</p></li>
 <li><p>Error 600: An exception condition occurred in the <span class="smallcaps">MISR</span> <span class="smallcaps">Toolkit</span> routine<br />
 <code>MTK_MAKE_FILENAME</code>.</p></li>
 </ul></li>
@@ -1409,7 +1463,7 @@ MISR_AM1_GRP_TERRAIN_LM_P168_O068050_CA_SITE_SKUKUZA_F03_0024.hdf
 MISR_AM1_GRP_TERRAIN_LM_P168_O068050_DA_SITE_SKUKUZA_F03_0024.hdf</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -1428,6 +1482,8 @@ MISR_AM1_GRP_TERRAIN_LM_P168_O068050_DA_SITE_SKUKUZA_F03_0024.hdf</code></pre></
 <li><p>2019&#8211;06&#8211;11: Version 2.11 &#8212; Update the code to include <code>ELSE</code> options in all <code>CASE</code> statements and update the documentation.</p></li>
 <li><p>2019&#8211;08&#8211;10: Version 2.12 &#8212; Create this function using <code>find_l1b2gm_files.pro</code> as a template.</p></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
+<li><p>2020&#8211;03&#8211;06: Version 2.1.1 &#8212; Update the code to handle input path names with wildcard characters.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>find_miss_l1b2gm_files</h2>
@@ -1523,7 +1579,7 @@ Number of missing files for Path 168 between
    2000-02-24T00:00:00Z and 2018-12-31T23:59:59Z is 63.</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -1532,6 +1588,8 @@ Number of missing files for Path 168 between
 <li><p>2019&#8211;06&#8211;11: Version 2.01 &#8212; Update the code to rely on the <code>IDL</code> function <code>FILE_TEST</code> rather than <code>is_writable</code>.</p></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>VERBOSE</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
 <li><p>2019&#8211;10&#8211;26: Version 2.1.1 &#8212; Improve the screen output when <code>VERBOSE</code> is set.</p></li>
+<li><p>2020&#8211;03&#8211;06: Version 2.1.2 &#8212; Update the code to use the current version of the function <code>set_l1b2gm_folder.pro</code> and to improve the readability of the log file.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>fix_l1b2</h2>
@@ -1733,7 +1791,7 @@ IDL&gt; PRINT, &#39;rc = &#39; + strstr(rc)
 rc = 0</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -1753,7 +1811,8 @@ rc = 0</code></pre></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
 <li><p>2019&#8211;09&#8211;17: Version 2.1.1 &#8212; Add the keywords <code>TEST_ID</code>, <code>FIRST_LINE</code> and <code>LAST_LINE</code> to include additional information in the map legends whenever missing data have been artificially inserted in the <span class="smallcaps">L1B2</span> data buffers.</p></li>
 <li><p>2019&#8211;09&#8211;28: Version 2.1.2 &#8212; Update the code to modify the default log, map and savefile output directories, and use the current version of the function <code>hr2lr.pro</code>.</p></li>
-<li><p>2019&#8211;10&#8211;23: Version 2.2.0 &#8212; Major rewrite of the function <code>fix_l1b2.pro</code>, breaking it up into smaller routines, including this one, and optionally replacing poor values before processing missing values.</p></li>
+<li><p>2019&#8211;10&#8211;23: Version 2.1.3 &#8212; Major rewrite of the function <code>fix_l1b2.pro</code>, breaking it up into smaller routines, including this one, and optionally replacing poor values before processing missing values.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>fix_miss_l1b2</h2>
@@ -1876,7 +1935,7 @@ rc = 0</code></pre></li>
 <pre><code>[See the outcome(s) generated by fix_l1b2.pro]</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -1896,7 +1955,8 @@ rc = 0</code></pre></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
 <li><p>2019&#8211;09&#8211;17: Version 2.1.1 &#8212; Add the keywords <code>TEST_ID</code>, <code>FIRST_LINE</code> and <code>LAST_LINE</code> to include additional information in the map legends whenever missing data have been artificially inserted in the <span class="smallcaps">L1B2</span> data buffers.</p></li>
 <li><p>2019&#8211;09&#8211;28: Version 2.1.2 &#8212; Update the code to modify the default log, map and savefile output directories, and use the current version of the function <code>hr2lr.pro</code>.</p></li>
-<li><p>2019&#8211;10&#8211;23: Version 2.2.0 &#8212; Major rewrite of the function <code>fix_l1b2.pro</code>, breaking it up into smaller routines, including this one, and optionally replacing poor values before processing missing values.</p></li>
+<li><p>2019&#8211;10&#8211;23: Version 2.1.3 &#8212; Major rewrite of the function <code>fix_l1b2.pro</code>, breaking it up into smaller routines, including this one, and optionally replacing poor values before processing missing values.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>fix_poor_l1b2</h2>
@@ -2024,7 +2084,7 @@ rc = 0</code></pre></li>
 <pre><code>[See the outcome(s) generated by fix_l1b2.pro]</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -2044,7 +2104,9 @@ rc = 0</code></pre></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
 <li><p>2019&#8211;09&#8211;17: Version 2.1.1 &#8212; Add the keywords <code>TEST_ID</code>, <code>FIRST_LINE</code> and <code>LAST_LINE</code> to include additional information in the map legends whenever missing data have been artificially inserted in the <span class="smallcaps">L1B2</span> data buffers.</p></li>
 <li><p>2019&#8211;09&#8211;28: Version 2.1.2 &#8212; Update the code to modify the default log, map and savefile output directories, and use the current version of the function <code>hr2lr.pro</code>.</p></li>
-<li><p>2019&#8211;10&#8211;23: Version 2.2.0 &#8212; Major rewrite of the function <code>fix_l1b2.pro</code>, breaking it up into smaller routines, including this one, and optionally replacing poor values before processing missing values; this version also includes the possibility of generating scatterplots of the updated versus the original <span class="smallcaps">RDQI</span> values, for each of the affected data channels.</p></li>
+<li><p>2019&#8211;10&#8211;23: Version 2.1.3 &#8212; Major rewrite of the function <code>fix_l1b2.pro</code>, breaking it up into smaller routines, including this one, and optionally replacing poor values before processing missing values; this version also includes the possibility of generating scatterplots of the updated versus the original <span class="smallcaps">RDQI</span> values, for each of the affected data channels.</p></li>
+<li><p>2020&#8211;03&#8211;05: Version 2.1.4 &#8212; Update the code to prevent computing statistics and plotting scatterplots when fewer than 5 data points are involved.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>heap_l1b2_block</h2>
@@ -2085,7 +2147,7 @@ rc = 0</code></pre></li>
 <code>set_roots_vers.pro):</code> The directory address of the folder containing the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> LM files, if they are not located in the default location.</p></li>
 <li><p><code>L1B2LM_VERSION = l1b2lm_version {STRING} [I] (Default value:</code> Set by function<br />
 <code>set_roots_vers.pro):</code> The <span class="smallcaps">L1B2</span> LM version identifier to use instead of the default value.</p></li>
-<li><p><code>MISR_SITE = misr_site {STRING} [I] (Default value: None</code>: The selected <span class="smallcaps">MISR</span> Site name.</p></li>
+<li><p><code>MISR_SITE = misr_site {STRING} [I] (Default value: None)</code>: The selected <span class="smallcaps">MISR</span> Local Mode Site name.</p></li>
 <li><p><code>TEST_ID = test_id {STRING} [I] (Default value: &#8221;):</code> Flag to activate (<code>non-empty STRING</code>) or skip (<code>empty STRING</code>) artificially introducing missing data in the L1B2 data buffer; if set, this keyword is used in output file names to label experiments.</p></li>
 <li><p><code>FIRST_LINE = first_line {INT array of 36 elements} [I] (Default value: 36 elements set to -1):</code> The index (between 0 and 127 [for GM data] or 511 [for LM data]) of the first line to be replaced by missing data, in the corresponding cameras and spectral bands. Values outside that range are ignored.</p></li>
 <li><p><code>LAST_LINE = last_line {INT array of 36 elements} [I] (Default value: 36 elements set to -1):</code> The index (between 0 and 127 [for GM data] or 511 [for LM data]) of the last line to be replaced by missing data, in the corresponding cameras and spectral bands. Values outside that range are ignored.</p></li>
@@ -2185,7 +2247,7 @@ rad_cf_nir[200, 120] = 11652</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
 <li><p>Mike Bull, Jason Matthews, Duncan McDonald, Alexander Menzies, Catherine Moroney, Kevin Mueller, Susan Paradise, Mike Smyth (2011) <em>MISR Data Products Specifications</em>, <strong>JPL D-13963</strong>, <strong>Revision S</strong>, Section 6.5.6, p. 72&#8211;73, Jet Propulsion Laboratory, California Institute of Technology, Pasadena, CA, USA.</p></li>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -2200,6 +2262,7 @@ rad_cf_nir[200, 120] = 11652</code></pre></li>
 <li><p>2019&#8211;08&#8211;10: Version 2.06 &#8212; Update this function to include a full set of input positional and keyword parameters and call the functions <code>find_l1b2gm_files.pro</code> and <code>find_l1b2lm_files.pro</code> to locate the files: This function now works for either <span class="smallcaps">GM</span> or <span class="smallcaps">LM</span> data.</p></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
 <li><p>2019&#8211;09&#8211;17: Version 2.1.1 &#8212; Add the keywords <code>TEST_ID</code>, <code>FIRST_LINE</code> and <code>LAST_LINE</code> to load on the heap <span class="smallcaps">L1B2</span> data buffers with additional missing data inserted for the purpose of testing.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>map_l1b2</h2>
@@ -2225,12 +2288,10 @@ rad_cf_nir[200, 120] = 11652</code></pre></li>
 <li><p>In Local Mode, all maps are generated at the full native spatial resolution of the sensor.</p></li>
 </ul></li>
 <li><p>If the optional keyword parameter <code>PER_BAND</code> is set, black and white maps of all 36 data Brf channels are generated.</p></li>
-<li><p>In addition, all the content of all these maps can be stretched to meet specific needs using one ot more of the following keywords:</p>
+<li><p>In addition, the contents of these maps can be adjusted to meet specific needs using one or more of the following keywords:</p>
 <ul>
-<li><p>If the optional keyword parameter <code>SCL_RGB_MIN</code> is set, its value defines the smallest Brf value recognized by the mapping program for the purpose of representing the blue, green and red data channels.</p></li>
-<li><p>If the optional keyword parameter <code>SCL_RGB_MAX</code> is set, its value defines the largest Brf value recognized by the mapping program for the purpose of representing the blue, green and red data channels.</p></li>
-<li><p>If the optional keyword parameter <code>SCL_NIR_MIN</code> is set, its value defines the smallest Brf value recognized by the mapping program for the purpose of representing the NIR data channels.</p></li>
-<li><p>If the optional keyword parameter <code>SCL_NIR_MAX</code> is set, its value defines the largest Brf value recognized by the mapping program for the purpose of representing the NIR data channels.</p></li>
+<li><p>The optional keyword parameters <code>SCL_RGB_MIN</code> and <code>SCL_RGB_MAX</code> control the stretching of the blue, green and red data channels onto black and white values for the purpose of mapping the Brf, as described below.</p></li>
+<li><p>The optional keyword parameters <code>SCL_NIR_MIN</code> and <code>SCL_NIR_MAX</code> control the stretching of the Near-Infrared (NIR) data channel onto black and white values for the purpose of mapping the Brf, as described below.</p></li>
 </ul></li>
 <li><p>If the optional keyword parameter <code>MAP_QUAL</code> is set, maps of the quality indicators of the 36 <span class="smallcaps">L1B2</span> data channels are generated. In that case, the color coding of these maps is as follows:</p>
 <ul>
@@ -2415,7 +2476,7 @@ IDL&gt; PRINT, &#39;rc = &#39; + strstr(rc)
 rc = 0</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -2428,6 +2489,8 @@ rc = 0</code></pre></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
 <li><p>2019&#8211;09&#8211;16: Version 2.1.1 &#8212; Improve the log file, update the documentation, add the keywords <code>TEST_ID</code>, <code>FIRST_LINE</code> and <code>LAST_LINE</code> to include additional information in the map legends whenever missing data have been artificially inserted in the <span class="smallcaps">L1B2</span> data buffers.</p></li>
 <li><p>2019&#8211;09&#8211;28: Version 2.1.2 &#8212; Update the code to modify the default log and map output directories, and use the current version of the function <code>hr2lr.pro</code>.</p></li>
+<li><p>2020&#8211;03&#8211;28: Version 2.1.3 &#8212; Update the code to output diagnostic information on the number of good, fair, poor, bad, obscured, edge and bad pixels in the log file, and update the documentation.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>mk_l1b2_masks</h2>
@@ -2442,6 +2505,7 @@ rc = 0</code></pre></li>
 <li><p><strong>Syntax:</strong> <code>rc = mk_l1b2_masks(misr_ptr, radrd_ptr, $</code><br />
 <code>n_masks, lwc_mask_ptr, $</code><br />
 <code>AGP_FOLDER = agp_folder, AGP_VERSION = agp_version, $</code><br />
+<code>L1B2GM_FOLDER = l1b2gm_folder, L1B2GM_VERSION = l1b2gm_version, $</code><br />
 <code>RCCM_FOLDER = rccm_folder, RCCM_VERSION = rccm_version, $</code><br />
 <code>MAP_IT = map_it, MAP_FOLDER = map_folder, $</code><br />
 <code>VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
@@ -2458,6 +2522,10 @@ rc = 0</code></pre></li>
 <code>set_roots_vers.pro):</code> The directory address of the folder containing the <span class="smallcaps">MISR</span> <span class="smallcaps">AGP</span> files, if they are not located in the default location.</p></li>
 <li><p><code>AGP_VERSION = agp_version {STRING} [I] (Default value:</code> Set by function<br />
 <code>set_roots_vers.pro):</code> The <span class="smallcaps">AGP</span> version identifier to use instead of the default value.</p></li>
+<li><p><code>L1B2GM_FOLDER = l1b2gm_folder {STRING} [I] (Default value:</code> Set by function<br />
+<code>set_roots_vers.pro):</code> The directory address of the folder containing the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> GM files, if they are not located in the default location. This keyword only needs to be provided (1) when processing Local Mode data <strong>and</strong> (2) when the L1B2 GRP data are not accessible from the default location.</p></li>
+<li><p><code>L1B2GM_VERSION = l1b2gm_version {STRING} [I] (Default value:</code> Set by function<br />
+<code>set_roots_vers.pro):</code> The <span class="smallcaps">L1B2</span> GM version identifier to use instead of the default value. This keyword only needs to be provided (1) when processing Local Mode data <strong>and</strong> (2) when the L1B2 GRP data are not accessible from the default location.</p></li>
 <li><p><code>RCCM_FOLDER = rccm_folder {STRING} [I] (Default value:</code> Set by function<br />
 <code>set_roots_vers.pro):</code> The directory address of the folder containing the <span class="smallcaps">MISR</span> <span class="smallcaps">RCCM</span> files, if they are not located in the default location.</p></li>
 <li><p><code>RCCM_VERSION = rccm_version {STRING} [I] (Default value:</code> Set by function<br />
@@ -2486,11 +2554,13 @@ rc = 0</code></pre></li>
 <li><p>Error 400: The directory <code>map_fpath</code> is unwritable.</p></li>
 <li><p>Error 500: An exception condition occurred in <code>mk_water_land_masks.pro</code>.</p></li>
 <li><p>Error 510: An exception condition occurred in <code>fix_rccm.pro</code>.</p></li>
+<li><p>Error 520: An exception condition occurred in <code>fix_rccm.pro</code>.</p></li>
 </ul></li>
 <li><p><strong>Dependencies:</strong></p>
 <ul>
 <li><p><code>fix_rccm.pro</code></p></li>
 <li><p><code>force_path_sep.pro</code></p></li>
+<li><p><code>heap_l1b2_block.pro</code></p></li>
 <li><p><code>is_array.pro</code></p></li>
 <li><p><code>is_numeric.pro</code></p></li>
 <li><p><code>is_pointer.pro</code></p></li>
@@ -2534,7 +2604,7 @@ IDL&gt; PRINT, &#39;rc = &#39;, rc, &#39; excpt_cond = &gt;&#39; + excpt_cond + 
 rc =        0 excpt_cond = &gt;&lt;</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -2548,6 +2618,8 @@ rc =        0 excpt_cond = &gt;&lt;</code></pre></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
 <li><p>2019&#8211;09&#8211;25: Version 2.1.1 &#8212; Update the code to use the latest version of <code>fix_rccm.pro</code> and to modify the default map output directory.</p></li>
 <li><p>2019&#8211;10&#8211;24: Version 2.1.2 &#8212; Update the documentation to clarify the fact that the output masks are always generated at the spatial resolution of Global Mode <span class="smallcaps">L1B2</span> databuffers. Masks for the non-red off-nadir data channels should be upscaled after calling this function when processing Local Mode data.</p></li>
+<li><p>2020&#8211;03&#8211;26: Version 2.1.3 &#8212; Update the code to generate the masks required to process Local Mode L1B2 data: this implied adding the optional keyword <code>L1B2GM_FOLDER</code> and <code>L1B2GM_VERSION</code> to the function&#8217;s parameters list, and calling the function <code>heap_l1b2_block.pro</code>; update the documentation.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>mpocv2fn_l1b2</h2>
@@ -2568,6 +2640,12 @@ rc =        0 excpt_cond = &gt;&lt;</code></pre></li>
 </ul></li>
 <li><p><strong>Keyword parameters [Input/Output]:</strong></p>
 <ul>
+<li><p><code>VERBOSE = verbose {INT} [I] (Default value: 0):</code> Flag to enable (&gt; 0) or skip (0) outputting messages on the console:</p>
+<ul>
+<li><p>If <code>verbose &gt; 0</code>, messages inform the user about progress in the execution of time-consuming routines, or the location of output files (e.g., log, map, plot, etc.);</p></li>
+<li><p>If <code>verbose &gt; 1</code>, messages record entering and exiting the routine; and</p></li>
+<li><p>If <code>verbose &gt; 2</code>, messages provide additional information about intermediary results.</p></li>
+</ul></li>
 <li><p><code>DEBUG = debug {INT} [I] (Default value: 0):</code> Flag to activate (<code>1</code>) or skip (<code>0</code>) debugging tests.</p></li>
 <li><p><code>EXCPT_COND = excpt_cond {STRING} [O] (Default value: &#8221;):</code> Description of the exception condition if one has been encountered, or a null string otherwise.</p></li>
 </ul></li>
@@ -2627,7 +2705,7 @@ l1b2_fspec = /Volumes/MISR_Data3/P168/L1_LM/
    MISR_AM1_GRP_TERRAIN_LM_P168_O068050_CF_F03_0024.hdf</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -2643,6 +2721,8 @@ l1b2_fspec = /Volumes/MISR_Data3/P168/L1_LM/
 <li><p>2019&#8211;05&#8211;04: Version 2.02 &#8212; Update the code to report the specific error message of MTK routines.</p></li>
 <li><p>2019&#8211;06&#8211;11: Version 2.03 &#8212; Update the code to include <code>ELSE</code> options in all <code>CASE</code> statements and update the documentation.</p></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
+<li><p>2020&#8211;03&#8211;26: Version 2.1.1 &#8212; Update the code to add the optional keyword parameter <code>VERBOSE</code> and update the documentation.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>plot_l1b2gm_miss</h2>
@@ -2704,13 +2784,14 @@ The semi-logarithmic time series plot has been saved in
    Num_L1B2_miss_P168-B110_2000-03-24_2018-12-23_slog.png</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
 <li><p>2019&#8211;05&#8211;01: Version 1.0 &#8212; Initial release.</p></li>
 <li><p>2019&#8211;05&#8211;06: Version 2.00 &#8212; Systematic update of all routines to implement stricter coding standards and improve documentation.</p></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>plot_l1b2gm_poor</h2>
@@ -2772,13 +2853,14 @@ The semi-logarithmic time series plot has been saved in
    Num_L1B2_poor_P168-B110_2000-03-24_2018-12-23_slog.png</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
 <li><p>2019&#8211;05&#8211;01: Version 1.0 &#8212; Initial release.</p></li>
 <li><p>2019&#8211;05&#8211;06: Version 2.00 &#8212; Systematic update of all routines to implement stricter coding standards and improve documentation.</p></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>plt_scatt_gen</h2>
@@ -2874,7 +2956,7 @@ correlation coefficient between the two data channels.</p></li>
 best_fit_l1b2.pro.]</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -2890,6 +2972,7 @@ best_fit_l1b2.pro.]</code></pre></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
 <li><p>2019&#8211;09&#8211;30: Version 2.1.1 &#8212; Update the code to include annotations in scatterplots only when they take on finite values.</p></li>
 <li><p>2019&#8211;10&#8211;24: Version 2.1.2 &#8212; Update the code to prevent a run time error when some of the optional keyword parameters are undefined.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>pre_fix_l1b2</h2>
@@ -2981,7 +3064,7 @@ best_fit_l1b2.pro.]</code></pre></li>
 <pre><code>[See the outcome(s) generated by fix_l1b2.pro]</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -3001,14 +3084,15 @@ best_fit_l1b2.pro.]</code></pre></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
 <li><p>2019&#8211;09&#8211;17: Version 2.1.1 &#8212; Add the keywords <code>TEST_ID</code>, <code>FIRST_LINE</code> and <code>LAST_LINE</code> to include additional information in the map legends whenever missing data have been artificially inserted in the <span class="smallcaps">L1B2</span> data buffers.</p></li>
 <li><p>2019&#8211;09&#8211;28: Version 2.1.2 &#8212; Update the code to modify the default log, map and savefile output directories, and use the current version of the function <code>hr2lr.pro</code>.</p></li>
-<li><p>2019&#8211;10&#8211;23: Version 2.2.0 &#8212; Major rewrite of the function <code>fix_l1b2.pro</code>, breaking it up into smaller routines, including this one; update the code to properly handle Local Mode data.</p></li>
+<li><p>2019&#8211;10&#8211;23: Version 2.1.3 &#8212; Major rewrite of the function <code>fix_l1b2.pro</code>, breaking it up into smaller routines, including this one; update the code to properly handle Local Mode data.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 <h2>set_l1b2gm_folder</h2>
 <ul>
 <li><p><strong>Purpose:</strong> This function sets the path to the folder containing the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> files for the specified <span class="smallcaps">Path</span>.</p></li>
 <li><p><strong>Algorithm:</strong> By default, this function sets the path to the folder containing the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> files according to the settings included in the function <code>set_roots_vers</code>; the optional input keyword parameter <code>l1b2gm_folder</code> overrides this setting. The function also checks that this folder is available for reading.</p></li>
-<li><p><strong>Syntax:</strong> <code>rc = set_l1b2gm_folder(misr_mode, misr_path, $</code><br />
+<li><p><strong>Syntax:</strong> <code>rc = set_l1b2gm_folder(misr_path, $</code><br />
 <code>l1b2gm_fpath, n_l1b2gm_files, $</code><br />
 <code>L1B2GM_FOLDER = l1b2gm_folder, L1B2GM_VERSION = l1b2gm_version, $</code><br />
 <code>VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)</code></p></li>
@@ -3043,8 +3127,10 @@ best_fit_l1b2.pro.]</code></pre></li>
 <li><p>Error 200: Unrecognized <code>misr_mode</code> in a <code>CASE</code> statement.</p></li>
 <li><p>Error 210: An exception condition occurred in function <code>path2str.pro</code>.</p></li>
 <li><p>Error 299: The computer is not recognized and the optional input keyword parameter <code>l1b2gm_folder</code> is not specified.</p></li>
-<li><p>Error 300: The folder <code>l1b2gm_fpath</code> is not found, is not a directory or is not readable.</p></li>
-<li><p>Error 310: The folder <code>l1b2_path</code> does not contain any <span class="smallcaps">L1B2</span> files.</p></li>
+<li><p>Error 300: The input folder <code>l1b2gm_fpath</code> does not exist.</p></li>
+<li><p>Error 310: The input folder <code>l1b2gm_fpath</code> points to multiple directories.</p></li>
+<li><p>Error 320: The folder <code>l1b2gm_fpath</code> is not found, is not a directory or is not readable.</p></li>
+<li><p>Error 330: The folder <code>l1b2_path</code> does not contain any <span class="smallcaps">L1B2</span> files.</p></li>
 </ul></li>
 <li><p><strong>Dependencies:</strong></p>
 <ul>
@@ -3081,7 +3167,7 @@ IDL&gt; PRINT, &#39;n_l1b2gm_files = &#39; + strstr(n_l1b2gm_files)
 n_l1b2gm_files = 3861</code></pre></li>
 <li><p><strong>References:</strong></p>
 <ul>
-<li><p>Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019) <em>Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications</em>, <code>Earth System Science Data</code>, Vol. xxx, p. yy&#8211;yy, available from <a href="https://www.earth-syst-sci-data.net/essd-2019-zz/" class="uri">https://www.earth-syst-sci-data.net/essd-2019-zz/</a> (DOI: 10.5194/zzz).</p></li>
+<li><p>Michel M. Verstraete, Linda A. Hunt and Veljko M. Jovanovic (2019) Improving the usability of the <span class="smallcaps">MISR</span> <span class="smallcaps">L1B2</span> Georectified Radiance Product (2000&#8211;present) in land surface applications, <em>Earth System Science Data Discussions (ESSDD)</em>, Vol. 2019, p. 1&#8211;31, available from <a href="https://www.earth-syst-sci-data-discuss.net/essd-2019-210/" class="uri">https://www.earth-syst-sci-data-discuss.net/essd-2019-210/</a> (DOI: 10.5194/essd-2019-210).</p></li>
 </ul></li>
 <li><p><strong>Versioning:</strong></p>
 <ul>
@@ -3090,6 +3176,8 @@ n_l1b2gm_files = 3861</code></pre></li>
 <li><p>2019&#8211;08&#8211;10: Version 2.01 &#8212; Rename this function from <code>set_l1b2_folder.pro</code> to <code>set_l1b2gm_folder.pro</code>.</p></li>
 <li><p>2019&#8211;08&#8211;20: Version 2.1.0 &#8212; Adopt revised coding and documentation standards (in particular regarding the use of <code>verbose</code> and the assignment of numeric return codes), and switch to 3-parts version identifiers.</p></li>
 <li><p>2019&#8211;10&#8211;27: Version 2.1.1 &#8212; Delete input positional parameter <code>misr_mode</code> since this function applies only to Global Mode files, and update the documentation.</p></li>
+<li><p>2020&#8211;03&#8211;06: Version 2.1.2 &#8212; Update the code to handle input path names with wildcard characters.</p></li>
+<li><p>2020&#8211;03&#8211;30: Version 2.1.5 &#8212; Software version described in the preprint published in <em>ESSDD</em> referenced above.</p></li>
 </ul></li>
 </ul>
 </body>

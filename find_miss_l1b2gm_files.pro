@@ -191,12 +191,13 @@ FUNCTION find_miss_l1b2gm_files, $
    ;
    ;  REFERENCES:
    ;
-   ;  *   Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019)
-   ;      _Improving the usability of the MISR L1B2 Georectified Radiance
-   ;      Product (2000–present) in land surface applications_,
-   ;      Earth System Science Data, Vol. xxx, p. yy–yy, available from
-   ;      https://www.earth-syst-sci-data.net/essd-2019-zz/ (DOI:
-   ;      10.5194/zzz).
+   ;  *   Michel M. Verstraete, Linda A. Hunt and Veljko M.
+   ;      Jovanovic (2019) Improving the usability of the MISR L1B2
+   ;      Georectified Radiance Product (2000–present) in land surface
+   ;      applications, _Earth System Science Data Discussions (ESSDD)_,
+   ;      Vol. 2019, p. 1–31, available from
+   ;      https://www.earth-syst-sci-data-discuss.net/essd-2019-210/ (DOI:
+   ;      10.5194/essd-2019-210).
    ;
    ;  VERSIONING:
    ;
@@ -215,10 +216,17 @@ FUNCTION find_miss_l1b2gm_files, $
    ;
    ;  *   2019–10–26: Version 2.1.1 — Improve the screen output when
    ;      VERBOSE is set.
+   ;
+   ;  *   2020–03–06: Version 2.1.2 — Update the code to use the current
+   ;      version of the function set_l1b2gm_folder.pro and to improve the
+   ;      readability of the log file.
+   ;
+   ;  *   2020–03–30: Version 2.1.5 — Software version described in the
+   ;      preprint published in _ESSDD_ referenced above.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
-   ;  *   Copyright (C) 2017-2019 Michel M. Verstraete.
+   ;  *   Copyright (C) 2017-2020 Michel M. Verstraete.
    ;
    ;      Permission is hereby granted, free of charge, to any person
    ;      obtaining a copy of this software and associated documentation
@@ -230,7 +238,7 @@ FUNCTION find_miss_l1b2gm_files, $
    ;      conditions:
    ;
    ;      1. The above copyright notice and this permission notice shall
-   ;      be included in its entirety in all copies or substantial
+   ;      be included in their entirety in all copies or substantial
    ;      portions of the Software.
    ;
    ;      2. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY
@@ -391,7 +399,7 @@ FUNCTION find_miss_l1b2gm_files, $
    ENDIF
 
    ;  Set the directory address of the folder containing the MISR L1B2 files:
-   rc = set_l1b2gm_folder('GM', misr_path, l1b2gm_fpath, n_l1b2gm_files, $
+   rc = set_l1b2gm_folder(misr_path, l1b2gm_fpath, n_l1b2gm_files, $
       L1B2GM_FOLDER = l1b2gm_folder, L1B2GM_VERSION = l1b2gm_version, $
       VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)
    IF (debug AND (rc NE 0)) THEN BEGIN
@@ -465,7 +473,7 @@ FUNCTION find_miss_l1b2gm_files, $
       PRINTF, log_unit, '# Orbits accomplished: ', strstr(n_orbits), $
          FORMAT = fmt1
       PRINTF, log_unit
-      PRINTF, log_unit, 'Missing files:', '', FORMAT = fmt1
+      PRINTF, log_unit, 'Missing files: ', '', FORMAT = fmt1
       PRINTF, log_unit
    ENDIF
 
@@ -475,6 +483,7 @@ FUNCTION find_miss_l1b2gm_files, $
       product = 'GRP_TERRAIN_GM'
 
    ;  Loop over the Cameras:
+      tst = 0
       FOR cam = 0, n_cams - 1 DO BEGIN
          camera = misr_cams[cam]
          status = MTK_MAKE_FILENAME(l1b2gm_fpath, product, camera, $
@@ -484,9 +493,14 @@ FUNCTION find_miss_l1b2gm_files, $
          res = is_readable_file(l1b2gm_filename)
          IF (res NE 1) THEN BEGIN
             n_miss_l1b2gm_files++
+            tst = 1
             IF (log_it) THEN PRINTF, log_unit, l1b2gm_filename
          ENDIF
       ENDFOR
+      IF (tst EQ 1) THEN BEGIN
+         PRINTF, log_unit
+         tst = 0
+      ENDIF
    ENDFOR
 
    IF (log_it) THEN BEGIN

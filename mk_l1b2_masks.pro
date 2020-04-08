@@ -5,6 +5,8 @@ FUNCTION mk_l1b2_masks, $
    lwc_mask_ptr, $
    AGP_FOLDER = agp_folder, $
    AGP_VERSION = agp_version, $
+   L1B2GM_FOLDER = l1b2gm_folder, $
+   L1B2GM_VERSION = l1b2gm_version, $
    RCCM_FOLDER = rccm_folder, $
    RCCM_VERSION = rccm_version, $
    MAP_IT = map_it, $
@@ -47,6 +49,7 @@ FUNCTION mk_l1b2_masks, $
    ;  SYNTAX: rc = mk_l1b2_masks(misr_ptr, radrd_ptr, $
    ;  n_masks, lwc_mask_ptr, $
    ;  AGP_FOLDER = agp_folder, AGP_VERSION = agp_version, $
+   ;  L1B2GM_FOLDER = l1b2gm_folder, L1B2GM_VERSION = l1b2gm_version, $
    ;  RCCM_FOLDER = rccm_folder, RCCM_VERSION = rccm_version, $
    ;  MAP_IT = map_it, MAP_FOLDER = map_folder, $
    ;  VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)
@@ -86,6 +89,21 @@ FUNCTION mk_l1b2_masks, $
    ;      function
    ;      set_roots_vers.pro): The AGP version identifier to use instead
    ;      of the default value.
+   ;
+   ;  *   L1B2GM_FOLDER = l1b2gm_folder {STRING} [I] (Default value: Set
+   ;      by function
+   ;      set_roots_vers.pro): The directory address of the folder
+   ;      containing the MISR L1B2 GM files, if they are not located in
+   ;      the default location. This keyword only needs to be provided (1)
+   ;      when processing Local Mode data AND (2) when the L1B2 GRP data
+   ;      are not accessible from the default location.
+   ;
+   ;  *   L1B2GM_VERSION = l1b2gm_version {STRING} [I] (Default value: Set
+   ;      by function
+   ;      set_roots_vers.pro): The L1B2 GM version identifier to use
+   ;      instead of the default value. This keyword only needs to be
+   ;      provided (1) when processing Local Mode data AND (2) when the
+   ;      L1B2 GRP data are not accessible from the default location.
    ;
    ;  *   RCCM_FOLDER = rccm_folder {STRING} [I] (Default value: Set by
    ;      function
@@ -164,11 +182,15 @@ FUNCTION mk_l1b2_masks, $
    ;
    ;  *   Error 510: An exception condition occurred in fix_rccm.pro.
    ;
+   ;  *   Error 520: An exception condition occurred in fix_rccm.pro.
+   ;
    ;  DEPENDENCIES:
    ;
    ;  *   fix_rccm.pro
    ;
    ;  *   force_path_sep.pro
+   ;
+   ;  *   heap_l1b2_block.pro
    ;
    ;  *   is_array.pro
    ;
@@ -242,12 +264,13 @@ FUNCTION mk_l1b2_masks, $
    ;
    ;  REFERENCES:
    ;
-   ;  *   Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019)
-   ;      _Improving the usability of the MISR L1B2 Georectified Radiance
-   ;      Product (2000–present) in land surface applications_,
-   ;      Earth System Science Data, Vol. xxx, p. yy–yy, available from
-   ;      https://www.earth-syst-sci-data.net/essd-2019-zz/ (DOI:
-   ;      10.5194/zzz).
+   ;  *   Michel M. Verstraete, Linda A. Hunt and Veljko M.
+   ;      Jovanovic (2019) Improving the usability of the MISR L1B2
+   ;      Georectified Radiance Product (2000–present) in land surface
+   ;      applications, _Earth System Science Data Discussions (ESSDD)_,
+   ;      Vol. 2019, p. 1–31, available from
+   ;      https://www.earth-syst-sci-data-discuss.net/essd-2019-210/ (DOI:
+   ;      10.5194/essd-2019-210).
    ;
    ;  VERSIONING:
    ;
@@ -286,10 +309,19 @@ FUNCTION mk_l1b2_masks, $
    ;      spatial resolution of Global Mode L1B2 databuffers. Masks for
    ;      the non-red off-nadir data channels should be upscaled after
    ;      calling this function when processing Local Mode data.
+   ;
+   ;  *   2020–03–26: Version 2.1.3 — Update the code to generate the
+   ;      masks required to process Local Mode L1B2 data: this implied
+   ;      adding the optional keyword L1B2GM_FOLDER and L1B2GM_VERSION to
+   ;      the function’s parameters list, and calling the function
+   ;      heap_l1b2_block.pro; update the documentation.
+   ;
+   ;  *   2020–03–30: Version 2.1.5 — Software version described in the
+   ;      preprint published in _ESSDD_ referenced above.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
-   ;  *   Copyright (C) 2017-2019 Michel M. Verstraete.
+   ;  *   Copyright (C) 2017-2020 Michel M. Verstraete.
    ;
    ;      Permission is hereby granted, free of charge, to any person
    ;      obtaining a copy of this software and associated documentation
@@ -301,7 +333,7 @@ FUNCTION mk_l1b2_masks, $
    ;      conditions:
    ;
    ;      1. The above copyright notice and this permission notice shall
-   ;      be included in its entirety in all copies or substantial
+   ;      be included in their entirety in all copies or substantial
    ;      portions of the Software.
    ;
    ;      2. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY
@@ -585,19 +617,50 @@ FUNCTION mk_l1b2_masks, $
 
    ;  Retrieve the upgraded RCCM:
    IF (n_masks GT 2) THEN BEGIN
-      rc = fix_rccm(misr_ptr, radrd_ptr, rccm, $
-         RCCM_FOLDER = rccm_folder, RCCM_VERSION = rccm_version, $
-         TEST_ID = test_id, FIRST_LINE = first_line, LAST_LINE = last_line, $
-         LOG_IT = log_it, LOG_FOLDER = log_folder, $
-         SAVE_IT = save_it, SAVE_FOLDER = save_folder, $
-         MAP_IT = map_it, MAP_FOLDER = map_folder, $
-         VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)
-      IF (debug AND (rc NE 0)) THEN BEGIN
-         error_code = 510
-         excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
-            ': ' + excpt_cond
-         RETURN, error_code
-      ENDIF
+
+   ;  Whenever processing Local Mode data, load the Global Mode L1B2 GRP data
+   ;  for the same Path, Orbit and Block on the heap for the purpose of
+   ;  correcting the RCCM data product:
+      IF (misr_mode EQ 'LM') THEN BEGIN
+         misr_gm_mode = 'GM'
+         rc = heap_l1b2_block(misr_gm_mode, misr_path, misr_orbit, misr_block, $
+            misr_gm_ptr, radrd_gm_ptr, rad_gm_ptr, brf_gm_ptr, rdqi_gm_ptr, $
+            scalf_gm_ptr, convf_gm_ptr, $
+            L1B2GM_FOLDER = l1b2gm_folder, L1B2GM_VERSION = l1b2gm_version, $
+            L1B2LM_FOLDER = l1b2lm_folder, L1B2LM_VERSION = l1b2lm_version, $
+            MISR_SITE = misr_site, TEST_ID = test_id, $
+            FIRST_LINE = first_line, LAST_LINE = last_line, $
+            VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)
+
+         rc = fix_rccm(misr_gm_ptr, radrd_gm_ptr, rccm, $
+            RCCM_FOLDER = rccm_folder, RCCM_VERSION = rccm_version, $
+            TEST_ID = test_id, FIRST_LINE = first_line, LAST_LINE = last_line, $
+            LOG_IT = log_it, LOG_FOLDER = log_folder, $
+            SAVE_IT = save_it, SAVE_FOLDER = save_folder, $
+            MAP_IT = map_it, MAP_FOLDER = map_folder, $
+            VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)
+         IF (debug AND (rc NE 0)) THEN BEGIN
+            error_code = 510
+            excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
+               ': ' + excpt_cond
+            RETURN, error_code
+         ENDIF
+      ENDIF ELSE BEGIN
+
+         rc = fix_rccm(misr_ptr, radrd_ptr, rccm, $
+            RCCM_FOLDER = rccm_folder, RCCM_VERSION = rccm_version, $
+            TEST_ID = test_id, FIRST_LINE = first_line, LAST_LINE = last_line, $
+            LOG_IT = log_it, LOG_FOLDER = log_folder, $
+            SAVE_IT = save_it, SAVE_FOLDER = save_folder, $
+            MAP_IT = map_it, MAP_FOLDER = map_folder, $
+            VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)
+         IF (debug AND (rc NE 0)) THEN BEGIN
+            error_code = 520
+            excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
+               ': ' + excpt_cond
+            RETURN, error_code
+         ENDIF
+      ENDELSE
 
    ;  Reset the lwc_masks to include the water bodies:
    ;  Loop over the camera files:

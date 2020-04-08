@@ -243,12 +243,13 @@ FUNCTION diag_l1b2gm, $
    ;
    ;  REFERENCES:
    ;
-   ;  *   Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019)
-   ;      _Improving the usability of the MISR L1B2 Georectified Radiance
-   ;      Product (2000–present) in land surface applications_,
-   ;      Earth System Science Data, Vol. xxx, p. yy–yy, available from
-   ;      https://www.earth-syst-sci-data.net/essd-2019-zz/ (DOI:
-   ;      10.5194/zzz).
+   ;  *   Michel M. Verstraete, Linda A. Hunt and Veljko M.
+   ;      Jovanovic (2019) Improving the usability of the MISR L1B2
+   ;      Georectified Radiance Product (2000–present) in land surface
+   ;      applications, _Earth System Science Data Discussions (ESSDD)_,
+   ;      Vol. 2019, p. 1–31, available from
+   ;      https://www.earth-syst-sci-data-discuss.net/essd-2019-210/ (DOI:
+   ;      10.5194/essd-2019-210).
    ;
    ;  VERSIONING:
    ;
@@ -307,10 +308,18 @@ FUNCTION diag_l1b2gm, $
    ;      documentation standards (in particular regarding the use of
    ;      verbose and the assignment of numeric return codes), and switch
    ;      to 3-parts version identifiers.
+   ;
+   ;  *   2020–03–25: Version 2.1.1 — Edit the code to (1) pass the
+   ;      optional keyword parameter VERBOSE to the function
+   ;      diag_l1b2_block_cam.pro, (2) save all output files in a more
+   ;      appropriate default folder, and (3) update the documentation.
+   ;
+   ;  *   2020–03–30: Version 2.1.5 — Software version described in the
+   ;      preprint published in _ESSDD_ referenced above.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
-   ;  *   Copyright (C) 2017-2019 Michel M. Verstraete.
+   ;  *   Copyright (C) 2017-2020 Michel M. Verstraete.
    ;
    ;      Permission is hereby granted, free of charge, to any person
    ;      obtaining a copy of this software and associated documentation
@@ -322,7 +331,7 @@ FUNCTION diag_l1b2gm, $
    ;      conditions:
    ;
    ;      1. The above copyright notice and this permission notice shall
-   ;      be included in its entirety in all copies or substantial
+   ;      be included in their entirety in all copies or substantial
    ;      portions of the Software.
    ;
    ;      2. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY
@@ -560,8 +569,8 @@ FUNCTION diag_l1b2gm, $
             EXCPT_COND = excpt_cond)
          log_fpath = log_folder
       ENDIF ELSE BEGIN
-         log_fpath = root_dirs[3] + pob_str + PATH_SEP() + $
-            misr_mode + PATH_SEP()
+         log_fpath = root_dirs[3] + pob_str + PATH_SEP() + misr_mode + $
+            PATH_SEP() + 'L1B2' + PATH_SEP() + 'Diagnostics' + PATH_SEP()
       ENDELSE
 
    ;  Check that the output directory 'log_fpath' exists and is writable, and
@@ -584,8 +593,8 @@ FUNCTION diag_l1b2gm, $
             EXCPT_COND = excpt_cond)
          save_fpath = save_folder
       ENDIF ELSE BEGIN
-         save_fpath = root_dirs[3] + pob_str + PATH_SEP() + $
-            misr_mode + PATH_SEP()
+         save_fpath = root_dirs[3] + pob_str + PATH_SEP() + misr_mode + $
+            PATH_SEP() + 'L1B2' + PATH_SEP() + 'Diagnostics' + PATH_SEP()
       ENDELSE
 
    ;  Check that the output directory 'save_fpath' exists and is writable, and
@@ -608,8 +617,8 @@ FUNCTION diag_l1b2gm, $
             EXCPT_COND = excpt_cond)
          hist_fpath = hist_folder
       ENDIF ELSE BEGIN
-         hist_fpath = root_dirs[3] + pob_str + PATH_SEP() + $
-            misr_mode + PATH_SEP()
+         hist_fpath = root_dirs[3] + pob_str + PATH_SEP() + misr_mode + $
+            PATH_SEP() + 'L1B2' + PATH_SEP() + 'Diagnostics' + PATH_SEP()
       ENDELSE
 
    ;  Check that the output directory 'hist_fpath' exists and is writable, and
@@ -658,9 +667,10 @@ FUNCTION diag_l1b2gm, $
          PRINTF, log_unit, 'Saved on: ', date_time, FORMAT = fmt1
          PRINTF, log_unit
 
-         PRINTF, log_unit, 'Content: Metadata for a single Block of a single'
-         PRINTF, log_unit, 'MISR L1B2 Terrain-projected Global Mode ' + $
-            '(camera) file.'
+         PRINTF, log_unit, 'Content: ', 'Metadata for a single Block of ' + $
+            'a single', FORMAT = fmt1
+         PRINTF, log_unit, '', 'MISR L1B2 Terrain-projected Global Mode ' + $
+            '(camera) file.', FORMAT = fmt1
          PRINTF, log_unit
          PRINTF, log_unit, 'MISR Mode: ', misr_mode, FORMAT = fmt1
          PRINTF, log_unit, 'MISR Path: ', strstr(misr_path), FORMAT = fmt1
@@ -675,7 +685,7 @@ FUNCTION diag_l1b2gm, $
    ;  Gather the metadata for that file:
       rc = diag_l1b2_block_cam(l1b2gm_files[i], misr_block, meta_data, $
          HIST_IT = hist_it, HIST_FOLDER = hist_fpath, $
-         DEBUG = debug, EXCPT_COND = excpt_cond)
+         VERBOSE = verbose, DEBUG = debug, EXCPT_COND = excpt_cond)
       IF (debug AND (rc NE 0)) THEN BEGIN
          error_code = 500
          excpt_cond = 'Error ' + strstr(error_code) + ' in ' + $

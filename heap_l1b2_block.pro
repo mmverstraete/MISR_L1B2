@@ -113,8 +113,8 @@ FUNCTION heap_l1b2_block, $
    ;      set_roots_vers.pro): The L1B2 LM version identifier to use
    ;      instead of the default value.
    ;
-   ;  *   MISR_SITE = misr_site {STRING} [I] (Default value: None: The
-   ;      selected MISR Site name.
+   ;  *   MISR_SITE = misr_site {STRING} [I] (Default value: None): The
+   ;      selected MISR Local Mode Site name.
    ;
    ;  *   TEST_ID = test_id {STRING} [I] (Default value: ”): Flag to
    ;      activate (non-empty STRING) or skip (empty STRING) artificially
@@ -347,12 +347,13 @@ FUNCTION heap_l1b2_block, $
    ;      REVISION S, Section 6.5.6, p. 72–73, Jet Propulsion Laboratory,
    ;      California Institute of Technology, Pasadena, CA, USA.
    ;
-   ;  *   Michel Verstraete, Linda Hunt and Veljko M. Jovanovic (2019)
-   ;      _Improving the usability of the MISR L1B2 Georectified Radiance
-   ;      Product (2000–present) in land surface applications_,
-   ;      Earth System Science Data, Vol. xxx, p. yy–yy, available from
-   ;      https://www.earth-syst-sci-data.net/essd-2019-zz/ (DOI:
-   ;      10.5194/zzz).
+   ;  *   Michel M. Verstraete, Linda A. Hunt and Veljko M.
+   ;      Jovanovic (2019) Improving the usability of the MISR L1B2
+   ;      Georectified Radiance Product (2000–present) in land surface
+   ;      applications, _Earth System Science Data Discussions (ESSDD)_,
+   ;      Vol. 2019, p. 1–31, available from
+   ;      https://www.earth-syst-sci-data-discuss.net/essd-2019-210/ (DOI:
+   ;      10.5194/essd-2019-210).
    ;
    ;  VERSIONING:
    ;
@@ -396,10 +397,13 @@ FUNCTION heap_l1b2_block, $
    ;  *   2019–09–17: Version 2.1.1 — Add the keywords TEST_ID, FIRST_LINE
    ;      and LAST_LINE to load on the heap L1B2 data buffers with
    ;      additional missing data inserted for the purpose of testing.
+   ;
+   ;  *   2020–03–30: Version 2.1.5 — Software version described in the
+   ;      preprint published in _ESSDD_ referenced above.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
-   ;  *   Copyright (C) 2017-2019 Michel M. Verstraete.
+   ;  *   Copyright (C) 2017-2020 Michel M. Verstraete.
    ;
    ;      Permission is hereby granted, free of charge, to any person
    ;      obtaining a copy of this software and associated documentation
@@ -411,7 +415,7 @@ FUNCTION heap_l1b2_block, $
    ;      conditions:
    ;
    ;      1. The above copyright notice and this permission notice shall
-   ;      be included in its entirety in all copies or substantial
+   ;      be included in their entirety in all copies or substantial
    ;      portions of the Software.
    ;
    ;      2. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY
