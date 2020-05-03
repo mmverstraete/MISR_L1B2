@@ -69,7 +69,7 @@ FUNCTION best_fits_l1b2, $
    ;      compute statistics separately for clear land masses, clear water
    ;      bodies and cloud fields.
    ;
-   ;  *   lwc_mask_ptr {POINTER array} [O]: The array of 36 (9 cameras by
+   ;  *   lwc_mask_ptr {POINTER array} [I]: The array of 36 (9 cameras by
    ;      4 spectral bands) pointers to the BYTE masks containing the
    ;      information on the spatial distribution of geophysical media to
    ;      consider, as defined by n_masks.
@@ -364,6 +364,8 @@ FUNCTION best_fits_l1b2, $
    ;
    ;  *   2020–03–30: Version 2.1.5 — Software version described in the
    ;      preprint published in _ESSDD_ referenced above.
+   ;
+   ;  *   2020–05–02: Version 2.1.6 — Update the documentation.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
@@ -442,7 +444,7 @@ FUNCTION best_fits_l1b2, $
          excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
             ': Routine must be called with ' + strstr(n_reqs) + $
             ' positional parameters: misr_ptr, rad_ptr, rdqi_ptr, ' + $
-            'target_camera, target_band, n_masks, lwc_mask, best_fits.'
+            'target_camera, target_band, n_masks, lwc_mask_ptr, best_fits.'
         RETURN, error_code
       ENDIF
 
