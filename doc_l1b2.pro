@@ -303,6 +303,9 @@ PRO doc_l1b2, $
    ;
    ;  *   2020–03–30: Version 2.1.5 — Software version described in the
    ;      preprint published in _ESSDD_ referenced above.
+   ;
+   ;  *   2020–05–02: Version 2.1.6 — Update the code to free all heap
+   ;      variables before ending the processing.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
@@ -635,6 +638,10 @@ PRO doc_l1b2, $
       READ, answ, PROMPT = 'Do you wish to continue (Y/N): '
       IF (STRUPCASE(first_char(strstr(answ))) NE 'Y') THEN STOP
    ENDIF
+
+   ;  Release the heap variables:
+   PTR_FREE, misr_ptr, radrd_ptr, rad_ptr, brf_ptr, rdqi_ptr, scalf_ptr,
+      convf_ptr
 
    IF (verbose GT 0) THEN BEGIN
       TOC, clock2
