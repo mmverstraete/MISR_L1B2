@@ -640,7 +640,7 @@ PRO doc_l1b2, $
    ENDIF
 
    ;  Release the heap variables:
-   PTR_FREE, misr_ptr, radrd_ptr, rad_ptr, brf_ptr, rdqi_ptr, scalf_ptr,
+   PTR_FREE, misr_ptr, radrd_ptr, rad_ptr, brf_ptr, rdqi_ptr, scalf_ptr, $
       convf_ptr
 
    IF (verbose GT 0) THEN BEGIN
