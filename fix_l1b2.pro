@@ -93,16 +93,16 @@ FUNCTION fix_l1b2, $
    ;      original MISR data buffers containing the FLOAT L1B2 BRF values,
    ;      in the native order (DF/Blue to DA/NIR).
    ;
-   ;  *   rdqi_ptr {POINTER array} [O]: The array of 36 pointers to the
+   ;  *   rdqi_ptr {POINTER array} [I]: The array of 36 pointers to the
    ;      original MISR data buffers containing the BYTE L1B2 RDQI values,
    ;      in the native order (DF/Blue to DA/NIR).
    ;
-   ;  *   scalf_ptr {POINTER array} [O]: The array of 36 DOUBLE scale
+   ;  *   scalf_ptr {POINTER array} [I]: The array of 36 DOUBLE scale
    ;      factors used to convert the unsigned 14-bit integer data into
    ;      radiance measurements, in units of W m^( − 2) sr^( − 1)
    ;      μm^( − 1).
    ;
-   ;  *   convf_ptr {POINTER array} [O]: The array of 36 pointers to the
+   ;  *   convf_ptr {POINTER array} [I]: The array of 36 pointers to the
    ;      data buffers containing the FLOAT conversion factor arrays to
    ;      convert radiances into bidirectional reflectance factors.
    ;
@@ -465,11 +465,14 @@ FUNCTION fix_l1b2, $
    ;         DEBUG = debug, EXCPT_COND = excpt_cond)
    ;      IDL> agp_folder = ''
    ;      IDL> agp_version = ''
+   ;      IDL> l1b2gm_folder = ''
+   ;      IDL> l1b2gm_version = ''
    ;      IDL> rccm_folder = ''
    ;      IDL> rccm_version = ''
    ;      IDL> n_masks = 3
    ;      IDL> also_poor = 0
    ;      IDL> n_attempts = 4
+   ;      IDL> test_id = ''
    ;      IDL> log_it = 1
    ;      IDL> log_folder = ''
    ;      IDL> save_it = 1
@@ -482,6 +485,8 @@ FUNCTION fix_l1b2, $
    ;      IDL> map_folder = ''
    ;      IDL> map_brf = 1
    ;      IDL> map_qual = 1
+   ;      IDL> verbose = 1
+   ;      IDL> debug = 1
    ;      IDL> rc = fix_l1b2(misr_ptr, radrd_ptr, rad_ptr, $
    ;         brf_ptr, rdqi_ptr, scalf_ptr, convf_ptr, $
    ;         fixed_misr_ptr, fixed_radrd_ptr, fixed_rad_ptr, $
@@ -492,7 +497,8 @@ FUNCTION fix_l1b2, $
    ;         RCCM_FOLDER = rccm_folder, $
    ;         RCCM_VERSION = rccm_version, $
    ;         N_MASKS = n_masks, ALSO_POOR = also_poor, $
-   ;         N_ATTEMPTS = n_attempts, $
+   ;         N_ATTEMPTS = n_attempts, TEST_ID = test_id, $
+   ;         FIRST_LINE = first_line, LAST_LINE = last_line, $
    ;         LOG_IT = log_it, LOG_FOLDER = log_folder, $
    ;         SAVE_IT = save_it, SAVE_FOLDER = save_folder, $
    ;         SCATT_IT = scatt_it, SCATT_FOLDER = scatt_folder, $
@@ -589,6 +595,11 @@ FUNCTION fix_l1b2, $
    ;
    ;  *   2020–03–30: Version 2.1.5 — Software version described in the
    ;      preprint published in _ESSDD_ referenced above.
+   ;
+   ;  *   2020–05–02: Version 2.1.6 — Update the code to free all pointers
+   ;      to heap variables that are generated in the course of the
+   ;      processing but not returned as outputs; update the
+   ;      documentation.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
@@ -1187,6 +1198,7 @@ FUNCTION fix_l1b2, $
          PRINT, 'Mapping the fixed L1B2 Brf product completed.'
          PRINT
       ENDIF
+
    ENDIF
 
    ;  Save the final result in an IDL SAVE file if requested:
@@ -1229,6 +1241,17 @@ FUNCTION fix_l1b2, $
          PRINTF, main_log_unit
       ENDIF
    ENDIF
+
+   ;  Free all pointers to heap variables that are not returned as output
+   ;  parameters:
+   PTR_FREE, lwc_mask_ptr
+   PTR_FREE, n_poor_lnd_ptr, idx_poor_lnd_ptr
+   PTR_FREE, n_poor_wat_ptr, idx_poor_wat_ptr
+   PTR_FREE, n_poor_cld_ptr, idx_poor_cld_ptr
+   PTR_FREE, n_miss_lnd_ptr, idx_miss_lnd_ptr
+   PTR_FREE, n_miss_wat_ptr, idx_miss_wat_ptr
+   PTR_FREE, n_miss_cld_ptr, idx_miss_cld_ptr
+   PTR_FREE, best_fits_ptr
 
    IF (log_it) THEN BEGIN
       CLOSE, main_log_unit
