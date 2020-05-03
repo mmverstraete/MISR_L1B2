@@ -1522,7 +1522,7 @@ FUNCTION map_l1b2, $
 
    ;  Set and save the B&W map for the red channel:
                ired = IMAGE(img, DIMENSIONS = [sz[0], sz[1]], $
-                  POSITION = [0, 0, 1, 1], /ORDER) ;, BUFFER = buffer)
+                  POSITION = [0, 0, 1, 1], /ORDER, BUFFER = buffer)
 
                ir2 = IMAGE(visbar, /CURRENT, $
                   POSITION = [0.925, 0.1, 0.975, 0.9])
