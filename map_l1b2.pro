@@ -533,6 +533,9 @@ FUNCTION map_l1b2, $
    ;
    ;  *   2020–03–30: Version 2.1.5 — Software version described in the
    ;      preprint published in _ESSDD_ referenced above.
+   ;
+   ;  *   2020–05–03: Version 2.1.6 — Update the code to close the image
+   ;      objects after they have been saved.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
@@ -601,8 +604,9 @@ FUNCTION map_l1b2, $
    IF (KEYWORD_SET(debug)) THEN debug = 1 ELSE debug = 0
    excpt_cond = ''
 
-   ;  Control the amount of output on the console during processing:
    IF (verbose GT 1) THEN PRINT, 'Entering ' + rout_name + '.'
+
+   ;  Control the amount of output on the console during processing:
    IF (verbose LT 3) THEN buffer = 1 ELSE buffer = 0
 
    IF (debug) THEN BEGIN
@@ -1136,7 +1140,7 @@ FUNCTION map_l1b2, $
 
    ;  First, generate the colorbar legends to interpret the B&W visible and
    ;  NIR maps:
-               w = WINDOW(DIMENSIONS = [100, 400], /NO_TOOLBAR, /BUFFER)
+               w = WINDOW(DIMENSIONS = [120, 400], /NO_TOOLBAR, /BUFFER)
                cb = COLORBAR(RANGE = [scl_rgb_min_eff, scl_rgb_max_eff], $
                   TITLE = 'Gray scale for L1B2 VIS spectral maps from Cam ' + $
                      misr_cams[cam], $
@@ -1155,7 +1159,7 @@ FUNCTION map_l1b2, $
                visbar = READ_PNG(l1b2_vis_cb_fspec)
                w.Close
 
-               w = WINDOW(DIMENSIONS = [100, 400], /NO_TOOLBAR, /BUFFER)
+               w = WINDOW(DIMENSIONS = [120, 400], /NO_TOOLBAR, /BUFFER)
                cbnir = COLORBAR(RANGE = [scl_nir_min_eff, scl_nir_max_eff], $
                   TITLE = 'Gray scale for L1B2 NIR spectral map from Cam ' + $
                      misr_cams[cam], $
@@ -1196,6 +1200,7 @@ FUNCTION map_l1b2, $
                   ir2 = IMAGE(visbar, /CURRENT, $
                      POSITION = [0.925, 0.1, 0.975, 0.9])
                   ibnd.Save, map_fspec
+                  ibnd.Close
 
                   IF (log_it) THEN BEGIN
                      PRINTF, log_unit, '   - Saved the B&W map for band ' + $
@@ -1252,6 +1257,7 @@ FUNCTION map_l1b2, $
                ir2 = IMAGE(nirbar, /CURRENT, $
                   POSITION = [0.925, 0.1, 0.975, 0.9])
                inir.Save, map_fspec
+               inir.Close
 
                IF (log_it) THEN BEGIN
                   PRINTF, log_unit, '   - Saved the B&W map for band ' + $
@@ -1465,7 +1471,7 @@ FUNCTION map_l1b2, $
 
    ;  First, generate the colorbar legends to interpret the B&W visible and
    ;  NIR maps:
-               w = WINDOW(DIMENSIONS = [100, 400], /NO_TOOLBAR, /BUFFER)
+               w = WINDOW(DIMENSIONS = [120, 400], /NO_TOOLBAR, /BUFFER)
                cb = COLORBAR(RANGE = [scl_rgb_min_eff, scl_rgb_max_eff], $
                   TITLE = 'Gray scale for L1B2 VIS spectral maps from Cam ' + $
                      misr_cams[cam], $
@@ -1484,7 +1490,7 @@ FUNCTION map_l1b2, $
                visbar = READ_PNG(l1b2_vis_cb_fspec)
                w.Close
 
-               w = WINDOW(DIMENSIONS = [100, 400], /NO_TOOLBAR, /BUFFER)
+               w = WINDOW(DIMENSIONS = [120, 400], /NO_TOOLBAR, /BUFFER)
                cbnir = COLORBAR(RANGE = [scl_nir_min_eff, scl_nir_max_eff], $
                   TITLE = 'Gray scale for L1B2 NIR spectral map from Cam ' + $
                      misr_cams[cam], $
@@ -1516,10 +1522,12 @@ FUNCTION map_l1b2, $
 
    ;  Set and save the B&W map for the red channel:
                ired = IMAGE(img, DIMENSIONS = [sz[0], sz[1]], $
-                  POSITION = [0, 0, 1, 1], /ORDER, BUFFER = buffer)
+                  POSITION = [0, 0, 1, 1], /ORDER) ;, BUFFER = buffer)
+
                ir2 = IMAGE(visbar, /CURRENT, $
                   POSITION = [0.925, 0.1, 0.975, 0.9])
                ired.Save, map_fspec
+               ired.Close
 
                IF (log_it) THEN BEGIN
                   PRINTF, log_unit, '   - Saved the high-resolution B&W ' + $
@@ -1577,6 +1585,7 @@ FUNCTION map_l1b2, $
                ir2 = IMAGE(visbar, /CURRENT, $
                   POSITION = [0.925, 0.1, 0.975, 0.9])
                igreen.Save, map_fspec
+               igreen.Close
 
                IF (log_it) THEN BEGIN
                   PRINTF, log_unit, '   - Saved the high-resolution B&W ' + $
@@ -1634,6 +1643,7 @@ FUNCTION map_l1b2, $
                ir2 = IMAGE(visbar, /CURRENT, $
                   POSITION = [0.925, 0.1, 0.975, 0.9])
                iblue.Save, map_fspec
+               iblue.Close
 
                IF (log_it) THEN BEGIN
                   PRINTF, log_unit, '   - Saved the high-resolution B&W ' + $
@@ -1691,6 +1701,7 @@ FUNCTION map_l1b2, $
                ir2 = IMAGE(nirbar, /CURRENT, $
                   POSITION = [0.925, 0.1, 0.975, 0.9])
                inir.Save, map_fspec
+               inir.Close
 
                IF (log_it) THEN BEGIN
                   PRINTF, log_unit, '   - Saved the high-resolution B&W ' + $
@@ -1732,8 +1743,8 @@ FUNCTION map_l1b2, $
          ENDELSE
          IF (log_it) THEN PRINTF, log_unit
 
-      ENDFOR
-   ENDIF
+      ENDFOR   ;  End of loop on cameras
+   ENDIF   ;  End of IF (map_brf)
 
    ;  === Map the L1B2 RDQI data ===============================================
 
