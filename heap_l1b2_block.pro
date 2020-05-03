@@ -210,6 +210,9 @@ FUNCTION heap_l1b2_block, $
    ;  *   Error 310: An exception condition occurred in function
    ;      find_l1b2lm_files.pro.
    ;
+   ;  *   Error 400: An exception condition occurred in function
+   ;      is_readable_file.pro.
+   ;
    ;  *   Error 500: An exception condition occurred in function
    ;      path2str.pro.
    ;
@@ -319,6 +322,11 @@ FUNCTION heap_l1b2_block, $
    ;      particular data channel is available. The fill values on the
    ;      extreme edges of the BLOCK are -444.0, as in the original data.
    ;
+   ;  *   NOTE 4: This function generates 7 pointers to variable on the
+   ;      heap (misr_ptr, radrd_ptr, rad_ptr, brf_ptr, rdqi_ptr,
+   ;      scalf_ptr, convf_ptr): Make sure the calling routine frees these
+   ;      memory allocations when those variables are not needed anymore.
+   ;
    ;  EXAMPLES:
    ;
    ;      IDL> misr_mode = 'GM'
@@ -400,6 +408,11 @@ FUNCTION heap_l1b2_block, $
    ;
    ;  *   2020–03–30: Version 2.1.5 — Software version described in the
    ;      preprint published in _ESSDD_ referenced above.
+   ;
+   ;  *   2020–05–02: Version 2.1.6 — Update the code to return an error
+   ;      code if one of the MISR L1B2 GRP input files is not found,
+   ;      whether the optional keyword parameter DEBUG is set or not;
+   ;      update the documentation.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
@@ -731,7 +744,8 @@ FUNCTION heap_l1b2_block, $
    ENDIF
 
    ;  Define the output arrays of pointers to the L1B2 data buffers to be
-   ;  placed on the heap:
+   ;  placed on the heap. Note that the following 7 statements together define
+   ;  (6 * 36) + 1 = 217 individual pointers:
    misr_ptr = PTR_NEW([misr_mode, misr_path_str, misr_orbit_str, + $
       misr_block_str, misr_version])
    radrd_ptr = PTRARR(9, 4)
@@ -743,6 +757,14 @@ FUNCTION heap_l1b2_block, $
 
    ;  Loop over the camera files:
    FOR cam = 0, n_cams - 1 DO BEGIN
+
+   ;  Check that the input file for the current camera exists and is readable:
+      IF (is_readable_file(l1b2_files[cam]) NE 1) THEN BEGIN
+         error_code = 400
+         excpt_cond = 'Error ' + strstr(error_code) + ' in ' + rout_name + $
+            ': ' + excpt_cond
+         RETURN, error_code
+      ENDIF
 
    ;  Loop over the spectral bands:
       FOR bnd = 0, n_bnds - 1 DO BEGIN
