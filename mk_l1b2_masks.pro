@@ -318,6 +318,10 @@ FUNCTION mk_l1b2_masks, $
    ;
    ;  *   2020–03–30: Version 2.1.5 — Software version described in the
    ;      preprint published in _ESSDD_ referenced above.
+   ;
+   ;  *   2020–05–01: Version 2.1.6 — Update the code to free the heap
+   ;      pointers to the GLOBAL MODE variables while processing LOCAL
+   ;      MODE data.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
@@ -645,6 +649,8 @@ FUNCTION mk_l1b2_masks, $
                ': ' + excpt_cond
             RETURN, error_code
          ENDIF
+         PTR_FREE, misr_gm_ptr, radrd_gm_ptr, rad_gm_ptr, brf_gm_ptr, $
+            rdqi_gm_ptr, scalf_gm_ptr, convf_gm_ptr
       ENDIF ELSE BEGIN
 
          rc = fix_rccm(misr_ptr, radrd_ptr, rccm, $
