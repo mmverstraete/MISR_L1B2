@@ -349,6 +349,14 @@ FUNCTION fix_miss_l1b2, $
    ;      https://www.earth-syst-sci-data-discuss.net/essd-2019-210/ (DOI:
    ;      10.5194/essd-2019-210).
    ;
+   ;  *   Michel M. Verstraete, Linda A. Hunt and Veljko M.
+   ;      Jovanovic (2020) Multi-angle Imaging SpectroRadiometer (MISR)
+   ;      L1B2 Georectified Radiance Product (2000–present) in land surface
+   ;      applications, _Earth System Science Data (ESSD)_, Vol. 12,
+   ;      p. 1321-1346, available from
+   ;      https://www.earth-syst-sci-data-discuss.net/essd-2019-210/
+   ;      (DOI: 10.5194/essd-12-1321-2020).
+   ;
    ;  VERSIONING:
    ;
    ;  *   2019–02–28: Version 0.9 — Initial release.
@@ -426,6 +434,9 @@ FUNCTION fix_miss_l1b2, $
    ;      preprint published in _ESSDD_ referenced above.
    ;
    ;  *   2020–05–02: Version 2.1.6 — Update the documentation.
+   ;
+   ;  *   2020–05–10: Version 2.1.7 — Software version described in the
+   ;      peer-reviewed paper published in _ESSD_ referenced above.
    ;Sec-Lic
    ;  INTELLECTUAL PROPERTY RIGHTS
    ;
